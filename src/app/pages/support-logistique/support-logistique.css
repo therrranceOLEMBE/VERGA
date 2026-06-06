@@ -1,0 +1,13 @@
+.support-table-wrap {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.support-table {
+  min-width: 80rem;
+}
+
+.support-action-btn {
+  white-space: nowrap;
+  text-align: left;
+}

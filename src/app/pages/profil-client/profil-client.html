@@ -1,0 +1,45 @@
+<div class="mx-auto max-w-3xl">
+ <div class="mb-8">
+ <h1 class="text-2xl font-bold text-gray-900">{{ 'clientBackoffice.profile.title' | translate }}</h1>
+ <p class="mt-2 text-sm text-verga-muted">{{ 'clientBackoffice.profile.subtitle' | translate }}</p>
+ </div>
+
+ <form class="space-y-6 border border-verga-border bg-white p-4 sm:p-8" (ngSubmit)="onSubmit($event)">
+ <div class="flex flex-col items-start gap-4 border-b border-verga-border pb-6 sm:flex-row sm:items-center">
+ <span class="flex h-16 w-16 items-center justify-center bg-verga-primary text-xl font-bold text-white">{{ initials }}</span>
+ <div>
+ <p class="font-bold text-gray-900">{{ firstName }} {{ lastName }}</p>
+ <p class="text-sm text-verga-muted">{{ 'clientBackoffice.profile.accountType' | translate }}</p>
+ </div>
+ </div>
+
+ <div class="grid gap-5 sm:grid-cols-2">
+ <div>
+ <label for="client-first-name" class="block text-sm font-medium text-gray-700">{{ 'auth.signup.firstName' | translate }}</label>
+ <input id="client-first-name" name="firstName" type="text" [(ngModel)]="firstName" class="verga-field mt-2" />
+ </div>
+ <div>
+ <label for="client-last-name" class="block text-sm font-medium text-gray-700">{{ 'auth.signup.lastName' | translate }}</label>
+ <input id="client-last-name" name="lastName" type="text" [(ngModel)]="lastName" class="verga-field mt-2" />
+ </div>
+ </div>
+
+ <div class="grid gap-5 sm:grid-cols-2">
+ <div>
+ <label for="client-email" class="block text-sm font-medium text-gray-700">{{ 'backoffice.profile.email' | translate }}</label>
+ <input id="client-email" name="email" type="email" [(ngModel)]="email" class="verga-field mt-2" />
+ </div>
+ <div>
+ <label for="client-phone" class="block text-sm font-medium text-gray-700">{{ 'backoffice.profile.phone' | translate }}</label>
+ <input id="client-phone" name="phone" type="tel" [(ngModel)]="phone" class="verga-field mt-2" />
+ </div>
+ </div>
+
+ <div>
+ <label for="client-address" class="block text-sm font-medium text-gray-700">{{ 'auth.signup.address' | translate }}</label>
+ <input id="client-address" name="address" type="text" [(ngModel)]="address" class="verga-field mt-2" />
+ </div>
+
+ <button type="submit" class="verga-btn !w-auto px-8">{{ 'clientBackoffice.profile.save' | translate }}</button>
+ </form>
+</div>

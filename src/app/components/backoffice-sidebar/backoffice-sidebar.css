@@ -1,0 +1,16 @@
+.backoffice-sidebar {
+  height: 100vh;
+  height: 100dvh;
+  scrollbar-width: thin;
+  transition: transform 0.25s ease;
+}
+
+@media (max-width: 1023px) {
+  .backoffice-sidebar {
+    transform: translateX(-100%);
+  }
+
+  .backoffice-sidebar.is-open {
+    transform: translateX(0);
+  }
+}

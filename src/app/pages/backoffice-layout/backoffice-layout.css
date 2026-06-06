@@ -1,0 +1,20 @@
+.backoffice-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.backoffice-main {
+  margin-left: 0;
+  width: 100%;
+}
+
+@media (min-width: 1024px) {
+  .backoffice-main {
+    margin-left: 18rem;
+    width: calc(100% - 18rem);
+  }
+}
+
+.backoffice-overlay {
+  -webkit-tap-highlight-color: transparent;
+}

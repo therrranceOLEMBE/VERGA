@@ -1,0 +1,9 @@
+.offer-poster-blur {
+  filter: blur(28px);
+  transform: scale(1.15);
+  opacity: 0.55;
+}
+
+.offer-poster-main {
+  box-shadow: 0 12px 40px rgb(30 41 59 / 0.18);
+}

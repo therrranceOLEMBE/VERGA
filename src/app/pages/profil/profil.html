@@ -1,0 +1,44 @@
+<div class="mx-auto max-w-3xl">
+ <div class="mb-8">
+ <h1 class="text-2xl font-bold text-gray-900">{{ 'backoffice.profile.title' | translate }}</h1>
+ <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.profile.subtitle' | translate }}</p>
+ </div>
+
+ <form class="space-y-6 border border-verga-border bg-white p-4 sm:p-8" (ngSubmit)="onSubmit($event)">
+ <div class="flex flex-col items-start gap-4 border-b border-verga-border pb-6 sm:flex-row sm:items-center">
+ <span class="flex h-16 w-16 items-center justify-center bg-verga-primary text-xl font-bold text-white">TE</span>
+ <div>
+ <p class="font-bold text-gray-900">{{ companyName }}</p>
+ <p class="text-sm text-verga-muted">{{ 'backoffice.profile.accountType' | translate }} : {{ accountType }}</p>
+ </div>
+ </div>
+
+ <div>
+ <label for="profile-company" class="block text-sm font-medium text-gray-700">{{ 'backoffice.profile.companyName' | translate }}</label>
+ <input id="profile-company" name="companyName" type="text" [(ngModel)]="companyName" class="verga-field mt-2" />
+ </div>
+
+ <div class="grid gap-5 sm:grid-cols-2">
+ <div>
+ <label for="profile-email" class="block text-sm font-medium text-gray-700">{{ 'backoffice.profile.email' | translate }}</label>
+ <input id="profile-email" name="email" type="email" [(ngModel)]="email" class="verga-field mt-2" />
+ </div>
+ <div>
+ <label for="profile-phone" class="block text-sm font-medium text-gray-700">{{ 'backoffice.profile.phone' | translate }}</label>
+ <input id="profile-phone" name="phone" type="tel" [(ngModel)]="phone" class="verga-field mt-2" />
+ </div>
+ </div>
+
+ <div>
+ <label for="profile-address" class="block text-sm font-medium text-gray-700">{{ 'backoffice.profile.address' | translate }}</label>
+ <input id="profile-address" name="address" type="text" [(ngModel)]="address" class="verga-field mt-2" />
+ </div>
+
+ <div>
+ <label for="profile-description" class="block text-sm font-medium text-gray-700">{{ 'backoffice.profile.description' | translate }}</label>
+ <textarea id="profile-description" name="description" rows="4" [(ngModel)]="description" class="verga-field mt-2 resize-y"></textarea>
+ </div>
+
+ <button type="submit" class="verga-btn !w-auto px-8">{{ 'backoffice.profile.save' | translate }}</button>
+ </form>
+</div>

@@ -1,0 +1,190 @@
+<div class="mx-auto max-w-[1600px]">
+ <div class="mb-8">
+ <h1 class="text-2xl font-bold text-gray-900">{{ 'backoffice.transactions.title' | translate }}</h1>
+ <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.transactions.subtitle' | translate }}</p>
+ </div>
+
+ <section class="mb-6 border border-verga-border bg-white p-5 sm:p-6">
+ <h2 class="text-sm font-bold uppercase tracking-wide text-gray-900">{{ 'backoffice.transactions.filters' | translate }}</h2>
+ <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+ <div>
+ <label for="filter-name" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.transactions.filterName' | translate }}</label>
+ <input id="filter-name" type="text" [ngModel]="filterName()" (ngModelChange)="filterName.set($event); onFilterChange()" class="verga-field mt-1.5" [placeholder]="'backoffice.transactions.filterNamePh' | translate" />
+ </div>
+ <div>
+ <label for="filter-code" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.transactions.filterCode' | translate }}</label>
+ <input id="filter-code" type="text" [ngModel]="filterCode()" (ngModelChange)="filterCode.set($event); onFilterChange()" class="verga-field mt-1.5" placeholder="TRX-2026-..." />
+ </div>
+ <div>
+ <label for="filter-status" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.transactions.colStatus' | translate }}</label>
+ <select id="filter-status" [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event); onFilterChange()" class="verga-field mt-1.5 appearance-none bg-white">
+ @for (opt of statusOptions; track opt.value) {
+ <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
+ }
+ </select>
+ </div>
+ <div>
+ <label for="filter-date" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.transactions.filterDate' | translate }}</label>
+ <input id="filter-date" type="date" [ngModel]="filterDate()" (ngModelChange)="filterDate.set($event); onFilterChange()" class="verga-field mt-1.5" />
+ </div>
+ <div>
+ <label for="filter-year" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.transactions.filterYear' | translate }}</label>
+ <select id="filter-year" [ngModel]="filterYear()" (ngModelChange)="filterYear.set($event); onFilterChange()" class="verga-field mt-1.5 appearance-none bg-white">
+ <option value="">{{ 'backoffice.transactions.allYears' | translate }}</option>
+ @for (y of yearOptions; track y) {
+ @if (y) {
+ <option [value]="y">{{ y }}</option>
+ }
+ }
+ </select>
+ </div>
+ </div>
+ <div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+ <button type="button" (click)="resetFilters()" class="self-start text-sm font-semibold text-verga-primary hover:underline">
+ {{ 'backoffice.transactions.reset' | translate }}
+ </button>
+
+ <div class="flex flex-col items-start gap-2 sm:items-end">
+ <p class="text-xs text-verga-muted">{{ 'backoffice.transactions.exportHint' | translate:{ count: filteredTransactions().length } }}</p>
+ <div class="flex flex-wrap items-center gap-2">
+ <span class="text-xs font-semibold uppercase tracking-wide text-verga-muted">{{ 'backoffice.transactions.export' | translate }}</span>
+ <button
+ type="button"
+ (click)="exportExcel()"
+ [disabled]="filteredTransactions().length === 0"
+ class="transactions-export-btn border border-verga-border bg-white px-3 py-2 text-xs font-semibold uppercase text-verga-primary transition hover:bg-verga-primary-muted disabled:cursor-not-allowed disabled:opacity-40"
+ >
+ {{ 'backoffice.transactions.exportExcel' | translate }}
+ </button>
+ <button
+ type="button"
+ (click)="exportPdf()"
+ [disabled]="filteredTransactions().length === 0"
+ class="transactions-export-btn border border-verga-border bg-white px-3 py-2 text-xs font-semibold uppercase text-verga-primary transition hover:bg-verga-primary-muted disabled:cursor-not-allowed disabled:opacity-40"
+ >
+ {{ 'backoffice.transactions.exportPdf' | translate }}
+ </button>
+ <button
+ type="button"
+ (click)="exportCsv()"
+ [disabled]="filteredTransactions().length === 0"
+ class="transactions-export-btn border border-verga-border bg-white px-3 py-2 text-xs font-semibold uppercase text-verga-primary transition hover:bg-verga-primary-muted disabled:cursor-not-allowed disabled:opacity-40"
+ >
+ {{ 'backoffice.transactions.exportCsv' | translate }}
+ </button>
+ </div>
+ </div>
+ </div>
+ </section>
+
+ <div class="transactions-table-wrap overflow-x-auto border border-verga-border bg-white">
+ <table class="transactions-table min-w-full text-left text-sm">
+ <thead class="border-b border-verga-border bg-verga-surface text-xs font-semibold uppercase tracking-wide text-verga-muted">
+ <tr>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.transactions.colCode' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.transactions.colName' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.transactions.colEmail' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.transactions.colPhone' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.transactions.colDeparture' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.transactions.colArrival' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.transactions.colKilos' | translate }}</th>
+ <th class="min-w-[12rem] px-3 py-3 sm:px-4">{{ 'backoffice.transactions.colPackageDescription' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.transactions.colDate' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.transactions.colYear' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.transactions.colAmount' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.transactions.colDeposited' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.transactions.colArrived' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.transactions.colPickedUp' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.transactions.colStatus' | translate }}</th>
+ </tr>
+ </thead>
+ <tbody class="divide-y divide-verga-border">
+ @for (tx of displayedTransactions(); track tx.id) {
+ <tr class="hover:bg-verga-primary-muted/30">
+ <td class="whitespace-nowrap px-3 py-3 font-mono text-xs font-semibold text-verga-primary sm:px-4">{{ tx.code }}</td>
+ <td class="whitespace-nowrap px-3 py-3 font-medium text-gray-900 sm:px-4">{{ tx.name }}</td>
+ <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ tx.email }}</td>
+ <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ tx.phone }}</td>
+ <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ tx.departureCountry }}</td>
+ <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ tx.arrivalCountry }}</td>
+ <td class="whitespace-nowrap px-3 py-3 font-medium text-gray-900 sm:px-4">{{ tx.kilos }} kg</td>
+ <td class="max-w-xs px-3 py-3 text-gray-600 sm:px-4" [attr.title]="tx.packageDescription">{{ tx.packageDescription }}</td>
+ <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ tx.date }}</td>
+ <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ tx.year }}</td>
+ <td class="whitespace-nowrap px-3 py-3 font-semibold text-gray-900 sm:px-4">{{ tx.amount }}</td>
+ <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ yesNoKey(tx.depositedAtAgency) | translate }}</td>
+ <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ yesNoKey(tx.arrivedInDestination) | translate }}</td>
+ <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ yesNoKey(tx.pickedUpByClient) | translate }}</td>
+ <td class="whitespace-nowrap px-3 py-3 sm:px-4">
+ <span
+ class="inline-block px-2.5 py-1 text-xs font-semibold uppercase"
+ [class.bg-verga-success-muted]="tx.status === 'achete'"
+ [class.text-verga-success]="tx.status === 'achete'"
+ [class.bg-verga-primary-muted]="tx.status === 'reserve'"
+ [class.text-verga-primary]="tx.status === 'reserve'"
+ [class.bg-verga-surface]="tx.status === 'annule'"
+ [class.text-verga-muted]="tx.status === 'annule'"
+ >
+ {{ statusKey(tx.status) | translate }}
+ </span>
+ </td>
+ </tr>
+ } @empty {
+ <tr>
+ <td colspan="15" class="px-4 py-10 text-center text-sm text-verga-muted">{{ 'backoffice.transactions.empty' | translate }}</td>
+ </tr>
+ }
+ </tbody>
+ </table>
+ </div>
+
+ @if (filteredTransactions().length > 0) {
+ <div class="mt-6 flex flex-col items-center gap-4">
+ <nav class="flex flex-wrap items-center justify-center gap-1" [attr.aria-label]="'aria.navigation' | translate">
+ <button
+ type="button"
+ (click)="previousPage()"
+ [disabled]="currentPage() === 1"
+ class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
+ [attr.aria-label]="'aria.prevPage' | translate"
+ >
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+ </svg>
+ </button>
+
+ @for (page of pageNumbers(); track page) {
+ <button
+ type="button"
+ (click)="goToPage(page)"
+ class="flex h-9 min-w-9 items-center justify-center px-2 text-sm font-medium transition"
+ [class.bg-verga-primary]="currentPage() === page"
+ [class.text-white]="currentPage() === page"
+ [class.border]="currentPage() !== page"
+ [class.border-verga-border]="currentPage() !== page"
+ [class.bg-white]="currentPage() !== page"
+ [class.text-verga-primary]="currentPage() !== page"
+ [class.hover:bg-verga-primary/10]="currentPage() !== page"
+ [attr.aria-current]="currentPage() === page ? 'page' : null"
+ >
+ {{ page }}
+ </button>
+ }
+
+ <button
+ type="button"
+ (click)="nextPage()"
+ [disabled]="currentPage() === totalPages()"
+ class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
+ [attr.aria-label]="'aria.nextPage' | translate"
+ >
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
+ </svg>
+ </button>
+ </nav>
+
+ <p class="text-center text-sm text-gray-600">{{ resultsLabel() }}</p>
+ </div>
+ }
+</div>

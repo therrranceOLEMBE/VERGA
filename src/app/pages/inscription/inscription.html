@@ -1,0 +1,252 @@
+<div
+ class="inscription-page min-h-screen flex items-center justify-center bg-verga-surface p-4 font-sans sm:p-6 lg:p-10"
+>
+ <div
+ class="flex w-full max-w-[1200px] min-h-[520px] flex-col overflow-hidden md:flex-row"
+ >
+ <div
+ class="relative hidden md:block md:w-1/2 bg-white overflow-hidden shrink-0"
+ aria-hidden="true"
+ >
+ <img
+ src="/images/logo_verga.jpeg"
+ [attr.alt]="'common.logoAlt' | translate"
+ class="absolute inset-0 h-full w-full object-contain object-center p-8 pointer-events-none select-none"
+ />
+ </div>
+
+ <div class="flex w-full flex-col bg-white px-8 py-8 sm:px-10 sm:py-10 md:w-1/2">
+ <h1 class="text-center text-3xl font-semibold text-gray-900 tracking-tight">{{ 'auth.signup.title' | translate }}</h1>
+
+ <div class="mt-6 grid grid-cols-2 border border-verga-border" role="tablist" [attr.aria-label]="'auth.signup.formSwitcher' | translate">
+ <button
+ type="button"
+ role="tab"
+ [attr.aria-selected]="formType() === 'entreprise'"
+ class="inscription-tab px-4 py-3 text-sm font-semibold transition"
+ [class.is-active]="formType() === 'entreprise'"
+ (click)="setFormType('entreprise')"
+ >
+ {{ 'auth.signup.tabCompany' | translate }}
+ </button>
+ <button
+ type="button"
+ role="tab"
+ [attr.aria-selected]="formType() === 'particulier'"
+ class="inscription-tab px-4 py-3 text-sm font-semibold transition"
+ [class.is-active]="formType() === 'particulier'"
+ (click)="setFormType('particulier')"
+ >
+ {{ 'auth.signup.tabIndividual' | translate }}
+ </button>
+ </div>
+
+ <p class="mt-4 text-center text-sm text-verga-muted">
+ @if (formType() === 'entreprise') {
+ {{ 'auth.signup.companySubtitle' | translate }}
+ } @else {
+ {{ 'auth.signup.individualSubtitle' | translate }}
+ }
+ </p>
+
+ <form class="mt-6 flex flex-col flex-1" (ngSubmit)="onSubmit($event)">
+ <div class="space-y-5">
+ @if (formType() === 'entreprise') {
+ <div>
+ <label for="inscription-company-scope" class="block text-sm text-gray-700">
+ {{ 'auth.signup.companyScope' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <select
+ id="inscription-company-scope"
+ name="companyScope"
+ required
+ [(ngModel)]="companyScope"
+ class="verga-field mt-2 appearance-none bg-white"
+ >
+ @for (opt of companyScopeOptions; track opt.value) {
+ <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
+ }
+ </select>
+ </div>
+
+ <div>
+ <label for="inscription-company-name" class="block text-sm text-gray-700">
+ {{ 'auth.signup.companyName' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <input
+ id="inscription-company-name"
+ name="companyName"
+ type="text"
+ autocomplete="organization"
+ required
+ [(ngModel)]="companyName"
+ class="verga-field mt-2"
+ />
+ </div>
+
+ <div>
+ <label for="inscription-company-email" class="block text-sm text-gray-700">
+ {{ 'auth.email' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <input
+ id="inscription-company-email"
+ name="email"
+ type="email"
+ autocomplete="email"
+ required
+ [(ngModel)]="email"
+ class="verga-field mt-2"
+ />
+ </div>
+
+ <div>
+ <label for="inscription-company-phone" class="block text-sm text-gray-700">
+ {{ 'auth.signup.phone' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <input
+ id="inscription-company-phone"
+ name="phone"
+ type="tel"
+ autocomplete="tel"
+ required
+ [(ngModel)]="phone"
+ class="verga-field mt-2"
+ />
+ </div>
+
+ <div>
+ <label for="inscription-company-address" class="block text-sm text-gray-700">
+ {{ 'auth.signup.address' | translate }}
+ </label>
+ <input
+ id="inscription-company-address"
+ name="address"
+ type="text"
+ autocomplete="street-address"
+ [(ngModel)]="address"
+ class="verga-field mt-2"
+ />
+ </div>
+ } @else {
+ <div class="grid gap-5 sm:grid-cols-2">
+ <div>
+ <label for="inscription-first-name" class="block text-sm text-gray-700">
+ {{ 'auth.signup.firstName' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <input
+ id="inscription-first-name"
+ name="firstName"
+ type="text"
+ autocomplete="given-name"
+ required
+ [(ngModel)]="firstName"
+ class="verga-field mt-2"
+ />
+ </div>
+ <div>
+ <label for="inscription-last-name" class="block text-sm text-gray-700">
+ {{ 'auth.signup.lastName' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <input
+ id="inscription-last-name"
+ name="lastName"
+ type="text"
+ autocomplete="family-name"
+ required
+ [(ngModel)]="lastName"
+ class="verga-field mt-2"
+ />
+ </div>
+ </div>
+
+ <div>
+ <label for="inscription-individual-email" class="block text-sm text-gray-700">
+ {{ 'auth.email' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <input
+ id="inscription-individual-email"
+ name="email"
+ type="email"
+ autocomplete="email"
+ required
+ [(ngModel)]="email"
+ class="verga-field mt-2"
+ />
+ </div>
+
+ <div>
+ <label for="inscription-individual-phone" class="block text-sm text-gray-700">
+ {{ 'auth.signup.phone' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <input
+ id="inscription-individual-phone"
+ name="phone"
+ type="tel"
+ autocomplete="tel"
+ required
+ [(ngModel)]="phone"
+ class="verga-field mt-2"
+ />
+ </div>
+ }
+
+ <div>
+ <label for="inscription-password" class="block text-sm text-gray-700">
+ {{ 'auth.password' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <div class="relative mt-2">
+ <input
+ id="inscription-password"
+ name="password"
+ [type]="showPassword() ? 'text' : 'password'"
+ autocomplete="new-password"
+ required
+ minlength="8"
+ [(ngModel)]="password"
+ class="verga-field pr-12"
+ />
+ <button
+ type="button"
+ (click)="togglePassword()"
+ class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-gray-700"
+ [attr.aria-label]="(showPassword() ? 'aria.hidePassword' : 'aria.showPassword') | translate"
+ >
+ @if (showPassword()) {
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+ </svg>
+ } @else {
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+ <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+ </svg>
+ }
+ </button>
+ </div>
+ <p class="mt-2 text-sm text-gray-500">{{ 'auth.passwordHint' | translate }}</p>
+ </div>
+ </div>
+
+ <p class="mt-5 text-sm text-gray-600 leading-relaxed">
+ {{ 'auth.legalPrefix' | translate }}
+ <a href="#" class="verga-link underline">{{ 'auth.privacy' | translate }}</a>
+ {{ 'auth.and' | translate }}
+ <a href="#" class="verga-link underline">{{ 'auth.terms' | translate }}</a>.
+ </p>
+
+ <button type="submit" class="verga-btn mt-6">
+ @if (formType() === 'entreprise') {
+ {{ 'auth.signup.submitCompany' | translate }}
+ } @else {
+ {{ 'auth.signup.submitIndividual' | translate }}
+ }
+ </button>
+
+ <p class="mt-auto pt-10 text-center text-sm text-gray-700">
+ {{ 'auth.signup.hasAccount' | translate }}
+ <a routerLink="/connexion" class="verga-link font-medium hover:underline">{{ 'auth.signup.loginLink' | translate }}</a>
+ </p>
+ </form>
+ </div>
+ </div>
+</div>

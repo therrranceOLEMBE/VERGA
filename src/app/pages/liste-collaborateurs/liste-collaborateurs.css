@@ -1,0 +1,8 @@
+.collaborator-table-wrap {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.collaborator-table {
+  min-width: 56rem;
+}

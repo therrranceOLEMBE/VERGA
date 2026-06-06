@@ -1,0 +1,12 @@
+.transactions-table-wrap {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.transactions-table {
+  min-width: 72rem;
+}
+
+.transactions-export-btn {
+  min-width: 4.5rem;
+}

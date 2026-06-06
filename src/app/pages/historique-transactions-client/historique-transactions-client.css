@@ -1,0 +1,65 @@
+.client-transactions-table-wrap {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.client-transactions-table {
+  min-width: 44rem;
+  table-layout: fixed;
+}
+
+.client-transactions-table th,
+.client-transactions-table td {
+  vertical-align: middle;
+}
+
+.client-col-code {
+  width: 10rem;
+}
+
+.client-col-date {
+  width: 7.5rem;
+}
+
+.client-col-route {
+  width: 14rem;
+}
+
+.client-col-description {
+  width: auto;
+}
+
+.client-col-quantity {
+  width: 6rem;
+}
+
+.client-col-amount {
+  width: 9.5rem;
+}
+
+.client-description-cell {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+@media (max-width: 639px) {
+  .client-transactions-table {
+    min-width: 36rem;
+  }
+
+  .client-col-code {
+    width: 8.5rem;
+  }
+
+  .client-col-route {
+    width: 11rem;
+  }
+
+  .client-col-amount {
+    width: 8rem;
+  }
+}

@@ -1,0 +1,36 @@
+<div class="backoffice-shell min-h-screen bg-verga-surface font-sans">
+ @if (sidebarOpen()) {
+ <button
+ type="button"
+ class="backoffice-overlay fixed inset-0 z-30 bg-black/40 lg:hidden"
+ (click)="closeSidebar()"
+ [attr.aria-label]="'aria.close' | translate"
+ ></button>
+ }
+
+ <app-backoffice-sidebar [open]="sidebarOpen()" (navigate)="closeSidebar()" />
+
+ <div class="backoffice-main flex min-h-screen min-h-dvh flex-col">
+ <header class="backoffice-mobile-bar sticky top-0 z-20 flex items-center gap-3 border-b border-verga-border bg-white px-4 py-3 lg:hidden">
+ <button
+ type="button"
+ class="flex h-10 w-10 shrink-0 items-center justify-center border border-verga-border text-verga-primary transition hover:bg-verga-primary-muted"
+ (click)="toggleSidebar()"
+ [attr.aria-label]="'aria.openMenu' | translate"
+ [attr.aria-expanded]="sidebarOpen()"
+ >
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+ </svg>
+ </button>
+ <a routerLink="/accueil" class="inline-flex min-w-0 items-baseline leading-none">
+ <span class="truncate text-lg font-bold tracking-tight text-verga-primary">VERGA</span>
+ <span class="ml-0.5 text-xs font-semibold text-verga-primary-light">.com</span>
+ </a>
+ </header>
+
+ <main class="min-h-0 flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-8">
+ <router-outlet />
+ </main>
+ </div>
+</div>

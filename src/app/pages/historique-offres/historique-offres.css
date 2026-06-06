@@ -1,0 +1,17 @@
+.offer-history-table-wrap {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.offer-history-table {
+  min-width: 82rem;
+}
+
+.offer-action-btn {
+  white-space: nowrap;
+}
+
+.offer-modal-backdrop {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}

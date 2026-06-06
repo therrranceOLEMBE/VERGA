@@ -1,0 +1,81 @@
+<div class="mx-auto max-w-3xl">
+ <div class="mb-8">
+ <h1 class="text-2xl font-bold text-gray-900">{{ 'backoffice.createCollaborator.title' | translate }}</h1>
+ <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.createCollaborator.subtitle' | translate }}</p>
+ </div>
+
+ <form class="space-y-6 border border-verga-border bg-white p-4 sm:p-8" (ngSubmit)="onSubmit($event)">
+ <div class="grid gap-5 sm:grid-cols-2">
+ <div>
+ <label for="collab-firstname" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createCollaborator.firstName' | translate }} *</label>
+ <input id="collab-firstname" name="firstName" type="text" required [(ngModel)]="firstName" class="verga-field mt-2" />
+ </div>
+ <div>
+ <label for="collab-lastname" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createCollaborator.lastName' | translate }} *</label>
+ <input id="collab-lastname" name="lastName" type="text" required [(ngModel)]="lastName" class="verga-field mt-2" />
+ </div>
+ </div>
+
+ <div class="grid gap-5 sm:grid-cols-2">
+ <div>
+ <label for="collab-email" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createCollaborator.email' | translate }} *</label>
+ <input id="collab-email" name="email" type="email" required [(ngModel)]="email" class="verga-field mt-2" />
+ </div>
+ <div>
+ <label for="collab-phone" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createCollaborator.phone' | translate }} *</label>
+ <input id="collab-phone" name="phone" type="tel" required [(ngModel)]="phone" class="verga-field mt-2" />
+ </div>
+ </div>
+
+ <div>
+ <label for="collab-role" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createCollaborator.role' | translate }}</label>
+ <input id="collab-role" name="role" type="text" readonly [value]="'backoffice.createCollaborator.roleSupport' | translate" class="verga-field mt-2 bg-verga-surface text-gray-700" />
+ </div>
+
+ <div class="grid gap-5 sm:grid-cols-2">
+ <div>
+ <label for="collab-password" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createCollaborator.password' | translate }} *</label>
+ <div class="relative mt-2">
+ <input
+ id="collab-password"
+ name="password"
+ [type]="showPassword() ? 'text' : 'password'"
+ required
+ minlength="8"
+ [(ngModel)]="password"
+ class="verga-field pr-12"
+ />
+ <button type="button" (click)="togglePassword()" class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-gray-700" [attr.aria-label]="(showPassword() ? 'aria.hidePassword' : 'aria.showPassword') | translate">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+ <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+ </svg>
+ </button>
+ </div>
+ <p class="mt-2 text-sm text-gray-500">{{ 'auth.passwordHint' | translate }}</p>
+ </div>
+ <div>
+ <label for="collab-confirm" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createCollaborator.confirmPassword' | translate }} *</label>
+ <div class="relative mt-2">
+ <input
+ id="collab-confirm"
+ name="confirmPassword"
+ [type]="showConfirm() ? 'text' : 'password'"
+ required
+ minlength="8"
+ [(ngModel)]="confirmPassword"
+ class="verga-field pr-12"
+ />
+ <button type="button" (click)="toggleConfirm()" class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-gray-700" [attr.aria-label]="(showConfirm() ? 'aria.hidePassword' : 'aria.showPassword') | translate">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+ <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+ </svg>
+ </button>
+ </div>
+ </div>
+ </div>
+
+ <button type="submit" class="verga-btn !w-auto px-8">{{ 'backoffice.createCollaborator.submit' | translate }}</button>
+ </form>
+</div>

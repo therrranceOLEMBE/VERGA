@@ -1,0 +1,71 @@
+<div
+ class="fixed inset-0 z-[60] flex items-start justify-center bg-black/40 px-4 pt-16 pb-8 sm:items-center sm:pt-8"
+ role="dialog"
+ aria-modal="true"
+ [attr.aria-labelledby]="'offer-booking-title'"
+ (click)="onBackdropClick($event)"
+>
+ <div class="w-full max-w-lg border border-verga-border bg-white shadow-lg" (click)="$event.stopPropagation()">
+ <div class="flex items-start justify-between border-b border-verga-border px-6 py-4">
+ <div>
+ <h2 id="offer-booking-title" class="text-lg font-semibold text-gray-900">{{ titleKey() | translate }}</h2>
+ <p class="mt-1 text-sm text-verga-muted">{{ offer().title }}</p>
+ </div>
+ <button type="button" class="text-verga-muted transition hover:text-verga-ink" [attr.aria-label]="'aria.close' | translate" (click)="close()">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-6 w-6">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+ </svg>
+ </button>
+ </div>
+
+ @if (submittedSuccess()) {
+ <div class="px-6 py-10 text-center">
+ <p class="text-sm font-semibold text-verga-success">{{ 'offerBooking.success' | translate }}</p>
+ </div>
+ } @else {
+ <form class="space-y-4 px-6 py-6" (ngSubmit)="onSubmit($event)">
+ <div>
+ <label for="booking-full-name" class="block text-sm text-gray-700">{{ 'offerBooking.fullName' | translate }} <span class="text-verga-primary">*</span></label>
+ <input id="booking-full-name" name="fullName" type="text" autocomplete="name" required [(ngModel)]="fullName" class="verga-field mt-2" />
+ </div>
+
+ @if (isKiloOffer()) {
+ <div>
+ <label for="booking-kilos" class="block text-sm text-gray-700">{{ 'offerBooking.kilos' | translate }} <span class="text-verga-primary">*</span></label>
+ <input id="booking-kilos" name="kilos" type="number" min="1" step="1" required [(ngModel)]="kilos" class="verga-field mt-2" placeholder="Ex. 25" />
+ </div>
+ }
+
+ @if (isCubicMeterOffer()) {
+ <div>
+ <label for="booking-cubic-meters" class="block text-sm text-gray-700">{{ 'offerBooking.cubicMeters' | translate }} <span class="text-verga-primary">*</span></label>
+ <input id="booking-cubic-meters" name="cubicMeters" type="number" min="0.1" step="0.1" required [(ngModel)]="cubicMeters" class="verga-field mt-2" placeholder="Ex. 2.5" />
+ </div>
+ }
+
+ @if (isContainerOffer()) {
+ <p class="border border-verga-border bg-verga-surface px-4 py-3 text-sm text-verga-muted">{{ 'offerBooking.containerHint' | translate }}</p>
+ }
+
+ <div>
+ <label for="booking-email" class="block text-sm text-gray-700">{{ 'auth.email' | translate }} <span class="text-verga-primary">*</span></label>
+ <input id="booking-email" name="email" type="email" autocomplete="email" required [(ngModel)]="email" class="verga-field mt-2" />
+ </div>
+
+ <div>
+ <label for="booking-phone" class="block text-sm text-gray-700">{{ 'auth.signup.phone' | translate }} <span class="text-verga-primary">*</span></label>
+ <input id="booking-phone" name="phone" type="tel" autocomplete="tel" required [(ngModel)]="phone" class="verga-field mt-2" />
+ </div>
+
+ <div class="flex flex-wrap justify-end gap-3 border-t border-verga-border pt-4">
+ <button type="button" class="border border-verga-border px-5 py-2.5 text-sm font-semibold text-verga-ink transition hover:bg-verga-surface" (click)="close()">
+ {{ 'offerBooking.cancel' | translate }}
+ </button>
+ <button type="submit" class="verga-btn !w-auto px-6 py-2.5 text-sm">
+ {{ submitKey() | translate }}
+ </button>
+ </div>
+ </form>
+ }
+ </div>
+</div>

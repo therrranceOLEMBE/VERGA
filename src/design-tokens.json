@@ -1,0 +1,21 @@
+{
+  "brand": {
+    "primary": "#5EADD6",
+    "primaryDark": "#3D94C4",
+    "primaryLight": "#87CEEB",
+    "primaryMuted": "#EBF6FC"
+  },
+  "neutral": {
+    "ink": "#1E293B",
+    "muted": "#64748B",
+    "border": "#E2E8F0",
+    "surface": "#F8FAFC",
+    "white": "#FFFFFF"
+  },
+  "semantic": {
+    "success": "#2E8B72",
+    "successMuted": "#E6F4F0",
+    "whatsapp": "#25A366",
+    "whatsappDark": "#1D8A54"
+  }
+}

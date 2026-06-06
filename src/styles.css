@@ -1,3 +1,88 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+/*
+ * Palette Verga (web + mobile)
+ * ─────────────────────────────
+ * Primaire   : bleu logistique — CTA, liens, logo
+ * Neutres    : slate — textes, bordures, fonds
+ * Succès     : vert discret — prix, badges, « gratuit »
+ * WhatsApp   : seul accent tiers — boutons conseiller
+ */
+@theme {
+  --color-verga-primary: #5eadd6;
+  --color-verga-primary-dark: #3d94c4;
+  --color-verga-primary-light: #87ceeb;
+  --color-verga-primary-muted: #ebf6fc;
+
+  --color-verga-sky: #5eadd6;
+  --color-verga-sky-dark: #3d94c4;
+
+  --color-verga-ink: #1e293b;
+  --color-verga-muted: #64748b;
+  --color-verga-border: #e2e8f0;
+  --color-verga-surface: #f8fafc;
+
+  --color-verga-success: #2e8b72;
+  --color-verga-success-muted: #e6f4f0;
+
+  --color-verga-whatsapp: #25a366;
+  --color-verga-whatsapp-dark: #1d8a54;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    border-radius: 0 !important;
+  }
+}
+
+@layer components {
+  .verga-field {
+    @apply w-full border border-verga-border bg-white px-4 py-3 text-verga-ink placeholder:text-verga-muted outline-none transition focus:border-verga-primary focus:ring-2 focus:ring-verga-primary/30;
+  }
+
+  .verga-btn {
+    @apply w-full bg-verga-primary px-4 py-3.5 text-base font-medium text-white transition hover:bg-verga-primary-dark focus:outline-none focus:ring-2 focus:ring-verga-primary/40;
+  }
+
+  .verga-btn-whatsapp {
+    @apply inline-flex items-center gap-3 bg-verga-whatsapp px-6 py-3 text-sm font-semibold text-white transition hover:bg-verga-whatsapp-dark;
+  }
+
+  .verga-link {
+    @apply text-verga-primary transition-colors hover:text-verga-primary-dark;
+  }
+
+  .verga-heading-accent {
+    @apply mx-auto mt-5 h-1 w-16 bg-verga-primary;
+  }
+
+  .verga-section-muted {
+    @apply bg-verga-surface;
+  }
+
+  .verga-icon-circle {
+    @apply flex items-center justify-center bg-verga-primary-muted text-verga-primary;
+  }
+
+  .verga-badge-success {
+    @apply bg-verga-success text-white;
+  }
+
+  .verga-text-success {
+    @apply font-semibold text-verga-success;
+  }
+
+  .main-with-header {
+    padding-top: 5.25rem;
+  }
+
+  @media (min-width: 640px) {
+    .main-with-header {
+      padding-top: 5.5rem;
+    }
+  }
+}

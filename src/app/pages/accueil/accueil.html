@@ -1,0 +1,78 @@
+<div class="flex min-h-screen flex-col bg-verga-surface font-sans">
+ <app-header />
+
+ <main class="main-with-header flex-1">
+ <div class="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
+ <div class="grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-4">
+ @for (offer of displayedOffers(); track offer.id) {
+ <app-offer-card [offer]="offer" />
+ }
+ </div>
+
+ <!-- Pagination -->
+ <div class="mt-10 flex flex-col items-center gap-4">
+ <nav class="flex flex-wrap items-center justify-center gap-1" aria-label="Pagination">
+ <button
+ type="button"
+ (click)="previousPage()"
+ [disabled]="currentPage() === 1"
+ class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
+ [attr.aria-label]="'aria.prevPage' | translate"
+ >
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+ </svg>
+ </button>
+
+ @for (page of pageNumbers(); track page) {
+ <button
+ type="button"
+ (click)="goToPage(page)"
+ class="flex h-9 min-w-9 items-center justify-center px-2 text-sm font-medium transition"
+ [class.bg-verga-primary]="currentPage() === page"
+ [class.text-white]="currentPage() === page"
+ [class.border]="currentPage() !== page"
+ [class.border-verga-border]="currentPage() !== page"
+ [class.bg-white]="currentPage() !== page"
+ [class.text-verga-primary]="currentPage() !== page"
+ [class.hover:bg-verga-primary/10]="currentPage() !== page"
+ [attr.aria-current]="currentPage() === page ? 'page' : null"
+ >
+ {{ page }}
+ </button>
+ }
+
+ <button
+ type="button"
+ (click)="nextPage()"
+ [disabled]="currentPage() === totalPages"
+ class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
+ [attr.aria-label]="'aria.nextPage' | translate"
+ >
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
+ </svg>
+ </button>
+ </nav>
+
+ <p class="text-center text-sm text-gray-600">{{ resultsLabel() }}</p>
+ </div>
+
+ </div>
+ </main>
+
+ @if (showScrollTop()) {
+ <button
+ type="button"
+ (click)="scrollToTop()"
+      class="fixed bottom-6 right-6 z-40 flex h-11 w-11 items-center justify-center bg-verga-primary text-white transition hover:-translate-y-0.5 hover:bg-verga-primary-dark sm:bottom-8 sm:right-8"
+ [attr.aria-label]="'aria.backToTopPage' | translate"
+ >
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+ </svg>
+ </button>
+ }
+
+ <app-footer [showBackToTop]="false" />
+</div>
