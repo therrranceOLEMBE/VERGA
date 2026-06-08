@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 
 export interface OfferFilters {
   category: string;
+  destination: string;
   date: string;
   location: string;
   sortBy: string;
@@ -10,6 +11,7 @@ export interface OfferFilters {
 
 export const DEFAULT_OFFER_FILTERS: OfferFilters = {
   category: '',
+  destination: '',
   date: '',
   location: '',
   sortBy: 'recommended',

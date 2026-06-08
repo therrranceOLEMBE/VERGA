@@ -3,19 +3,77 @@
 
  <main class="main-with-header flex-1">
  <div class="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
+
+ <!-- Filtre destinations -->
+ <section class="mb-8" aria-label="{{ 'home.destination.title' | translate }}">
+ <div class="destination-filter-bar relative">
+ <div
+ #destinationScroll
+ class="destination-filter-scroll flex gap-3 overflow-x-auto scroll-smooth pb-1 pr-12"
+ >
+ @for (dest of destinationFilters; track dest.value) {
+ <button
+ type="button"
+ (click)="selectDestination(dest.value)"
+ class="destination-filter-card group flex shrink-0 flex-col items-center justify-center gap-2.5 border bg-white px-2 py-4 transition"
+ [class.destination-filter-card--active]="selectedDestination() === dest.value"
+ [attr.aria-pressed]="selectedDestination() === dest.value"
+ >
+ <span
+ class="destination-filter-icon flex h-9 w-9 items-center justify-center text-verga-primary transition"
+ [class.text-verga-primary]="selectedDestination() !== dest.value"
+ [class.text-verga-primary-dark]="selectedDestination() === dest.value"
+ aria-hidden="true"
+ >
+ @switch (dest.icon) {
+ @case ('all') {
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-7 w-7">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
+ </svg>
+ }
+ @case ('route') {
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-7 w-7">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 12m0 0-4.5 4.5M21 12H7.5" />
+ </svg>
+ }
+ }
+ </span>
+ <span class="destination-filter-label text-center text-xs font-medium leading-tight text-gray-900">
+ {{ dest.labelKey | translate }}
+ </span>
+ </button>
+ }
+ </div>
+
+ <button
+ type="button"
+ (click)="scrollDestinations('right')"
+ class="destination-filter-next absolute right-0 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-verga-border bg-white text-verga-primary shadow-sm transition hover:border-verga-primary hover:bg-verga-primary-muted"
+ [attr.aria-label]="'home.destination.scrollNext' | translate"
+ >
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
+ </svg>
+ </button>
+ </div>
+ </section>
+
  <div class="grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-4">
  @for (offer of displayedOffers(); track offer.id) {
  <app-offer-card [offer]="offer" />
+ } @empty {
+ <p class="col-span-full py-16 text-center text-sm text-verga-muted">{{ 'home.noResults' | translate }}</p>
  }
  </div>
 
  <!-- Pagination -->
+ @if (filteredOffers().length > 0) {
  <div class="mt-10 flex flex-col items-center gap-4">
  <nav class="flex flex-wrap items-center justify-center gap-1" aria-label="Pagination">
  <button
  type="button"
  (click)="previousPage()"
- [disabled]="currentPage() === 1"
+ [disabled]="activePage() === 1"
  class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
  [attr.aria-label]="'aria.prevPage' | translate"
  >
@@ -29,14 +87,14 @@
  type="button"
  (click)="goToPage(page)"
  class="flex h-9 min-w-9 items-center justify-center px-2 text-sm font-medium transition"
- [class.bg-verga-primary]="currentPage() === page"
- [class.text-white]="currentPage() === page"
- [class.border]="currentPage() !== page"
- [class.border-verga-border]="currentPage() !== page"
- [class.bg-white]="currentPage() !== page"
- [class.text-verga-primary]="currentPage() !== page"
- [class.hover:bg-verga-primary/10]="currentPage() !== page"
- [attr.aria-current]="currentPage() === page ? 'page' : null"
+ [class.bg-verga-primary]="activePage() === page"
+ [class.text-white]="activePage() === page"
+ [class.border]="activePage() !== page"
+ [class.border-verga-border]="activePage() !== page"
+ [class.bg-white]="activePage() !== page"
+ [class.text-verga-primary]="activePage() !== page"
+ [class.hover:bg-verga-primary/10]="activePage() !== page"
+ [attr.aria-current]="activePage() === page ? 'page' : null"
  >
  {{ page }}
  </button>
@@ -45,7 +103,7 @@
  <button
  type="button"
  (click)="nextPage()"
- [disabled]="currentPage() === totalPages"
+ [disabled]="activePage() === totalPages()"
  class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
  [attr.aria-label]="'aria.nextPage' | translate"
  >
@@ -57,6 +115,7 @@
 
  <p class="text-center text-sm text-gray-600">{{ resultsLabel() }}</p>
  </div>
+ }
 
  </div>
  </main>
@@ -65,7 +124,7 @@
  <button
  type="button"
  (click)="scrollToTop()"
-      class="fixed bottom-6 right-6 z-40 flex h-11 w-11 items-center justify-center bg-verga-primary text-white transition hover:-translate-y-0.5 hover:bg-verga-primary-dark sm:bottom-8 sm:right-8"
+ class="fixed bottom-6 right-6 z-40 flex h-11 w-11 items-center justify-center bg-verga-primary text-white transition hover:-translate-y-0.5 hover:bg-verga-primary-dark sm:bottom-8 sm:right-8"
  [attr.aria-label]="'aria.backToTopPage' | translate"
  >
  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">

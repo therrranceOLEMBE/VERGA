@@ -88,6 +88,16 @@ export const translations: Record<Language, Record<string, string>> = {
     'contact.required': ' *',
 
     'home.results': 'Affichage de {{start}} à {{end}} sur {{total}} résultats.',
+    'home.noResults': 'Aucune offre ne correspond à cette destination.',
+    'home.destination.title': 'Filtrer par destination',
+    'home.destination.all': 'Toutes',
+    'home.destination.gabonChine': 'Gabon ↔ Chine',
+    'home.destination.gabonFrance': 'Gabon ↔ France',
+    'home.destination.gabonSenegal': 'Gabon ↔ Sénégal',
+    'home.destination.gabonMaroc': 'Gabon ↔ Maroc',
+    'home.destination.gabonEtatsUnis': 'Gabon ↔ États-Unis',
+    'home.destination.gabonCanada': 'Gabon ↔ Canada',
+    'home.destination.scrollNext': 'Voir plus de destinations',
 
     'filters.title': 'Filtres',
     'filters.category': 'Catégorie',
@@ -623,6 +633,16 @@ export const translations: Record<Language, Record<string, string>> = {
     'contact.required': ' *',
 
     'home.results': 'Showing {{start}} to {{end}} of {{total}} results.',
+    'home.noResults': 'No offers match this destination.',
+    'home.destination.title': 'Filter by destination',
+    'home.destination.all': 'All',
+    'home.destination.gabonChine': 'Gabon ↔ China',
+    'home.destination.gabonFrance': 'Gabon ↔ France',
+    'home.destination.gabonSenegal': 'Gabon ↔ Senegal',
+    'home.destination.gabonMaroc': 'Gabon ↔ Morocco',
+    'home.destination.gabonEtatsUnis': 'Gabon ↔ United States',
+    'home.destination.gabonCanada': 'Gabon ↔ Canada',
+    'home.destination.scrollNext': 'See more destinations',
 
     'filters.title': 'Filters',
     'filters.category': 'Category',

@@ -1,0 +1,42 @@
+.destination-filter-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.destination-filter-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.destination-filter-card {
+  width: 7.25rem;
+  min-height: 7rem;
+  border-radius: 0.75rem;
+  border-color: var(--color-verga-border, #e5e7eb);
+}
+
+.destination-filter-card:hover {
+  border-color: color-mix(in srgb, var(--color-verga-primary, #b91c1c) 40%, white);
+  background-color: color-mix(in srgb, var(--color-verga-primary-muted, #fef2f2) 50%, white);
+}
+
+.destination-filter-card--active {
+  border-color: var(--color-verga-primary, #b91c1c);
+  background-color: var(--color-verga-primary-muted, #fef2f2);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-verga-primary, #b91c1c) 15%, transparent);
+}
+
+.destination-filter-card--active .destination-filter-label {
+  color: var(--color-verga-primary-dark, #991b1b);
+  font-weight: 600;
+}
+
+@media (min-width: 640px) {
+  .destination-filter-card {
+    width: 8rem;
+    min-height: 7.75rem;
+  }
+}
+
+.destination-filter-label {
+  max-width: 6.5rem;
+}

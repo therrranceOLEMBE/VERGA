@@ -19,6 +19,7 @@ export class FiltersModal {
   readonly applied = output<void>();
 
   protected readonly category = signal(this.filtersService.filters().category);
+  protected readonly destination = signal(this.filtersService.filters().destination);
   protected readonly date = signal(this.filtersService.filters().date);
   protected readonly location = signal(this.filtersService.filters().location);
   protected readonly sortBy = signal(this.filtersService.filters().sortBy);
@@ -45,6 +46,7 @@ export class FiltersModal {
 
   protected reset(): void {
     this.category.set(DEFAULT_OFFER_FILTERS.category);
+    this.destination.set(DEFAULT_OFFER_FILTERS.destination);
     this.date.set(DEFAULT_OFFER_FILTERS.date);
     this.location.set(DEFAULT_OFFER_FILTERS.location);
     this.sortBy.set(DEFAULT_OFFER_FILTERS.sortBy);
@@ -55,6 +57,7 @@ export class FiltersModal {
   protected apply(): void {
     const filters: OfferFilters = {
       category: this.category(),
+      destination: this.destination(),
       date: this.date(),
       location: this.location().trim(),
       sortBy: this.sortBy(),

@@ -1,5 +1,13 @@
 export type OfferPricingType = 'kilo' | 'container' | 'metreCube';
 
+export type OfferDestinationRoute =
+  | 'gabon-chine'
+  | 'gabon-france'
+  | 'gabon-senegal'
+  | 'gabon-maroc'
+  | 'gabon-etats-unis'
+  | 'gabon-canada';
+
 export interface Offer {
   id: string;
   title: string;
@@ -15,6 +23,8 @@ export interface Offer {
   logoBg: string;
   description: string;
   pricingType: OfferPricingType;
+  departureCountry: string;
+  arrivalCountry: string;
   promotion?: boolean;
   verified?: boolean;
 }
