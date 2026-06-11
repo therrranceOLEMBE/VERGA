@@ -10,6 +10,9 @@ export const DESTINATION_ROUTE_PAIRS: Record<
   'gabon-maroc': ['Gabon', 'Maroc'],
   'gabon-etats-unis': ['Gabon', 'États-Unis'],
   'gabon-canada': ['Gabon', 'Canada'],
+  'gabon-burkina': ['Gabon', 'Burkina Faso'],
+  'libreville-port-gentil': ['Libreville', 'Port-Gentil'],
+  'libreville-franceville': ['Libreville', 'Franceville'],
 };
 
 /** Vrai si l'offre correspond au corridor, dans les deux sens (ex. Gabon→France et France→Gabon). */

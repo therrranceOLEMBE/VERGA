@@ -97,6 +97,9 @@ export const translations: Record<Language, Record<string, string>> = {
     'home.destination.gabonMaroc': 'Gabon ↔ Maroc',
     'home.destination.gabonEtatsUnis': 'Gabon ↔ États-Unis',
     'home.destination.gabonCanada': 'Gabon ↔ Canada',
+    'home.destination.gabonBurkina': 'Gabon ↔ Burkina Faso',
+    'home.destination.librevillePortGentil': 'Libreville ↔ Port-Gentil',
+    'home.destination.librevilleFranceville': 'Libreville ↔ Franceville',
     'home.destination.scrollNext': 'Voir plus de destinations',
 
     'filters.title': 'Filtres',
@@ -646,6 +649,9 @@ export const translations: Record<Language, Record<string, string>> = {
     'home.destination.gabonMaroc': 'Gabon ↔ Morocco',
     'home.destination.gabonEtatsUnis': 'Gabon ↔ United States',
     'home.destination.gabonCanada': 'Gabon ↔ Canada',
+    'home.destination.gabonBurkina': 'Gabon ↔ Burkina Faso',
+    'home.destination.librevillePortGentil': 'Libreville ↔ Port-Gentil',
+    'home.destination.librevilleFranceville': 'Libreville ↔ Franceville',
     'home.destination.scrollNext': 'See more destinations',
 
     'filters.title': 'Filters',

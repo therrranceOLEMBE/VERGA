@@ -50,6 +50,9 @@ export class Accueil {
     { value: 'gabon-maroc', labelKey: 'home.destination.gabonMaroc', icon: 'route' },
     { value: 'gabon-etats-unis', labelKey: 'home.destination.gabonEtatsUnis', icon: 'route' },
     { value: 'gabon-canada', labelKey: 'home.destination.gabonCanada', icon: 'route' },
+    { value: 'gabon-burkina', labelKey: 'home.destination.gabonBurkina', icon: 'route' },
+    { value: 'libreville-port-gentil', labelKey: 'home.destination.librevillePortGentil', icon: 'route' },
+    { value: 'libreville-franceville', labelKey: 'home.destination.librevilleFranceville', icon: 'route' },
   ];
 
   constructor() {

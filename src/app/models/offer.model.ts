@@ -6,7 +6,10 @@ export type OfferDestinationRoute =
   | 'gabon-senegal'
   | 'gabon-maroc'
   | 'gabon-etats-unis'
-  | 'gabon-canada';
+  | 'gabon-canada'
+  | 'gabon-burkina'
+  | 'libreville-port-gentil'
+  | 'libreville-franceville';
 
 export interface Offer {
   id: string;
