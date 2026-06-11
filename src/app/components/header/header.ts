@@ -12,6 +12,7 @@ interface MenuLink {
   selector: 'app-header',
   imports: [RouterLink, FiltersModal, TranslatePipe],
   templateUrl: './header.html',
+  styleUrl: './header.css',
 })
 export class Header {
   protected readonly menuOpen = signal(false);

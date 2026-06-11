@@ -1,0 +1,20 @@
+.site-header-search-input {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.site-header-search-input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+}
+
+/* iOS : texte de saisie toujours visible */
+.site-header-search-input {
+  color: #111827;
+  caret-color: var(--color-verga-primary, #5eadd6);
+}
+
+@media (max-width: 767px) {
+  .site-header-logo {
+    min-width: 0;
+  }
+}
