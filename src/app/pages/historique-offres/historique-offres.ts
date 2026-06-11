@@ -3,16 +3,19 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LanguageService } from '../../services/language.service';
 
+export type OfferHistoryPricingType = 'kilo' | 'container' | 'metreCube';
+
 export interface OfferHistoryItem {
   id: string;
   code: string;
   title: string;
+  offerType: OfferHistoryPricingType;
   transportType: 'aerien' | 'maritime' | 'terrestre';
   departureCountry: string;
   destinationCountry: string;
-  pricePerKg: string;
-  availableKg: number;
-  soldKg: number;
+  price: string;
+  availableQuantity: number;
+  soldQuantity: number;
   departureDate: string;
   arrivalDate: string;
   publishedDate: string;
@@ -31,6 +34,7 @@ export class HistoriqueOffres {
   private readonly language = inject(LanguageService);
 
   protected readonly filterTitle = signal('');
+  protected readonly filterOfferType = signal('');
   protected readonly filterTransport = signal('');
   protected readonly filterStatus = signal('');
   protected readonly filterYear = signal('');
@@ -40,16 +44,24 @@ export class HistoriqueOffres {
   protected readonly selectedOffer = signal<OfferHistoryItem | null>(null);
 
   protected editTitle = '';
+  protected editOfferType: OfferHistoryPricingType | '' = '';
   protected editTransportType: OfferHistoryItem['transportType'] | '' = '';
   protected editDepartureCountry = '';
   protected editDestinationCountry = '';
-  protected editPricePerKg = '';
-  protected editAvailableKg = 0;
-  protected editSoldKg = 0;
+  protected editPrice = '';
+  protected editAvailableQuantity = 0;
+  protected editSoldQuantity = 0;
   protected editDepartureDate = '';
   protected editArrivalDate = '';
   protected editPublishedDate = '';
   protected editStatus: OfferHistoryItem['status'] | '' = '';
+
+  protected readonly offerTypeOptions = [
+    { value: '', labelKey: 'backoffice.offerHistory.allOfferTypes' },
+    { value: 'kilo', labelKey: 'backoffice.createOffer.offerTypeKilo' },
+    { value: 'container', labelKey: 'backoffice.createOffer.offerTypeContainer' },
+    { value: 'metreCube', labelKey: 'backoffice.createOffer.offerTypeCubicMeter' },
+  ];
 
   protected readonly transportOptions = [
     { value: '', labelKey: 'backoffice.offerHistory.allTransports' },
@@ -63,6 +75,12 @@ export class HistoriqueOffres {
     { value: 'active', labelKey: 'backoffice.offerHistory.status.active' },
     { value: 'expired', labelKey: 'backoffice.offerHistory.status.expired' },
     { value: 'completed', labelKey: 'backoffice.offerHistory.status.completed' },
+  ];
+
+  protected readonly editOfferTypeOptions = [
+    { value: 'kilo', labelKey: 'backoffice.createOffer.offerTypeKilo' },
+    { value: 'container', labelKey: 'backoffice.createOffer.offerTypeContainer' },
+    { value: 'metreCube', labelKey: 'backoffice.createOffer.offerTypeCubicMeter' },
   ];
 
   protected readonly editTransportOptions = [
@@ -80,26 +98,34 @@ export class HistoriqueOffres {
   protected readonly yearOptions = ['', '2026', '2025', '2024'];
 
   private readonly offers = signal<OfferHistoryItem[]>([
-    { id: '1', code: 'OFF-2026-00042', title: 'Abidjan → Paris — fret aérien', transportType: 'aerien', departureCountry: "Côte d'Ivoire", destinationCountry: 'France', pricePerKg: '6 500 F CFA', availableKg: 120, soldKg: 85, departureDate: '2026-07-12', arrivalDate: '2026-07-18', publishedDate: '2026-06-01', status: 'active' },
-    { id: '2', code: 'OFF-2026-00038', title: 'Dakar → Abidjan — maritime', transportType: 'maritime', departureCountry: 'Sénégal', destinationCountry: "Côte d'Ivoire", pricePerKg: '3 200 F CFA', availableKg: 500, soldKg: 500, departureDate: '2026-05-20', arrivalDate: '2026-05-28', publishedDate: '2026-04-15', status: 'completed' },
-    { id: '3', code: 'OFF-2026-00031', title: 'Lomé → Accra — terrestre', transportType: 'terrestre', departureCountry: 'Togo', destinationCountry: 'Ghana', pricePerKg: '1 800 F CFA', availableKg: 80, soldKg: 42, departureDate: '2026-06-28', arrivalDate: '2026-06-29', publishedDate: '2026-06-10', status: 'active' },
-    { id: '4', code: 'OFF-2025-00112', title: 'Abidjan → Bruxelles — aérien', transportType: 'aerien', departureCountry: "Côte d'Ivoire", destinationCountry: 'Belgique', pricePerKg: '7 000 F CFA', availableKg: 60, soldKg: 60, departureDate: '2025-12-05', arrivalDate: '2025-12-07', publishedDate: '2025-11-01', status: 'completed' },
-    { id: '5', code: 'OFF-2025-00098', title: 'Casablanca → Abidjan — maritime', transportType: 'maritime', departureCountry: 'Maroc', destinationCountry: "Côte d'Ivoire", pricePerKg: '2 900 F CFA', availableKg: 300, soldKg: 0, departureDate: '2025-10-15', arrivalDate: '2025-10-28', publishedDate: '2025-09-01', status: 'expired' },
-    { id: '6', code: 'OFF-2026-00025', title: 'Bamako → Abidjan — terrestre', transportType: 'terrestre', departureCountry: 'Mali', destinationCountry: "Côte d'Ivoire", pricePerKg: '2 100 F CFA', availableKg: 150, soldKg: 98, departureDate: '2026-08-02', arrivalDate: '2026-08-04', publishedDate: '2026-05-28', status: 'active' },
-    { id: '7', code: 'OFF-2025-00087', title: 'Lagos → Lyon — aérien', transportType: 'aerien', departureCountry: 'Nigeria', destinationCountry: 'France', pricePerKg: '8 200 F CFA', availableKg: 90, soldKg: 90, departureDate: '2025-08-22', arrivalDate: '2025-08-24', publishedDate: '2025-07-10', status: 'completed' },
-    { id: '8', code: 'OFF-2026-00018', title: 'Abidjan → Montréal — aérien', transportType: 'aerien', departureCountry: "Côte d'Ivoire", destinationCountry: 'Canada', pricePerKg: '9 500 F CFA', availableKg: 200, soldKg: 45, departureDate: '2026-09-10', arrivalDate: '2026-09-12', publishedDate: '2026-06-04', status: 'active' },
-    { id: '9', code: 'OFF-2025-00065', title: 'Douala → Libreville — maritime', transportType: 'maritime', departureCountry: 'Cameroun', destinationCountry: 'Gabon', pricePerKg: '2 500 F CFA', availableKg: 180, soldKg: 0, departureDate: '2025-06-30', arrivalDate: '2025-07-05', publishedDate: '2025-05-12', status: 'expired' },
-    { id: '10', code: 'OFF-2026-00012', title: 'Ouagadougou → Abidjan — terrestre', transportType: 'terrestre', departureCountry: 'Burkina Faso', destinationCountry: "Côte d'Ivoire", pricePerKg: '1 950 F CFA', availableKg: 100, soldKg: 100, departureDate: '2026-04-18', arrivalDate: '2026-04-20', publishedDate: '2026-03-05', status: 'completed' },
+    { id: '1', code: 'OFF-2026-00042', title: 'Libreville → Paris — fret aérien', offerType: 'kilo', transportType: 'aerien', departureCountry: 'Gabon', destinationCountry: 'France', price: '6 500 F CFA / kg', availableQuantity: 120, soldQuantity: 85, departureDate: '2026-07-12', arrivalDate: '2026-07-18', publishedDate: '2026-06-01', status: 'active' },
+    { id: '2', code: 'OFF-2026-00038', title: 'Dakar → Libreville — maritime', offerType: 'kilo', transportType: 'maritime', departureCountry: 'Sénégal', destinationCountry: 'Gabon', price: '3 200 F CFA / kg', availableQuantity: 500, soldQuantity: 500, departureDate: '2026-05-20', arrivalDate: '2026-05-28', publishedDate: '2026-04-15', status: 'completed' },
+    { id: '3', code: 'OFF-2026-00035', title: 'Libreville → Shanghai — conteneur 40 pieds', offerType: 'container', transportType: 'maritime', departureCountry: 'Gabon', destinationCountry: 'Chine', price: '1 250 000 F CFA', availableQuantity: 6, soldQuantity: 2, departureDate: '2026-07-05', arrivalDate: '2026-08-02', publishedDate: '2026-05-30', status: 'active' },
+    { id: '4', code: 'OFF-2026-00033', title: 'Libreville → Lyon — déménagement m³', offerType: 'metreCube', transportType: 'maritime', departureCountry: 'Gabon', destinationCountry: 'France', price: '25 000 F CFA / m³', availableQuantity: 48, soldQuantity: 12, departureDate: '2026-06-25', arrivalDate: '2026-07-20', publishedDate: '2026-05-18', status: 'active' },
+    { id: '5', code: 'OFF-2026-00031', title: 'Lomé → Accra — terrestre', offerType: 'kilo', transportType: 'terrestre', departureCountry: 'Togo', destinationCountry: 'Ghana', price: '1 800 F CFA / kg', availableQuantity: 80, soldQuantity: 42, departureDate: '2026-06-28', arrivalDate: '2026-06-29', publishedDate: '2026-06-10', status: 'active' },
+    { id: '6', code: 'OFF-2025-00112', title: 'Libreville → Bruxelles — aérien', offerType: 'kilo', transportType: 'aerien', departureCountry: 'Gabon', destinationCountry: 'Belgique', price: '7 000 F CFA / kg', availableQuantity: 60, soldQuantity: 60, departureDate: '2025-12-05', arrivalDate: '2025-12-07', publishedDate: '2025-11-01', status: 'completed' },
+    { id: '7', code: 'OFF-2025-00108', title: 'Casablanca → Libreville — conteneur 20 pieds', offerType: 'container', transportType: 'maritime', departureCountry: 'Maroc', destinationCountry: 'Gabon', price: '980 000 F CFA', availableQuantity: 4, soldQuantity: 4, departureDate: '2025-11-20', arrivalDate: '2025-12-08', publishedDate: '2025-10-12', status: 'completed' },
+    { id: '8', code: 'OFF-2025-00098', title: 'Casablanca → Libreville — maritime', offerType: 'kilo', transportType: 'maritime', departureCountry: 'Maroc', destinationCountry: 'Gabon', price: '2 900 F CFA / kg', availableQuantity: 300, soldQuantity: 0, departureDate: '2025-10-15', arrivalDate: '2025-10-28', publishedDate: '2025-09-01', status: 'expired' },
+    { id: '9', code: 'OFF-2026-00028', title: 'Libreville → Montréal — volume m³', offerType: 'metreCube', transportType: 'maritime', departureCountry: 'Gabon', destinationCountry: 'Canada', price: '20 000 F CFA / m³', availableQuantity: 32, soldQuantity: 8, departureDate: '2026-08-15', arrivalDate: '2026-09-25', publishedDate: '2026-06-02', status: 'active' },
+    { id: '10', code: 'OFF-2026-00025', title: 'Bamako → Libreville — terrestre', offerType: 'kilo', transportType: 'terrestre', departureCountry: 'Mali', destinationCountry: 'Gabon', price: '2 100 F CFA / kg', availableQuantity: 150, soldQuantity: 98, departureDate: '2026-08-02', arrivalDate: '2026-08-04', publishedDate: '2026-05-28', status: 'active' },
+    { id: '11', code: 'OFF-2026-00022', title: 'Libreville → New York — conteneur', offerType: 'container', transportType: 'maritime', departureCountry: 'Gabon', destinationCountry: 'États-Unis', price: '2 100 000 F CFA', availableQuantity: 3, soldQuantity: 1, departureDate: '2026-09-01', arrivalDate: '2026-10-10', publishedDate: '2026-06-08', status: 'active' },
+    { id: '12', code: 'OFF-2025-00087', title: 'Lagos → Lyon — aérien', offerType: 'kilo', transportType: 'aerien', departureCountry: 'Nigeria', destinationCountry: 'France', price: '8 200 F CFA / kg', availableQuantity: 90, soldQuantity: 90, departureDate: '2025-08-22', arrivalDate: '2025-08-24', publishedDate: '2025-07-10', status: 'completed' },
+    { id: '13', code: 'OFF-2026-00018', title: 'Libreville → Montréal — aérien', offerType: 'kilo', transportType: 'aerien', departureCountry: 'Gabon', destinationCountry: 'Canada', price: '9 500 F CFA / kg', availableQuantity: 200, soldQuantity: 45, departureDate: '2026-09-10', arrivalDate: '2026-09-12', publishedDate: '2026-06-04', status: 'active' },
+    { id: '14', code: 'OFF-2025-00072', title: 'Paris → Libreville — mobilier m³', offerType: 'metreCube', transportType: 'maritime', departureCountry: 'France', destinationCountry: 'Gabon', price: '22 000 F CFA / m³', availableQuantity: 24, soldQuantity: 24, departureDate: '2025-09-05', arrivalDate: '2025-10-01', publishedDate: '2025-08-01', status: 'completed' },
+    { id: '15', code: 'OFF-2025-00065', title: 'Douala → Libreville — maritime', offerType: 'kilo', transportType: 'maritime', departureCountry: 'Cameroun', destinationCountry: 'Gabon', price: '2 500 F CFA / kg', availableQuantity: 180, soldQuantity: 0, departureDate: '2025-06-30', arrivalDate: '2025-07-05', publishedDate: '2025-05-12', status: 'expired' },
+    { id: '16', code: 'OFF-2026-00012', title: 'Ouagadougou → Libreville — terrestre', offerType: 'kilo', transportType: 'terrestre', departureCountry: 'Burkina Faso', destinationCountry: 'Gabon', price: '1 950 F CFA / kg', availableQuantity: 100, soldQuantity: 100, departureDate: '2026-04-18', arrivalDate: '2026-04-20', publishedDate: '2026-03-05', status: 'completed' },
   ]);
 
   protected readonly filteredOffers = computed(() => {
     const title = this.filterTitle().trim().toLowerCase();
+    const offerType = this.filterOfferType();
     const transport = this.filterTransport();
     const status = this.filterStatus();
     const year = this.filterYear();
 
     return this.offers().filter((offer) => {
       if (title && !offer.title.toLowerCase().includes(title)) return false;
+      if (offerType && offer.offerType !== offerType) return false;
       if (transport && offer.transportType !== transport) return false;
       if (status && offer.status !== status) return false;
       if (year && !offer.publishedDate.startsWith(year)) return false;
@@ -138,6 +164,7 @@ export class HistoriqueOffres {
 
   protected resetFilters(): void {
     this.filterTitle.set('');
+    this.filterOfferType.set('');
     this.filterTransport.set('');
     this.filterStatus.set('');
     this.filterYear.set('');
@@ -170,12 +197,13 @@ export class HistoriqueOffres {
   protected openEdit(offer: OfferHistoryItem): void {
     this.selectedOffer.set(offer);
     this.editTitle = offer.title;
+    this.editOfferType = offer.offerType;
     this.editTransportType = offer.transportType;
     this.editDepartureCountry = offer.departureCountry;
     this.editDestinationCountry = offer.destinationCountry;
-    this.editPricePerKg = offer.pricePerKg;
-    this.editAvailableKg = offer.availableKg;
-    this.editSoldKg = offer.soldKg;
+    this.editPrice = offer.price;
+    this.editAvailableQuantity = offer.availableQuantity;
+    this.editSoldQuantity = offer.soldQuantity;
     this.editDepartureDate = offer.departureDate;
     this.editArrivalDate = offer.arrivalDate;
     this.editPublishedDate = offer.publishedDate;
@@ -202,7 +230,7 @@ export class HistoriqueOffres {
   protected saveEdit(event: Event): void {
     event.preventDefault();
     const selected = this.selectedOffer();
-    if (!selected || !this.editTransportType || !this.editStatus) return;
+    if (!selected || !this.editOfferType || !this.editTransportType || !this.editStatus) return;
 
     this.offers.update((list) =>
       list.map((offer) =>
@@ -210,12 +238,13 @@ export class HistoriqueOffres {
           ? {
               ...offer,
               title: this.editTitle.trim(),
+              offerType: this.editOfferType as OfferHistoryPricingType,
               transportType: this.editTransportType as OfferHistoryItem['transportType'],
               departureCountry: this.editDepartureCountry.trim(),
               destinationCountry: this.editDestinationCountry.trim(),
-              pricePerKg: this.editPricePerKg.trim(),
-              availableKg: this.editAvailableKg,
-              soldKg: this.editSoldKg,
+              price: this.editPrice.trim(),
+              availableQuantity: this.editAvailableQuantity,
+              soldQuantity: this.editSoldQuantity,
               departureDate: this.editDepartureDate,
               arrivalDate: this.editArrivalDate,
               publishedDate: this.editPublishedDate,
@@ -243,6 +272,26 @@ export class HistoriqueOffres {
       terrestre: 'backoffice.createOffer.transportTerrestrial',
     };
     return keys[type];
+  }
+
+  protected offerTypeKey(type: OfferHistoryPricingType): string {
+    const keys: Record<OfferHistoryPricingType, string> = {
+      kilo: 'backoffice.createOffer.offerTypeKilo',
+      container: 'backoffice.createOffer.offerTypeContainer',
+      metreCube: 'backoffice.createOffer.offerTypeCubicMeter',
+    };
+    return keys[type];
+  }
+
+  protected quantityLabel(offer: OfferHistoryItem, quantity: number): string {
+    switch (offer.offerType) {
+      case 'kilo':
+        return `${quantity} kg`;
+      case 'metreCube':
+        return `${quantity} m³`;
+      case 'container':
+        return this.language.translate('backoffice.offerHistory.containerCount', { count: quantity });
+    }
   }
 
   protected statusKey(status: OfferHistoryItem['status']): string {

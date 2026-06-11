@@ -6,10 +6,18 @@
 
  <section class="mb-6 border border-verga-border bg-white p-4 sm:p-6">
  <h2 class="text-sm font-bold uppercase tracking-wide text-gray-900">{{ 'backoffice.offerHistory.filters' | translate }}</h2>
- <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+ <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
  <div>
  <label for="filter-title" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.offerHistory.filterTitle' | translate }}</label>
  <input id="filter-title" type="text" [ngModel]="filterTitle()" (ngModelChange)="filterTitle.set($event); onFilterChange()" class="verga-field mt-1.5" [placeholder]="'backoffice.offerHistory.filterTitlePh' | translate" />
+ </div>
+ <div>
+ <label for="filter-offer-type" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.offerHistory.filterOfferType' | translate }}</label>
+ <select id="filter-offer-type" [ngModel]="filterOfferType()" (ngModelChange)="filterOfferType.set($event); onFilterChange()" class="verga-field mt-1.5 appearance-none bg-white">
+ @for (opt of offerTypeOptions; track opt.value) {
+ <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
+ }
+ </select>
  </div>
  <div>
  <label for="filter-transport" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.offerHistory.filterTransport' | translate }}</label>
@@ -50,12 +58,13 @@
  <tr>
  <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colCode' | translate }}</th>
  <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colTitle' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colOfferType' | translate }}</th>
  <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colTransport' | translate }}</th>
  <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colDeparture' | translate }}</th>
  <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colDestination' | translate }}</th>
  <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colPrice' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colAvailableKg' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colSoldKg' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colAvailable' | translate }}</th>
+ <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colSold' | translate }}</th>
  <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colDepartureDate' | translate }}</th>
  <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colArrivalDate' | translate }}</th>
  <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colPublishedDate' | translate }}</th>
@@ -68,12 +77,13 @@
  <tr class="hover:bg-verga-primary-muted/30">
  <td class="whitespace-nowrap px-3 py-3 font-mono text-xs font-semibold text-verga-primary sm:px-4">{{ offer.code }}</td>
  <td class="whitespace-nowrap px-3 py-3 font-medium text-gray-900 sm:px-4">{{ offer.title }}</td>
+ <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ offerTypeKey(offer.offerType) | translate }}</td>
  <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ transportKey(offer.transportType) | translate }}</td>
  <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ offer.departureCountry }}</td>
  <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ offer.destinationCountry }}</td>
- <td class="whitespace-nowrap px-3 py-3 font-semibold text-gray-900 sm:px-4">{{ offer.pricePerKg }}</td>
- <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ offer.availableKg }} kg</td>
- <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ offer.soldKg }} kg</td>
+ <td class="whitespace-nowrap px-3 py-3 font-semibold text-gray-900 sm:px-4">{{ offer.price }}</td>
+ <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ quantityLabel(offer, offer.availableQuantity) }}</td>
+ <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ quantityLabel(offer, offer.soldQuantity) }}</td>
  <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ offer.departureDate }}</td>
  <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ offer.arrivalDate }}</td>
  <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ offer.publishedDate }}</td>
@@ -106,7 +116,7 @@
  </tr>
  } @empty {
  <tr>
- <td colspan="13" class="px-4 py-10 text-center text-sm text-verga-muted">{{ 'backoffice.offerHistory.empty' | translate }}</td>
+ <td colspan="14" class="px-4 py-10 text-center text-sm text-verga-muted">{{ 'backoffice.offerHistory.empty' | translate }}</td>
  </tr>
  }
  </tbody>
@@ -147,13 +157,14 @@
  <div class="grid grid-cols-1 gap-4 px-5 py-6 sm:grid-cols-2 sm:px-6">
  <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colCode' | translate }}</p><p class="mt-1 font-mono text-sm font-semibold text-verga-primary">{{ offer.code }}</p></div>
  <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colTitle' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offer.title }}</p></div>
+ <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colOfferType' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offerTypeKey(offer.offerType) | translate }}</p></div>
  <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colTransport' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ transportKey(offer.transportType) | translate }}</p></div>
  <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colStatus' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ statusKey(offer.status) | translate }}</p></div>
  <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colDeparture' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offer.departureCountry }}</p></div>
  <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colDestination' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offer.destinationCountry }}</p></div>
- <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colPrice' | translate }}</p><p class="mt-1 text-sm font-semibold text-gray-900">{{ offer.pricePerKg }}</p></div>
- <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colAvailableKg' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offer.availableKg }} kg</p></div>
- <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colSoldKg' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offer.soldKg }} kg</p></div>
+ <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colPrice' | translate }}</p><p class="mt-1 text-sm font-semibold text-gray-900">{{ offer.price }}</p></div>
+ <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colAvailable' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ quantityLabel(offer, offer.availableQuantity) }}</p></div>
+ <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colSold' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ quantityLabel(offer, offer.soldQuantity) }}</p></div>
  <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colDepartureDate' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offer.departureDate }}</p></div>
  <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colArrivalDate' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offer.arrivalDate }}</p></div>
  <div class="sm:col-span-2"><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colPublishedDate' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offer.publishedDate }}</p></div>
@@ -180,7 +191,15 @@
  <label for="edit-title" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colTitle' | translate }} *</label>
  <input id="edit-title" name="editTitle" type="text" required [(ngModel)]="editTitle" class="verga-field mt-2" />
  </div>
- <div class="grid gap-4 sm:grid-cols-2">
+ <div class="grid gap-4 sm:grid-cols-3">
+ <div>
+ <label for="edit-offer-type" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colOfferType' | translate }} *</label>
+ <select id="edit-offer-type" name="editOfferType" required [(ngModel)]="editOfferType" class="verga-field mt-2 appearance-none bg-white">
+ @for (opt of editOfferTypeOptions; track opt.value) {
+ <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
+ }
+ </select>
+ </div>
  <div>
  <label for="edit-transport" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colTransport' | translate }} *</label>
  <select id="edit-transport" name="editTransportType" required [(ngModel)]="editTransportType" class="verga-field mt-2 appearance-none bg-white">
@@ -211,17 +230,17 @@
  <div class="grid gap-4 sm:grid-cols-2">
  <div>
  <label for="edit-price" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colPrice' | translate }} *</label>
- <input id="edit-price" name="editPricePerKg" type="text" required [(ngModel)]="editPricePerKg" class="verga-field mt-2" />
+ <input id="edit-price" name="editPrice" type="text" required [(ngModel)]="editPrice" class="verga-field mt-2" />
  </div>
  <div>
- <label for="edit-available" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colAvailableKg' | translate }} *</label>
- <input id="edit-available" name="editAvailableKg" type="number" min="0" required [(ngModel)]="editAvailableKg" class="verga-field mt-2" />
+ <label for="edit-available" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colAvailable' | translate }} *</label>
+ <input id="edit-available" name="editAvailableQuantity" type="number" min="0" required [(ngModel)]="editAvailableQuantity" class="verga-field mt-2" />
  </div>
  </div>
  <div class="grid gap-4 sm:grid-cols-2">
  <div>
- <label for="edit-sold" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colSoldKg' | translate }} *</label>
- <input id="edit-sold" name="editSoldKg" type="number" min="0" required [(ngModel)]="editSoldKg" class="verga-field mt-2" />
+ <label for="edit-sold" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colSold' | translate }} *</label>
+ <input id="edit-sold" name="editSoldQuantity" type="number" min="0" required [(ngModel)]="editSoldQuantity" class="verga-field mt-2" />
  </div>
  <div>
  <label for="edit-published-date" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colPublishedDate' | translate }} *</label>
