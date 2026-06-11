@@ -13,8 +13,16 @@
   caret-color: var(--color-verga-primary, #5eadd6);
 }
 
+.site-header-icon-btn {
+  flex-shrink: 0;
+}
+
 @media (max-width: 767px) {
   .site-header-logo {
     min-width: 0;
+  }
+
+  .site-header-actions {
+    gap: 0.25rem;
   }
 }
