@@ -100,6 +100,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'home.destination.gabonBurkina': 'Gabon ↔ Burkina Faso',
     'home.destination.librevillePortGentil': 'Libreville ↔ Port-Gentil',
     'home.destination.librevilleFranceville': 'Libreville ↔ Franceville',
+    'home.destination.scrollPrevious': 'Voir les destinations précédentes',
     'home.destination.scrollNext': 'Voir plus de destinations',
 
     'filters.title': 'Filtres',
@@ -652,6 +653,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'home.destination.gabonBurkina': 'Gabon ↔ Burkina Faso',
     'home.destination.librevillePortGentil': 'Libreville ↔ Port-Gentil',
     'home.destination.librevilleFranceville': 'Libreville ↔ Franceville',
+    'home.destination.scrollPrevious': 'See previous destinations',
     'home.destination.scrollNext': 'See more destinations',
 
     'filters.title': 'Filters',

@@ -9,7 +9,7 @@
  <div class="destination-filter-bar relative">
  <div
  #destinationScroll
- class="destination-filter-scroll flex gap-3 overflow-x-auto scroll-smooth pb-1 pr-12"
+ class="destination-filter-scroll flex gap-3 overflow-x-auto scroll-smooth px-12 pb-1"
  >
  @for (dest of destinationFilters; track dest.value) {
  <button
@@ -47,8 +47,19 @@
 
  <button
  type="button"
+ (click)="scrollDestinations('left')"
+ class="destination-filter-nav absolute left-0 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-verga-border bg-white text-verga-primary shadow-sm transition hover:border-verga-primary hover:bg-verga-primary-muted"
+ [attr.aria-label]="'home.destination.scrollPrevious' | translate"
+ >
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+ </svg>
+ </button>
+
+ <button
+ type="button"
  (click)="scrollDestinations('right')"
- class="destination-filter-next absolute right-0 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-verga-border bg-white text-verga-primary shadow-sm transition hover:border-verga-primary hover:bg-verga-primary-muted"
+ class="destination-filter-nav absolute right-0 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-verga-border bg-white text-verga-primary shadow-sm transition hover:border-verga-primary hover:bg-verga-primary-muted"
  [attr.aria-label]="'home.destination.scrollNext' | translate"
  >
  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
