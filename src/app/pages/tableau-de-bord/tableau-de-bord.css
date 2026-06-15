@@ -2,13 +2,13 @@
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
 
-@media (min-width: 480px) {
+@media (min-width: 640px) {
   .dashboard-metrics {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .dashboard-metrics {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -16,10 +16,25 @@
 
 @media (min-width: 1280px) {
   .dashboard-metrics {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
 
 .dashboard-metric-card {
   min-width: 0;
+}
+
+.dashboard-period-block {
+  min-width: 0;
+}
+
+.dashboard-period-table {
+  width: 100%;
+  table-layout: fixed;
+}
+
+.dashboard-period-table th,
+.dashboard-period-table td {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }

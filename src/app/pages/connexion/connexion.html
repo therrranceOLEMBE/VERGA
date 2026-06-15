@@ -5,7 +5,7 @@
  class="flex w-full max-w-[1200px] min-h-[520px] flex-col overflow-hidden md:flex-row"
  >
  <div
- class="relative h-44 shrink-0 overflow-hidden bg-white verga-watermark md:h-auto md:w-1/2"
+ class="relative hidden md:block md:w-1/2 bg-white overflow-hidden shrink-0"
  aria-hidden="true"
  >
  <img
@@ -18,14 +18,45 @@
  <div class="flex w-full flex-col bg-white px-8 py-8 sm:px-10 sm:py-10 md:w-1/2">
  <h1 class="text-center text-3xl font-semibold text-gray-900 tracking-tight">{{ 'auth.login.title' | translate }}</h1>
 
- <form class="mt-8 flex flex-col flex-1" (ngSubmit)="onSubmit($event)">
+ <div class="mt-6 grid grid-cols-2 border border-verga-border" role="tablist" [attr.aria-label]="'auth.login.formSwitcher' | translate">
+ <button
+ type="button"
+ role="tab"
+ [attr.aria-selected]="formType() === 'entreprise'"
+ class="connexion-tab px-4 py-3 text-sm font-semibold transition"
+ [class.is-active]="formType() === 'entreprise'"
+ (click)="setFormType('entreprise')"
+ >
+ {{ 'auth.login.tabCompany' | translate }}
+ </button>
+ <button
+ type="button"
+ role="tab"
+ [attr.aria-selected]="formType() === 'particulier'"
+ class="connexion-tab px-4 py-3 text-sm font-semibold transition"
+ [class.is-active]="formType() === 'particulier'"
+ (click)="setFormType('particulier')"
+ >
+ {{ 'auth.login.tabIndividual' | translate }}
+ </button>
+ </div>
+
+ <p class="mt-4 text-center text-sm text-verga-muted">
+ @if (formType() === 'entreprise') {
+ {{ 'auth.login.companySubtitle' | translate }}
+ } @else {
+ {{ 'auth.login.individualSubtitle' | translate }}
+ }
+ </p>
+
+ <form class="mt-6 flex flex-col flex-1" (ngSubmit)="onSubmit($event)">
  <div class="space-y-5">
  <div>
- <label for="email" class="block text-sm text-gray-700">
+ <label for="connexion-email" class="block text-sm text-gray-700">
  {{ 'auth.email' | translate }} <span class="text-verga-primary">*</span>
  </label>
  <input
- id="email"
+ id="connexion-email"
  name="email"
  type="email"
  autocomplete="email"
@@ -36,12 +67,12 @@
  </div>
 
  <div>
- <label for="password" class="block text-sm text-gray-700">
+ <label for="connexion-password" class="block text-sm text-gray-700">
  {{ 'auth.password' | translate }} <span class="text-verga-primary">*</span>
  </label>
  <div class="relative mt-2">
  <input
- id="password"
+ id="connexion-password"
  name="password"
  [type]="showPassword() ? 'text' : 'password'"
  autocomplete="current-password"
@@ -73,7 +104,13 @@
  </div>
  </div>
 
- <button type="submit" class="verga-btn mt-6">{{ 'auth.login.submit' | translate }}</button>
+ <button type="submit" class="verga-btn mt-6">
+ @if (formType() === 'entreprise') {
+ {{ 'auth.login.submitCompany' | translate }}
+ } @else {
+ {{ 'auth.login.submitIndividual' | translate }}
+ }
+ </button>
 
  <p class="mt-auto pt-10 text-center text-sm text-gray-700">
  {{ 'auth.login.noAccount' | translate }}

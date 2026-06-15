@@ -3,7 +3,12 @@
   background-size: 280px 140px;
 }
 
-.verga-watermark {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='120' viewBox='0 0 220 120'%3E%3Ctext x='10' y='70' fill='%235EADD6' fill-opacity='0.45' font-family='Inter,Arial,sans-serif' font-size='28' font-weight='700' transform='rotate(-18 110 60)'%3EVerga%3C/text%3E%3C/svg%3E");
-  background-size: 220px 120px;
+.connexion-tab {
+  color: var(--color-verga-muted, #6b7280);
+  background: #fff;
+}
+
+.connexion-tab.is-active {
+  color: var(--color-verga-primary, #5eadd6);
+  background: var(--color-verga-primary-muted, #e8f4fa);
 }

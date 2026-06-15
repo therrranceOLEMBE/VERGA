@@ -4,7 +4,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 interface MetricCard {
   labelKey: string;
   value: string;
-  icon: 'offers' | 'kilos' | 'revenue' | 'subscribers';
+  icon: 'offers' | 'kilos' | 'revenue';
 }
 
 interface PeriodCounts {
@@ -23,7 +23,6 @@ interface PeriodCounts {
 export class TableauDeBord {
   protected readonly metrics: MetricCard[] = [
     { labelKey: 'backoffice.dashboard.activeOffers', value: '12', icon: 'offers' },
-    { labelKey: 'backoffice.dashboard.subscribers', value: '248', icon: 'subscribers' },
     { labelKey: 'backoffice.dashboard.kilosMonth', value: '385 kg', icon: 'kilos' },
     { labelKey: 'backoffice.dashboard.kilosYear', value: '2 450 kg', icon: 'kilos' },
     { labelKey: 'backoffice.dashboard.revenueMonth', value: '1,8 M F CFA', icon: 'revenue' },

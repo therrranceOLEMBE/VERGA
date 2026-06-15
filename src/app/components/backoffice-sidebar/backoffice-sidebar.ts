@@ -5,7 +5,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 interface NavItem {
   labelKey: string;
   path: string;
-  icon: 'dashboard' | 'transactions' | 'logistics';
+  icon: 'dashboard' | 'transactions' | 'logistics' | 'payments';
 }
 
 interface OfferItem {
@@ -23,7 +23,7 @@ interface CollaboratorItem {
 interface AccountItem {
   labelKey: string;
   path: string;
-  icon: 'profile' | 'notifications' | 'password';
+  icon: 'profile' | 'password';
 }
 
 @Component({
@@ -43,7 +43,8 @@ export class BackofficeSidebar {
   protected readonly mainNav: NavItem[] = [
     { labelKey: 'backoffice.nav.dashboard', path: '/backoffice/tableau-de-bord', icon: 'dashboard' },
     { labelKey: 'backoffice.nav.transactions', path: '/backoffice/transactions', icon: 'transactions' },
-    { labelKey: 'backoffice.nav.supportLogistics', path: '/backoffice/support-logistique', icon: 'logistics' },
+    { labelKey: 'backoffice.nav.payments', path: '/backoffice/paiements', icon: 'payments' },
+    { labelKey: 'backoffice.nav.parcelTracking', path: '/backoffice/support-logistique', icon: 'logistics' },
   ];
 
   protected readonly offersNav: OfferItem[] = [
@@ -58,7 +59,6 @@ export class BackofficeSidebar {
 
   protected readonly accountNav: AccountItem[] = [
     { labelKey: 'backoffice.nav.profile', path: '/backoffice/compte/profil', icon: 'profile' },
-    { labelKey: 'backoffice.nav.notifications', path: '/backoffice/compte/notifications', icon: 'notifications' },
     { labelKey: 'backoffice.nav.password', path: '/backoffice/compte/mot-de-passe', icon: 'password' },
   ];
 

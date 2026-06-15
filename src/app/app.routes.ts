@@ -44,6 +44,8 @@ import { TableauDeBord } from './pages/tableau-de-bord/tableau-de-bord';
 
 import { Tarifs } from './pages/tarifs/tarifs';
 
+import { Paiements } from './pages/paiements/paiements';
+
 import { SupportLogistique } from './pages/support-logistique/support-logistique';
 
 import { Transactions } from './pages/transactions/transactions';
@@ -87,6 +89,8 @@ export const routes: Routes = [
       { path: 'historique-offres', component: HistoriqueOffres },
 
       { path: 'transactions', component: Transactions },
+
+      { path: 'paiements', component: Paiements },
 
       { path: 'support-logistique', component: SupportLogistique },
 
