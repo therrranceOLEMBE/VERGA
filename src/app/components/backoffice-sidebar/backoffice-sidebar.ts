@@ -1,6 +1,8 @@
 import { Component, HostListener, inject, input, output, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { AgenceSessionService } from '../../services/agence-session.service';
+import { AgenceService } from '../../services/agence.service';
 
 interface NavItem {
   labelKey: string;
@@ -34,11 +36,14 @@ interface AccountItem {
 })
 export class BackofficeSidebar {
   private readonly router = inject(Router);
+  private readonly agenceSession = inject(AgenceSessionService);
+  private readonly agenceService = inject(AgenceService);
   readonly open = input(false);
   readonly navigate = output<void>();
   protected readonly offersOpen = signal(false);
   protected readonly collaboratorsOpen = signal(false);
   protected readonly accountOpen = signal(false);
+  protected readonly loggingOut = signal(false);
 
   protected readonly mainNav: NavItem[] = [
     { labelKey: 'backoffice.nav.dashboard', path: '/backoffice/tableau-de-bord', icon: 'dashboard' },
@@ -122,5 +127,31 @@ export class BackofficeSidebar {
   protected isAccountSectionActive(): boolean {
     const url = this.router.url;
     return this.accountNav.some((item) => url.startsWith(item.path));
+  }
+
+  protected logout(): void {
+    if (this.loggingOut()) {
+      return;
+    }
+
+    const token = this.agenceSession.getToken();
+    const finishLogout = (): void => {
+      this.agenceSession.clearSession();
+      this.loggingOut.set(false);
+      this.onNavigate();
+      void this.router.navigate(['/connexion']);
+    };
+
+    if (!token) {
+      finishLogout();
+      return;
+    }
+
+    this.loggingOut.set(true);
+
+    this.agenceService.logout(token).subscribe({
+      next: () => finishLogout(),
+      error: () => finishLogout(),
+    });
   }
 }

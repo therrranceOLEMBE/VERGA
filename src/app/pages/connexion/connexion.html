@@ -104,8 +104,20 @@
  </div>
  </div>
 
- <button type="submit" class="verga-btn mt-6">
- @if (formType() === 'entreprise') {
+ @if (errorMessage()) {
+ <p class="mt-4 text-sm font-medium text-red-600" role="alert">
+ @if (errorMessage().startsWith('auth.')) {
+ {{ errorMessage() | translate }}
+ } @else {
+ {{ errorMessage() }}
+ }
+ </p>
+ }
+
+ <button type="submit" class="verga-btn mt-6" [disabled]="submitting()">
+ @if (submitting()) {
+ {{ 'auth.login.submitting' | translate }}
+ } @else if (formType() === 'entreprise') {
  {{ 'auth.login.submitCompany' | translate }}
  } @else {
  {{ 'auth.login.submitIndividual' | translate }}

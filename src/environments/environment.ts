@@ -1,4 +1,5 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://51.210.178.164:2550/api',
+  apiUrl: 'http://51.210.178.164:2550/api/v1',
+  typeAgences: [] as Array<{ id: string; label: string }>,
 };

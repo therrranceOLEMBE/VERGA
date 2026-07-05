@@ -1,11 +1,13 @@
-import { Component, input, output } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, inject, input, output } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { ClientSessionService } from '../../services/client-session.service';
+import { ParticulierService } from '../../services/particulier.service';
 
 interface ClientNavItem {
   labelKey: string;
   path: string;
-  icon: 'dashboard' | 'transactions' | 'profile';
+  icon: 'dashboard' | 'commandes' | 'colis' | 'reclamations' | 'profile' | 'password';
 }
 
 @Component({
@@ -15,16 +17,42 @@ interface ClientNavItem {
   styleUrl: './client-backoffice-sidebar.css',
 })
 export class ClientBackofficeSidebar {
+  private readonly router = inject(Router);
+  private readonly clientSession = inject(ClientSessionService);
+  private readonly particulierService = inject(ParticulierService);
+
   readonly open = input(false);
   readonly navigate = output<void>();
 
   protected readonly navItems: ClientNavItem[] = [
     { labelKey: 'clientBackoffice.nav.dashboard', path: '/espace-client/dashboard', icon: 'dashboard' },
-    { labelKey: 'clientBackoffice.nav.transactions', path: '/espace-client/historique-transactions', icon: 'transactions' },
+    { labelKey: 'clientBackoffice.nav.commandes', path: '/espace-client/commandes', icon: 'commandes' },
+    { labelKey: 'clientBackoffice.nav.colis', path: '/espace-client/colis', icon: 'colis' },
+    { labelKey: 'clientBackoffice.nav.reclamations', path: '/espace-client/reclamations', icon: 'reclamations' },
     { labelKey: 'clientBackoffice.nav.profile', path: '/espace-client/profil', icon: 'profile' },
+    { labelKey: 'clientBackoffice.nav.password', path: '/espace-client/mot-de-passe', icon: 'password' },
   ];
 
   protected onNavigate(): void {
     this.navigate.emit();
+  }
+
+  protected logout(): void {
+    const token = this.clientSession.getToken();
+    const finishLogout = (): void => {
+      this.clientSession.clearSession();
+      this.onNavigate();
+      void this.router.navigate(['/connexion']);
+    };
+
+    if (!token) {
+      finishLogout();
+      return;
+    }
+
+    this.particulierService.logout(token).subscribe({
+      next: () => finishLogout(),
+      error: () => finishLogout(),
+    });
   }
 }

@@ -4,12 +4,34 @@
  <p class="mt-2 text-sm text-verga-muted">{{ 'clientBackoffice.profile.subtitle' | translate }}</p>
  </div>
 
+ @if (loading()) {
+ <p class="text-sm text-verga-muted">{{ 'clientBackoffice.profile.loading' | translate }}</p>
+ } @else {
+ @if (errorMessage()) {
+ <p class="mb-4 text-sm font-medium text-red-600" role="alert">
+ @if (errorMessage().startsWith('clientBackoffice.')) {
+ {{ errorMessage() | translate }}
+ } @else {
+ {{ errorMessage() }}
+ }
+ </p>
+ }
+ @if (successMessage()) {
+ <p class="mb-4 text-sm font-medium text-green-700" role="status">{{ successMessage() | translate }}</p>
+ }
+
  <form class="space-y-6 border border-verga-border bg-white p-4 sm:p-8" (ngSubmit)="onSubmit($event)">
  <div class="flex flex-col items-start gap-4 border-b border-verga-border pb-6 sm:flex-row sm:items-center">
  <span class="flex h-16 w-16 items-center justify-center bg-verga-primary text-xl font-bold text-white">{{ initials }}</span>
  <div>
- <p class="font-bold text-gray-900">{{ firstName }} {{ lastName }}</p>
- <p class="text-sm text-verga-muted">{{ 'clientBackoffice.profile.accountType' | translate }}</p>
+ <p class="font-bold text-gray-900">{{ displayName }}</p>
+ <p class="text-sm text-verga-muted">
+ @if (displayAccountType) {
+ {{ displayAccountType }}
+ } @else {
+ {{ 'clientBackoffice.profile.accountType' | translate }}
+ }
+ </p>
  </div>
  </div>
 
@@ -40,6 +62,24 @@
  <input id="client-address" name="address" type="text" [(ngModel)]="address" class="verga-field mt-2" />
  </div>
 
- <button type="submit" class="verga-btn !w-auto px-8">{{ 'clientBackoffice.profile.save' | translate }}</button>
+ <div class="grid gap-5 sm:grid-cols-2">
+ <div>
+ <label for="client-city" class="block text-sm font-medium text-gray-700">{{ 'auth.signup.city' | translate }}</label>
+ <input id="client-city" name="city" type="text" [(ngModel)]="city" class="verga-field mt-2" />
+ </div>
+ <div>
+ <label for="client-country" class="block text-sm font-medium text-gray-700">{{ 'auth.signup.country' | translate }}</label>
+ <input id="client-country" name="country" type="text" [(ngModel)]="country" class="verga-field mt-2" />
+ </div>
+ </div>
+
+ <button type="submit" class="verga-btn !w-auto px-8" [disabled]="submitting()">
+ @if (submitting()) {
+ {{ 'clientBackoffice.profile.saving' | translate }}
+ } @else {
+ {{ 'clientBackoffice.profile.save' | translate }}
+ }
+ </button>
  </form>
+ }
 </div>

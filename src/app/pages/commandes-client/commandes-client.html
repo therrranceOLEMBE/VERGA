@@ -1,0 +1,122 @@
+<div class="mx-auto max-w-[1200px]">
+ <div class="mb-8">
+ <h1 class="text-2xl font-bold text-gray-900">{{ 'clientBackoffice.commandes.title' | translate }}</h1>
+ <p class="mt-2 text-sm text-verga-muted">{{ 'clientBackoffice.commandes.subtitle' | translate }}</p>
+ </div>
+
+ <section class="mb-6 border border-verga-border bg-white p-4 sm:p-6">
+ <h2 class="text-sm font-bold uppercase tracking-wide text-gray-900">{{ 'backoffice.transactions.filters' | translate }}</h2>
+ <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+ <div>
+ <label for="filter-commande-code" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.transactions.filterCode' | translate }}</label>
+ <input
+ id="filter-commande-code"
+ type="text"
+ [ngModel]="filterSearch()"
+ (ngModelChange)="filterSearch.set($event)"
+ (keyup.enter)="onFilterChange()"
+ class="verga-field mt-1.5"
+ placeholder="CMD-..."
+ />
+ </div>
+ <div>
+ <label for="filter-commande-statut" class="block text-xs font-medium text-verga-muted">{{ 'clientBackoffice.commandes.filterStatus' | translate }}</label>
+ <select
+ id="filter-commande-statut"
+ [ngModel]="filterStatut()"
+ (ngModelChange)="filterStatut.set($event); onFilterChange()"
+ class="verga-field mt-1.5"
+ >
+ @for (option of statutOptions; track option.value) {
+ <option [ngValue]="option.value">{{ option.labelKey | translate }}</option>
+ }
+ </select>
+ </div>
+ </div>
+ <div class="mt-4">
+ <button type="button" (click)="resetFilters()" class="text-sm font-semibold text-verga-primary hover:underline">
+ {{ 'backoffice.transactions.reset' | translate }}
+ </button>
+ </div>
+ </section>
+
+ @if (errorMessage()) {
+ <p class="mb-4 text-sm font-medium text-red-600" role="alert">{{ errorMessage() | translate }}</p>
+ }
+
+ @if (loading()) {
+ <p class="text-sm text-verga-muted">{{ 'clientBackoffice.commandes.loading' | translate }}</p>
+ } @else {
+ <div class="client-commandes-table-wrap overflow-x-auto border border-verga-border bg-white">
+ <table class="client-commandes-table w-full text-left text-sm">
+ <thead class="border-b border-verga-border bg-verga-surface text-xs font-semibold uppercase tracking-wide text-verga-muted">
+ <tr>
+ <th class="client-col-code px-4 py-3.5">{{ 'clientBackoffice.commandes.colCode' | translate }}</th>
+ <th class="client-col-client px-4 py-3.5">{{ 'clientBackoffice.commandes.colClient' | translate }}</th>
+ <th class="client-col-agence px-4 py-3.5">{{ 'clientBackoffice.commandes.colAgence' | translate }}</th>
+ <th class="client-col-quantity px-4 py-3.5 text-right">{{ 'clientBackoffice.commandes.colQuantity' | translate }}</th>
+ <th class="client-col-amount px-4 py-3.5 text-right">{{ 'clientBackoffice.commandes.colAmount' | translate }}</th>
+ <th class="client-col-status px-4 py-3.5">{{ 'clientBackoffice.commandes.colStatus' | translate }}</th>
+ <th class="client-col-date px-4 py-3.5">{{ 'clientBackoffice.commandes.colDate' | translate }}</th>
+ <th class="client-col-actions px-4 py-3.5">{{ 'clientBackoffice.commandes.colActions' | translate }}</th>
+ </tr>
+ </thead>
+ <tbody class="divide-y divide-verga-border">
+ @for (commande of commandes(); track commande.id) {
+ <tr class="transition hover:bg-verga-primary-muted/30">
+ <td class="client-col-code whitespace-nowrap px-4 py-3.5 font-mono text-xs font-semibold text-verga-primary">{{ commande.code }}</td>
+ <td class="client-col-client px-4 py-3.5 text-gray-900">
+ <span class="client-cell-truncate" [attr.title]="commande.client">{{ commande.client || '—' }}</span>
+ </td>
+ <td class="client-col-agence px-4 py-3.5 text-gray-600">
+ <span class="client-cell-truncate" [attr.title]="commande.agence">{{ commande.agence || '—' }}</span>
+ </td>
+ <td class="client-col-quantity whitespace-nowrap px-4 py-3.5 text-right font-medium text-gray-900">{{ commande.quantite }}</td>
+ <td class="client-col-amount whitespace-nowrap px-4 py-3.5 text-right font-semibold text-gray-900">{{ commande.montant }}</td>
+ <td class="client-col-status whitespace-nowrap px-4 py-3.5">
+ @if (commande.statut) {
+ <span class="inline-block px-2.5 py-1 text-xs font-semibold uppercase" [class]="statusClass(commande.statut)">
+ {{ statusKey(commande.statut) | translate }}
+ </span>
+ } @else {
+ —
+ }
+ </td>
+ <td class="client-col-date whitespace-nowrap px-4 py-3.5 text-gray-600">{{ commande.date }}</td>
+ <td class="client-col-actions whitespace-nowrap px-4 py-3.5">
+ @if (canViewColis(commande)) {
+ <button type="button" class="client-commandes-action-btn" (click)="viewColis(commande)">
+ {{ 'clientBackoffice.commandes.actionViewColis' | translate }}
+ </button>
+ } @else {
+ —
+ }
+ </td>
+ </tr>
+ } @empty {
+ <tr>
+ <td colspan="8" class="px-4 py-12 text-center text-sm text-verga-muted">{{ 'clientBackoffice.commandes.empty' | translate }}</td>
+ </tr>
+ }
+ </tbody>
+ </table>
+ </div>
+
+ @if (totalItems() > 0) {
+ <div class="mt-6 flex flex-col items-center gap-4">
+ <nav class="flex flex-wrap items-center justify-center gap-1" [attr.aria-label]="'aria.navigation' | translate">
+ <button type="button" (click)="previousPage()" [disabled]="currentPage() === 1" class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40" [attr.aria-label]="'aria.prevPage' | translate">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+ </button>
+ @for (page of pageNumbers(); track page) {
+ <button type="button" (click)="goToPage(page)" class="flex h-9 min-w-9 items-center justify-center px-2 text-sm font-medium transition" [class.bg-verga-primary]="currentPage() === page" [class.text-white]="currentPage() === page" [class.border]="currentPage() !== page" [class.border-verga-border]="currentPage() !== page" [class.bg-white]="currentPage() !== page" [class.text-verga-primary]="currentPage() !== page" [class.hover:bg-verga-primary/10]="currentPage() !== page" [attr.aria-current]="currentPage() === page ? 'page' : null">{{ page }}</button>
+ }
+ <button type="button" (click)="nextPage()" [disabled]="currentPage() === totalPages()" class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40" [attr.aria-label]="'aria.nextPage' | translate">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" /></svg>
+ </button>
+ </nav>
+ <p class="text-center text-sm text-gray-600">{{ resultsLabel() }}</p>
+ </div>
+ }
+ }
+</div>

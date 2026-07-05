@@ -1,0 +1,68 @@
+.client-reclamations-table-wrap {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.client-reclamations-table {
+  min-width: 50rem;
+  table-layout: fixed;
+}
+
+.client-reclamations-table th,
+.client-reclamations-table td {
+  vertical-align: middle;
+}
+
+.client-col-client {
+  width: 11rem;
+}
+
+.client-col-objet {
+  width: 14rem;
+}
+
+.client-col-agence {
+  width: 11rem;
+}
+
+.client-col-status {
+  width: 8.5rem;
+}
+
+.client-col-date {
+  width: 7.5rem;
+}
+
+.client-col-actions {
+  width: 7.5rem;
+}
+
+.client-cell-truncate {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.client-reclamations-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-verga-border, #e5e7eb);
+  background: #fff;
+  padding: 0.375rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-verga-primary, #1d4ed8);
+  transition: background-color 0.15s ease;
+}
+
+.client-reclamations-action-btn:hover {
+  background: color-mix(in srgb, var(--color-verga-primary, #1d4ed8) 10%, white);
+}
+
+@media (max-width: 639px) {
+  .client-reclamations-table {
+    min-width: 40rem;
+  }
+}

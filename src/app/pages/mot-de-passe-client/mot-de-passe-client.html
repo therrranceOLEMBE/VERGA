@@ -1,0 +1,101 @@
+<div class="mx-auto max-w-xl">
+ <div class="mb-8">
+ <h1 class="text-2xl font-bold text-gray-900">{{ 'clientBackoffice.password.title' | translate }}</h1>
+ <p class="mt-2 text-sm text-verga-muted">{{ 'clientBackoffice.password.subtitle' | translate }}</p>
+ </div>
+
+ @if (errorMessage()) {
+ <p class="mb-4 text-sm font-medium text-red-600" role="alert">
+ @if (errorMessage().startsWith('clientBackoffice.')) {
+ {{ errorMessage() | translate }}
+ } @else {
+ {{ errorMessage() }}
+ }
+ </p>
+ }
+ @if (successMessage()) {
+ <p class="mb-4 text-sm font-medium text-green-700" role="status">
+ @if (successMessage().startsWith('clientBackoffice.')) {
+ {{ successMessage() | translate }}
+ } @else {
+ {{ successMessage() }}
+ }
+ </p>
+ }
+
+ <form class="space-y-5 border border-verga-border bg-white p-4 sm:p-8" (ngSubmit)="onSubmit($event)">
+ <div>
+ <label for="client-current-password" class="block text-sm font-medium text-gray-700">{{ 'clientBackoffice.password.current' | translate }}</label>
+ <div class="relative mt-2">
+ <input
+ id="client-current-password"
+ name="currentPassword"
+ [type]="showCurrent() ? 'text' : 'password'"
+ required
+ autocomplete="current-password"
+ [(ngModel)]="currentPassword"
+ class="verga-field pr-12"
+ />
+ <button type="button" (click)="toggleCurrent()" class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-gray-700" [attr.aria-label]="(showCurrent() ? 'aria.hidePassword' : 'aria.showPassword') | translate">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+ <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+ </svg>
+ </button>
+ </div>
+ </div>
+
+ <div>
+ <label for="client-new-password" class="block text-sm font-medium text-gray-700">{{ 'clientBackoffice.password.new' | translate }}</label>
+ <div class="relative mt-2">
+ <input
+ id="client-new-password"
+ name="newPassword"
+ [type]="showNew() ? 'text' : 'password'"
+ required
+ minlength="8"
+ autocomplete="new-password"
+ [(ngModel)]="newPassword"
+ class="verga-field pr-12"
+ />
+ <button type="button" (click)="toggleNew()" class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-gray-700" [attr.aria-label]="(showNew() ? 'aria.hidePassword' : 'aria.showPassword') | translate">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+ <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+ </svg>
+ </button>
+ </div>
+ <p class="mt-2 text-sm text-gray-500">{{ 'auth.passwordHint' | translate }}</p>
+ </div>
+
+ <div>
+ <label for="client-confirm-password" class="block text-sm font-medium text-gray-700">{{ 'clientBackoffice.password.confirm' | translate }}</label>
+ <div class="relative mt-2">
+ <input
+ id="client-confirm-password"
+ name="confirmPassword"
+ [type]="showConfirm() ? 'text' : 'password'"
+ required
+ minlength="8"
+ autocomplete="new-password"
+ [(ngModel)]="confirmPassword"
+ class="verga-field pr-12"
+ />
+ <button type="button" (click)="toggleConfirm()" class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-gray-700" [attr.aria-label]="(showConfirm() ? 'aria.hidePassword' : 'aria.showPassword') | translate">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+ <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+ </svg>
+ </button>
+ </div>
+ </div>
+
+ <button type="submit" class="verga-btn !w-auto px-8" [disabled]="submitting()">
+ @if (submitting()) {
+ {{ 'clientBackoffice.password.saving' | translate }}
+ } @else {
+ {{ 'clientBackoffice.password.save' | translate }}
+ }
+ </button>
+ </form>
+</div>

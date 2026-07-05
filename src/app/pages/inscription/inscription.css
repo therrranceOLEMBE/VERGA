@@ -12,3 +12,30 @@
   color: var(--color-verga-primary, #5eadd6);
   background: var(--color-verga-primary-muted, #e8f4fa);
 }
+
+.inscription-steps {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.inscription-step {
+  border: 1px solid var(--color-verga-border, #e5e7eb);
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-verga-muted, #6b7280);
+  background: #fff;
+}
+
+.inscription-step.is-active {
+  border-color: var(--color-verga-primary, #5eadd6);
+  color: var(--color-verga-primary, #5eadd6);
+  background: var(--color-verga-primary-muted, #e8f4fa);
+}
+
+.inscription-step.is-done {
+  color: var(--color-verga-ink, #111827);
+}

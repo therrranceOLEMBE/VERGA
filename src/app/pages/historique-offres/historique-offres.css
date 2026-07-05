@@ -4,7 +4,14 @@
 }
 
 .offer-history-table {
-  min-width: 82rem;
+  min-width: 56rem;
+}
+
+.offer-cell-truncate {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .offer-action-btn {

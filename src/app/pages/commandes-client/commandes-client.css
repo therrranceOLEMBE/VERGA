@@ -1,0 +1,76 @@
+.client-commandes-table-wrap {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.client-commandes-table {
+  min-width: 52rem;
+  table-layout: fixed;
+}
+
+.client-commandes-table th,
+.client-commandes-table td {
+  vertical-align: middle;
+}
+
+.client-col-code {
+  width: 9rem;
+}
+
+.client-col-client {
+  width: 11rem;
+}
+
+.client-col-agence {
+  width: 11rem;
+}
+
+.client-col-quantity {
+  width: 6.5rem;
+}
+
+.client-col-amount {
+  width: 8.5rem;
+}
+
+.client-col-status {
+  width: 8.5rem;
+}
+
+.client-col-date {
+  width: 7.5rem;
+}
+
+.client-col-actions {
+  width: 7.5rem;
+}
+
+.client-commandes-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--color-verga-border, #e5e7eb);
+  background: #fff;
+  padding: 0.375rem 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-verga-primary, #1d4ed8);
+  transition: background-color 0.15s ease;
+}
+
+.client-commandes-action-btn:hover {
+  background: color-mix(in srgb, var(--color-verga-primary, #1d4ed8) 10%, white);
+}
+
+.client-cell-truncate {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 639px) {
+  .client-commandes-table {
+    min-width: 42rem;
+  }
+}

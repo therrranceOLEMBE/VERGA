@@ -1,4 +1,4 @@
-<div class="mx-auto max-w-[1600px]">
+<div class="mx-auto max-w-[1400px]">
  <div class="mb-8">
  <h1 class="text-2xl font-bold text-gray-900">{{ 'backoffice.offerHistory.title' | translate }}</h1>
  <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.offerHistory.subtitle' | translate }}</p>
@@ -6,43 +6,28 @@
 
  <section class="mb-6 border border-verga-border bg-white p-4 sm:p-6">
  <h2 class="text-sm font-bold uppercase tracking-wide text-gray-900">{{ 'backoffice.offerHistory.filters' | translate }}</h2>
- <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
- <div>
- <label for="filter-title" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.offerHistory.filterTitle' | translate }}</label>
- <input id="filter-title" type="text" [ngModel]="filterTitle()" (ngModelChange)="filterTitle.set($event); onFilterChange()" class="verga-field mt-1.5" [placeholder]="'backoffice.offerHistory.filterTitlePh' | translate" />
- </div>
- <div>
- <label for="filter-offer-type" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.offerHistory.filterOfferType' | translate }}</label>
- <select id="filter-offer-type" [ngModel]="filterOfferType()" (ngModelChange)="filterOfferType.set($event); onFilterChange()" class="verga-field mt-1.5 appearance-none bg-white">
- @for (opt of offerTypeOptions; track opt.value) {
- <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
- }
- </select>
- </div>
- <div>
- <label for="filter-transport" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.offerHistory.filterTransport' | translate }}</label>
- <select id="filter-transport" [ngModel]="filterTransport()" (ngModelChange)="filterTransport.set($event); onFilterChange()" class="verga-field mt-1.5 appearance-none bg-white">
- @for (opt of transportOptions; track opt.value) {
- <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
- }
- </select>
+ <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+ <div class="sm:col-span-2 lg:col-span-1">
+ <label for="filter-search" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.offerHistory.filterTitle' | translate }}</label>
+ <input
+ id="filter-search"
+ type="search"
+ [ngModel]="filterSearch()"
+ (ngModelChange)="filterSearch.set($event); onFilterChange()"
+ class="verga-field mt-1.5"
+ [placeholder]="'backoffice.offerHistory.filterTitlePh' | translate"
+ />
  </div>
  <div>
  <label for="filter-status" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.offerHistory.filterStatus' | translate }}</label>
- <select id="filter-status" [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event); onFilterChange()" class="verga-field mt-1.5 appearance-none bg-white">
+ <select
+ id="filter-status"
+ [ngModel]="filterStatut()"
+ (ngModelChange)="filterStatut.set($event); onFilterChange()"
+ class="verga-field mt-1.5 appearance-none bg-white"
+ >
  @for (opt of statusOptions; track opt.value) {
  <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
- }
- </select>
- </div>
- <div>
- <label for="filter-year" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.offerHistory.filterYear' | translate }}</label>
- <select id="filter-year" [ngModel]="filterYear()" (ngModelChange)="filterYear.set($event); onFilterChange()" class="verga-field mt-1.5 appearance-none bg-white">
- <option value="">{{ 'backoffice.offerHistory.allYears' | translate }}</option>
- @for (y of yearOptions; track y) {
- @if (y) {
- <option [value]="y">{{ y }}</option>
- }
  }
  </select>
  </div>
@@ -52,89 +37,129 @@
  </button>
  </section>
 
+ @if (loading()) {
+ <p class="text-sm text-verga-muted">{{ 'backoffice.offerHistory.loading' | translate }}</p>
+ } @else {
+ @if (errorMessage()) {
+ <div class="mb-4 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+ <p>
+ @if (errorMessage().startsWith('backoffice.')) {
+ {{ errorMessage() | translate }}
+ } @else {
+ {{ errorMessage() }}
+ }
+ </p>
+ @if (unauthenticated()) {
+ <a routerLink="/connexion" class="mt-2 inline-block font-semibold text-verga-primary hover:underline">
+ {{ 'backoffice.dashboard.goToLogin' | translate }}
+ </a>
+ }
+ </div>
+ }
+
  <div class="offer-history-table-wrap overflow-x-auto border border-verga-border bg-white">
  <table class="offer-history-table min-w-full text-left text-sm">
  <thead class="border-b border-verga-border bg-verga-surface text-xs font-semibold uppercase tracking-wide text-verga-muted">
  <tr>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colCode' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colTitle' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colOfferType' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colTransport' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colDeparture' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colDestination' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colPrice' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colAvailable' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colSold' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colDepartureDate' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colArrivalDate' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colPublishedDate' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colStatus' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.offerHistory.colActions' | translate }}</th>
+ <th class="px-4 py-3.5">{{ 'backoffice.offerHistory.colTitle' | translate }}</th>
+ <th class="px-4 py-3.5">{{ 'backoffice.offerHistory.colOfferType' | translate }}</th>
+ <th class="px-4 py-3.5 text-right">{{ 'backoffice.offerHistory.colPrice' | translate }}</th>
+ <th class="px-4 py-3.5 text-right">{{ 'backoffice.offerHistory.colStockAvailable' | translate }}</th>
+ <th class="px-4 py-3.5 text-right">{{ 'backoffice.offerHistory.colStockTotal' | translate }}</th>
+ <th class="px-4 py-3.5">{{ 'backoffice.offerHistory.colOrigin' | translate }}</th>
+ <th class="px-4 py-3.5">{{ 'backoffice.offerHistory.colDestination' | translate }}</th>
+ <th class="px-4 py-3.5">{{ 'backoffice.offerHistory.colStatus' | translate }}</th>
+ <th class="px-4 py-3.5">{{ 'backoffice.offerHistory.colActions' | translate }}</th>
  </tr>
  </thead>
  <tbody class="divide-y divide-verga-border">
- @for (offer of displayedOffers(); track offer.id) {
- <tr class="hover:bg-verga-primary-muted/30">
- <td class="whitespace-nowrap px-3 py-3 font-mono text-xs font-semibold text-verga-primary sm:px-4">{{ offer.code }}</td>
- <td class="whitespace-nowrap px-3 py-3 font-medium text-gray-900 sm:px-4">{{ offer.title }}</td>
- <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ offerTypeKey(offer.offerType) | translate }}</td>
- <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ transportKey(offer.transportType) | translate }}</td>
- <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ offer.departureCountry }}</td>
- <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ offer.destinationCountry }}</td>
- <td class="whitespace-nowrap px-3 py-3 font-semibold text-gray-900 sm:px-4">{{ offer.price }}</td>
- <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ quantityLabel(offer, offer.availableQuantity) }}</td>
- <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ quantityLabel(offer, offer.soldQuantity) }}</td>
- <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ offer.departureDate }}</td>
- <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ offer.arrivalDate }}</td>
- <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ offer.publishedDate }}</td>
- <td class="whitespace-nowrap px-3 py-3 sm:px-4">
- <span
- class="inline-block px-2.5 py-1 text-xs font-semibold uppercase"
- [class.bg-verga-success-muted]="offer.status === 'active'"
- [class.text-verga-success]="offer.status === 'active'"
- [class.bg-verga-primary-muted]="offer.status === 'completed'"
- [class.text-verga-primary]="offer.status === 'completed'"
- [class.bg-verga-surface]="offer.status === 'expired'"
- [class.text-verga-muted]="offer.status === 'expired'"
- >
- {{ statusKey(offer.status) | translate }}
- </span>
+ @for (offer of offers(); track offer.id) {
+ <tr class="transition hover:bg-verga-primary-muted/30">
+ <td class="max-w-xs px-4 py-3.5 font-medium text-gray-900">
+ <span class="offer-cell-truncate" [attr.title]="offer.titre">{{ offer.titre }}</span>
  </td>
- <td class="whitespace-nowrap px-3 py-3 sm:px-4">
- <div class="flex flex-wrap gap-1">
- <button type="button" (click)="openDetail(offer)" class="offer-action-btn border border-verga-border bg-white px-2 py-1 text-xs font-semibold text-verga-primary transition hover:bg-verga-primary-muted" [attr.title]="'backoffice.offerHistory.actionDetail' | translate">
+ <td class="whitespace-nowrap px-4 py-3.5 text-gray-600">
+ @if (offer.typeLabelKey) {
+ {{ offer.typeLabelKey | translate }}
+ } @else {
+ {{ offer.type || '—' }}
+ }
+ </td>
+ <td class="whitespace-nowrap px-4 py-3.5 text-right font-semibold text-gray-900 tabular-nums">{{ offer.prix }}</td>
+ <td class="whitespace-nowrap px-4 py-3.5 text-right font-medium text-gray-900 tabular-nums">{{ offer.stockDisponible }}</td>
+ <td class="whitespace-nowrap px-4 py-3.5 text-right text-gray-900 tabular-nums">{{ offer.stockTotal }}</td>
+ <td class="whitespace-nowrap px-4 py-3.5 text-gray-600">{{ offer.origine }}</td>
+ <td class="whitespace-nowrap px-4 py-3.5 text-gray-600">{{ offer.destination }}</td>
+ <td class="whitespace-nowrap px-4 py-3.5">
+ @if (offer.statutLabelKey) {
+ <span class="inline-block px-2.5 py-1 text-xs font-semibold uppercase" [class]="statusClass(offer.statut)">
+ {{ offer.statutLabelKey | translate }}
+ </span>
+ } @else if (offer.statut) {
+ <span class="inline-block bg-verga-surface px-2.5 py-1 text-xs font-semibold uppercase text-verga-muted">
+ {{ offer.statut }}
+ </span>
+ } @else {
+ —
+ }
+ </td>
+ <td class="whitespace-nowrap px-4 py-3.5">
+ <button
+ type="button"
+ (click)="openDetail(offer)"
+ class="offer-action-btn border border-verga-border bg-white px-2.5 py-1 text-xs font-semibold text-verga-primary transition hover:bg-verga-primary-muted"
+ >
  {{ 'backoffice.offerHistory.actionDetail' | translate }}
  </button>
- <button type="button" (click)="openEdit(offer)" class="offer-action-btn border border-verga-border bg-white px-2 py-1 text-xs font-semibold text-verga-primary transition hover:bg-verga-primary-muted" [attr.title]="'backoffice.offerHistory.actionEdit' | translate">
- {{ 'backoffice.offerHistory.actionEdit' | translate }}
- </button>
- <button type="button" (click)="openDelete(offer)" class="offer-action-btn border border-verga-border bg-white px-2 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50" [attr.title]="'backoffice.offerHistory.actionDelete' | translate">
- {{ 'backoffice.offerHistory.actionDelete' | translate }}
- </button>
- </div>
  </td>
  </tr>
  } @empty {
  <tr>
- <td colspan="14" class="px-4 py-10 text-center text-sm text-verga-muted">{{ 'backoffice.offerHistory.empty' | translate }}</td>
+ <td colspan="9" class="px-4 py-10 text-center text-sm text-verga-muted">{{ 'backoffice.offerHistory.empty' | translate }}</td>
  </tr>
  }
  </tbody>
  </table>
  </div>
 
- @if (filteredOffers().length > 0) {
+ @if (totalItems() > 0) {
  <div class="mt-6 flex flex-col items-center gap-4">
  <nav class="flex flex-wrap items-center justify-center gap-1" [attr.aria-label]="'aria.navigation' | translate">
- <button type="button" (click)="previousPage()" [disabled]="currentPage() === 1" class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40" [attr.aria-label]="'aria.prevPage' | translate">
+ <button
+ type="button"
+ (click)="previousPage()"
+ [disabled]="currentPage() === 1"
+ class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
+ [attr.aria-label]="'aria.prevPage' | translate"
+ >
  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
  </svg>
  </button>
  @for (page of pageNumbers(); track page) {
- <button type="button" (click)="goToPage(page)" class="flex h-9 min-w-9 items-center justify-center px-2 text-sm font-medium transition" [class.bg-verga-primary]="currentPage() === page" [class.text-white]="currentPage() === page" [class.border]="currentPage() !== page" [class.border-verga-border]="currentPage() !== page" [class.bg-white]="currentPage() !== page" [class.text-verga-primary]="currentPage() !== page" [class.hover:bg-verga-primary/10]="currentPage() !== page" [attr.aria-current]="currentPage() === page ? 'page' : null">{{ page }}</button>
+ <button
+ type="button"
+ (click)="goToPage(page)"
+ class="flex h-9 min-w-9 items-center justify-center px-2 text-sm font-medium transition"
+ [class.bg-verga-primary]="currentPage() === page"
+ [class.text-white]="currentPage() === page"
+ [class.border]="currentPage() !== page"
+ [class.border-verga-border]="currentPage() !== page"
+ [class.bg-white]="currentPage() !== page"
+ [class.text-verga-primary]="currentPage() !== page"
+ [class.hover:bg-verga-primary/10]="currentPage() !== page"
+ [attr.aria-current]="currentPage() === page ? 'page' : null"
+ >
+ {{ page }}
+ </button>
  }
- <button type="button" (click)="nextPage()" [disabled]="currentPage() === totalPages()" class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40" [attr.aria-label]="'aria.nextPage' | translate">
+ <button
+ type="button"
+ (click)="nextPage()"
+ [disabled]="currentPage() === totalPages()"
+ class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
+ [attr.aria-label]="'aria.nextPage' | translate"
+ >
  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
  </svg>
@@ -143,144 +168,91 @@
  <p class="text-center text-sm text-gray-600">{{ resultsLabel() }}</p>
  </div>
  }
+ }
 </div>
 
-@if (activeModal() === 'detail' && selectedOffer(); as offer) {
-<div class="offer-modal-backdrop fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 py-8 sm:items-center" role="dialog" aria-modal="true" (click)="onModalBackdropClick($event)">
- <div class="w-full max-w-2xl border border-verga-border bg-white shadow-lg" (click)="$event.stopPropagation()">
+@if (detailOpen()) {
+<div
+ class="offer-modal-backdrop fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 py-8 sm:items-center"
+ role="dialog"
+ aria-modal="true"
+ (click)="onModalBackdropClick($event)"
+>
+ <div class="w-full max-w-lg border border-verga-border bg-white shadow-lg" (click)="$event.stopPropagation()">
  <div class="flex items-center justify-between border-b border-verga-border px-5 py-4 sm:px-6">
  <h2 class="text-lg font-bold text-gray-900">{{ 'backoffice.offerHistory.modalDetailTitle' | translate }}</h2>
- <button type="button" (click)="closeModal()" class="text-verga-muted transition hover:text-gray-900" [attr.aria-label]="'aria.close' | translate">
+ <button type="button" (click)="closeDetail()" class="text-verga-muted transition hover:text-gray-900" [attr.aria-label]="'aria.close' | translate">
  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
  </button>
  </div>
- <div class="grid grid-cols-1 gap-4 px-5 py-6 sm:grid-cols-2 sm:px-6">
- <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colCode' | translate }}</p><p class="mt-1 font-mono text-sm font-semibold text-verga-primary">{{ offer.code }}</p></div>
- <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colTitle' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offer.title }}</p></div>
- <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colOfferType' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offerTypeKey(offer.offerType) | translate }}</p></div>
- <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colTransport' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ transportKey(offer.transportType) | translate }}</p></div>
- <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colStatus' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ statusKey(offer.status) | translate }}</p></div>
- <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colDeparture' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offer.departureCountry }}</p></div>
- <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colDestination' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offer.destinationCountry }}</p></div>
- <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colPrice' | translate }}</p><p class="mt-1 text-sm font-semibold text-gray-900">{{ offer.price }}</p></div>
- <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colAvailable' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ quantityLabel(offer, offer.availableQuantity) }}</p></div>
- <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colSold' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ quantityLabel(offer, offer.soldQuantity) }}</p></div>
- <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colDepartureDate' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offer.departureDate }}</p></div>
- <div><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colArrivalDate' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offer.arrivalDate }}</p></div>
- <div class="sm:col-span-2"><p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colPublishedDate' | translate }}</p><p class="mt-1 text-sm text-gray-900">{{ offer.publishedDate }}</p></div>
+
+ @if (detailLoading()) {
+ <p class="px-5 py-8 text-sm text-verga-muted sm:px-6">{{ 'backoffice.offerHistory.detailLoading' | translate }}</p>
+ } @else if (detailError()) {
+ <div class="px-5 py-6 text-sm text-red-600 sm:px-6" role="alert">
+ @if (detailError().startsWith('backoffice.')) {
+ {{ detailError() | translate }}
+ } @else {
+ {{ detailError() }}
+ }
  </div>
+ } @else if (selectedOffer(); as offer) {
+ <dl class="grid grid-cols-1 gap-4 px-5 py-6 sm:grid-cols-2 sm:px-6">
+ <div class="sm:col-span-2">
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colTitle' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ offer.titre }}</dd>
+ </div>
+ @if (offer.description) {
+ <div class="sm:col-span-2">
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.createOffer.description' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ offer.description }}</dd>
+ </div>
+ }
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colOfferType' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">
+ @if (offer.typeLabelKey) {
+ {{ offer.typeLabelKey | translate }}
+ } @else {
+ {{ offer.type || '—' }}
+ }
+ </dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colPrice' | translate }}</dt>
+ <dd class="mt-1 text-sm font-semibold text-gray-900">{{ offer.prix }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colStockAvailable' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ offer.stockDisponible }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colStockTotal' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ offer.stockTotal }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colOrigin' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ offer.origine }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colDestination' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ offer.destination }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colStatus' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">
+ @if (offer.statutLabelKey) {
+ {{ offer.statutLabelKey | translate }}
+ } @else {
+ {{ offer.statut || '—' }}
+ }
+ </dd>
+ </div>
+ </dl>
+ }
+
  <div class="border-t border-verga-border px-5 py-4 sm:px-6">
- <button type="button" (click)="closeModal()" class="verga-btn !w-auto px-6">{{ 'backoffice.offerHistory.close' | translate }}</button>
- </div>
- </div>
-</div>
-}
-
-@if (activeModal() === 'edit' && selectedOffer(); as offer) {
-<div class="offer-modal-backdrop fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 py-8 sm:items-center" role="dialog" aria-modal="true" (click)="onModalBackdropClick($event)">
- <div class="w-full max-w-2xl border border-verga-border bg-white shadow-lg" (click)="$event.stopPropagation()">
- <div class="flex items-center justify-between border-b border-verga-border px-5 py-4 sm:px-6">
- <h2 class="text-lg font-bold text-gray-900">{{ 'backoffice.offerHistory.modalEditTitle' | translate }}</h2>
- <button type="button" (click)="closeModal()" class="text-verga-muted transition hover:text-gray-900" [attr.aria-label]="'aria.close' | translate">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
- </button>
- </div>
- <form class="space-y-4 px-5 py-6 sm:px-6" (ngSubmit)="saveEdit($event)">
- <p class="text-sm text-verga-muted">{{ offer.code }}</p>
- <div>
- <label for="edit-title" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colTitle' | translate }} *</label>
- <input id="edit-title" name="editTitle" type="text" required [(ngModel)]="editTitle" class="verga-field mt-2" />
- </div>
- <div class="grid gap-4 sm:grid-cols-3">
- <div>
- <label for="edit-offer-type" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colOfferType' | translate }} *</label>
- <select id="edit-offer-type" name="editOfferType" required [(ngModel)]="editOfferType" class="verga-field mt-2 appearance-none bg-white">
- @for (opt of editOfferTypeOptions; track opt.value) {
- <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
- }
- </select>
- </div>
- <div>
- <label for="edit-transport" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colTransport' | translate }} *</label>
- <select id="edit-transport" name="editTransportType" required [(ngModel)]="editTransportType" class="verga-field mt-2 appearance-none bg-white">
- @for (opt of editTransportOptions; track opt.value) {
- <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
- }
- </select>
- </div>
- <div>
- <label for="edit-status" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colStatus' | translate }} *</label>
- <select id="edit-status" name="editStatus" required [(ngModel)]="editStatus" class="verga-field mt-2 appearance-none bg-white">
- @for (opt of editStatusOptions; track opt.value) {
- <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
- }
- </select>
- </div>
- </div>
- <div class="grid gap-4 sm:grid-cols-2">
- <div>
- <label for="edit-departure" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colDeparture' | translate }} *</label>
- <input id="edit-departure" name="editDepartureCountry" type="text" required [(ngModel)]="editDepartureCountry" class="verga-field mt-2" />
- </div>
- <div>
- <label for="edit-destination" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colDestination' | translate }} *</label>
- <input id="edit-destination" name="editDestinationCountry" type="text" required [(ngModel)]="editDestinationCountry" class="verga-field mt-2" />
- </div>
- </div>
- <div class="grid gap-4 sm:grid-cols-2">
- <div>
- <label for="edit-price" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colPrice' | translate }} *</label>
- <input id="edit-price" name="editPrice" type="text" required [(ngModel)]="editPrice" class="verga-field mt-2" />
- </div>
- <div>
- <label for="edit-available" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colAvailable' | translate }} *</label>
- <input id="edit-available" name="editAvailableQuantity" type="number" min="0" required [(ngModel)]="editAvailableQuantity" class="verga-field mt-2" />
- </div>
- </div>
- <div class="grid gap-4 sm:grid-cols-2">
- <div>
- <label for="edit-sold" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colSold' | translate }} *</label>
- <input id="edit-sold" name="editSoldQuantity" type="number" min="0" required [(ngModel)]="editSoldQuantity" class="verga-field mt-2" />
- </div>
- <div>
- <label for="edit-published-date" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colPublishedDate' | translate }} *</label>
- <input id="edit-published-date" name="editPublishedDate" type="date" required [(ngModel)]="editPublishedDate" class="verga-field mt-2" />
- </div>
- </div>
- <div class="grid gap-4 sm:grid-cols-2">
- <div>
- <label for="edit-departure-date" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colDepartureDate' | translate }} *</label>
- <input id="edit-departure-date" name="editDepartureDate" type="date" required [(ngModel)]="editDepartureDate" class="verga-field mt-2" />
- </div>
- <div>
- <label for="edit-arrival-date" class="block text-sm font-medium text-gray-700">{{ 'backoffice.offerHistory.colArrivalDate' | translate }} *</label>
- <input id="edit-arrival-date" name="editArrivalDate" type="date" required [(ngModel)]="editArrivalDate" class="verga-field mt-2" />
- </div>
- </div>
- <div class="flex flex-wrap gap-3 border-t border-verga-border pt-4">
- <button type="submit" class="verga-btn !w-auto px-6">{{ 'backoffice.offerHistory.save' | translate }}</button>
- <button type="button" (click)="closeModal()" class="border border-verga-border bg-white px-6 py-3 text-sm font-semibold text-gray-700 transition hover:bg-verga-surface">{{ 'backoffice.offerHistory.cancel' | translate }}</button>
- </div>
- </form>
- </div>
-</div>
-}
-
-@if (activeModal() === 'delete' && selectedOffer(); as offer) {
-<div class="offer-modal-backdrop fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 py-8 sm:items-center" role="dialog" aria-modal="true" (click)="onModalBackdropClick($event)">
- <div class="w-full max-w-md border border-verga-border bg-white shadow-lg" (click)="$event.stopPropagation()">
- <div class="flex items-center justify-between border-b border-verga-border px-5 py-4 sm:px-6">
- <h2 class="text-lg font-bold text-gray-900">{{ 'backoffice.offerHistory.modalDeleteTitle' | translate }}</h2>
- <button type="button" (click)="closeModal()" class="text-verga-muted transition hover:text-gray-900" [attr.aria-label]="'aria.close' | translate">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
- </button>
- </div>
- <div class="px-5 py-6 sm:px-6">
- <p class="text-sm text-gray-700">{{ 'backoffice.offerHistory.modalDeleteMessage' | translate:{ code: offer.code, title: offer.title } }}</p>
- </div>
- <div class="flex flex-wrap gap-3 border-t border-verga-border px-5 py-4 sm:px-6">
- <button type="button" (click)="confirmDelete()" class="border border-red-600 bg-red-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-red-700">{{ 'backoffice.offerHistory.confirmDelete' | translate }}</button>
- <button type="button" (click)="closeModal()" class="border border-verga-border bg-white px-6 py-3 text-sm font-semibold text-gray-700 transition hover:bg-verga-surface">{{ 'backoffice.offerHistory.cancel' | translate }}</button>
+ <button type="button" (click)="closeDetail()" class="verga-btn !w-auto px-6">{{ 'backoffice.offerHistory.close' | translate }}</button>
  </div>
  </div>
 </div>

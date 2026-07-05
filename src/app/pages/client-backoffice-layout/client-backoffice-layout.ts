@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { ClientBackofficeSidebar } from '../../components/client-backoffice-sidebar/client-backoffice-sidebar';
@@ -12,7 +12,7 @@ import { TransactionService } from '../../services/transaction.service';
   templateUrl: './client-backoffice-layout.html',
   styleUrl: './client-backoffice-layout.css',
 })
-export class ClientBackofficeLayout implements OnDestroy {
+export class ClientBackofficeLayout implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly clientSession = inject(ClientSessionService);
   private readonly transactionService = inject(TransactionService);
@@ -21,16 +21,24 @@ export class ClientBackofficeLayout implements OnDestroy {
   protected readonly sidebarOpen = signal(false);
 
   constructor() {
-    const client = this.clientSession.client();
-    this.transactionService.ensureClientDemoData({
-      name: this.clientSession.fullName,
-      email: client.email,
-      phone: client.phone,
-    });
-
     this.navSub = this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe(() => this.closeSidebar());
+  }
+
+  ngOnInit(): void {
+    this.clientSession.loadProfile().subscribe({
+      next: () => {
+        const client = this.clientSession.client();
+        if (client.email) {
+          this.transactionService.ensureClientDemoData({
+            name: this.clientSession.fullName,
+            email: client.email,
+            phone: client.phone,
+          });
+        }
+      },
+    });
   }
 
   ngOnDestroy(): void {

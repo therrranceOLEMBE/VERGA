@@ -43,7 +43,11 @@
 
  <p class="mt-4 text-center text-sm text-verga-muted">
  @if (formType() === 'entreprise') {
- {{ 'auth.signup.companySubtitle' | translate }}
+ @if (companyStep() === 1) {
+ {{ 'auth.signup.companyStepSubtitle' | translate }}
+ } @else {
+ {{ 'auth.signup.managerStepSubtitle' | translate }}
+ }
  } @else {
  {{ 'auth.signup.individualSubtitle' | translate }}
  }
@@ -52,21 +56,38 @@
  <form class="mt-6 flex flex-col flex-1" (ngSubmit)="onSubmit($event)">
  <div class="space-y-5">
  @if (formType() === 'entreprise') {
+ <div class="inscription-steps" [attr.aria-label]="'auth.signup.stepsLabel' | translate">
+ <div class="inscription-step" [class.is-active]="companyStep() === 1" [class.is-done]="companyStep() === 2">
+ {{ 'auth.signup.stepCompany' | translate }}
+ </div>
+ <div class="inscription-step" [class.is-active]="companyStep() === 2">
+ {{ 'auth.signup.stepManager' | translate }}
+ </div>
+ </div>
+
+ @if (companyStep() === 1) {
  <div>
- <label for="inscription-company-scope" class="block text-sm text-gray-700">
- {{ 'auth.signup.companyScope' | translate }} <span class="text-verga-primary">*</span>
+ <label for="inscription-type-agence" class="block text-sm text-gray-700">
+ {{ 'auth.signup.typeAgence' | translate }} <span class="text-verga-primary">*</span>
  </label>
  <select
- id="inscription-company-scope"
- name="companyScope"
+ id="inscription-type-agence"
+ name="typeAgenceId"
  required
- [(ngModel)]="companyScope"
+ [(ngModel)]="typeAgenceId"
  class="verga-field mt-2 appearance-none bg-white"
+ [disabled]="loadingTypeAgences() || typeAgenceOptions().length === 0"
  >
- @for (opt of companyScopeOptions; track opt.value) {
- <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
+ <option value="">{{ 'auth.signup.typeAgencePlaceholder' | translate }}</option>
+ @for (option of typeAgenceOptions(); track option.id) {
+ <option [value]="option.id">{{ option.label }}</option>
  }
  </select>
+ @if (loadingTypeAgences()) {
+ <p class="mt-2 text-sm text-verga-muted">{{ 'auth.signup.typeAgenceLoading' | translate }}</p>
+ } @else if (typeAgenceOptions().length === 0) {
+ <p class="mt-2 text-sm text-amber-700">{{ 'auth.signup.typeAgenceLoadError' | translate }}</p>
+ }
  </div>
 
  <div>
@@ -86,7 +107,7 @@
 
  <div>
  <label for="inscription-company-email" class="block text-sm text-gray-700">
- {{ 'auth.email' | translate }} <span class="text-verga-primary">*</span>
+ {{ 'auth.signup.companyEmail' | translate }} <span class="text-verga-primary">*</span>
  </label>
  <input
  id="inscription-company-email"
@@ -116,17 +137,151 @@
 
  <div>
  <label for="inscription-company-address" class="block text-sm text-gray-700">
- {{ 'auth.signup.address' | translate }}
+ {{ 'auth.signup.address' | translate }} <span class="text-verga-primary">*</span>
  </label>
  <input
  id="inscription-company-address"
  name="address"
  type="text"
  autocomplete="street-address"
+ required
  [(ngModel)]="address"
  class="verga-field mt-2"
  />
  </div>
+
+ <div class="grid gap-5 sm:grid-cols-2">
+ <div>
+ <label for="inscription-company-city" class="block text-sm text-gray-700">
+ {{ 'auth.signup.city' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <input
+ id="inscription-company-city"
+ name="city"
+ type="text"
+ autocomplete="address-level2"
+ required
+ [(ngModel)]="city"
+ class="verga-field mt-2"
+ />
+ </div>
+ <div>
+ <label for="inscription-company-country" class="block text-sm text-gray-700">
+ {{ 'auth.signup.country' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <input
+ id="inscription-company-country"
+ name="country"
+ type="text"
+ autocomplete="country-name"
+ required
+ [(ngModel)]="country"
+ class="verga-field mt-2"
+ />
+ </div>
+ </div>
+ } @else {
+ <div>
+ <label for="inscription-gerant-name" class="block text-sm text-gray-700">
+ {{ 'auth.signup.gerantName' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <input
+ id="inscription-gerant-name"
+ name="gerantName"
+ type="text"
+ autocomplete="name"
+ required
+ [(ngModel)]="gerantName"
+ class="verga-field mt-2"
+ />
+ </div>
+
+ <div>
+ <label for="inscription-gerant-email" class="block text-sm text-gray-700">
+ {{ 'auth.signup.gerantEmail' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <input
+ id="inscription-gerant-email"
+ name="gerantEmail"
+ type="email"
+ autocomplete="email"
+ required
+ [(ngModel)]="gerantEmail"
+ class="verga-field mt-2"
+ />
+ </div>
+
+ <div>
+ <label for="inscription-password" class="block text-sm text-gray-700">
+ {{ 'auth.password' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <div class="relative mt-2">
+ <input
+ id="inscription-password"
+ name="password"
+ [type]="showPassword() ? 'text' : 'password'"
+ autocomplete="new-password"
+ required
+ minlength="8"
+ [(ngModel)]="password"
+ class="verga-field pr-12"
+ />
+ <button
+ type="button"
+ (click)="togglePassword()"
+ class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-gray-700"
+ [attr.aria-label]="(showPassword() ? 'aria.hidePassword' : 'aria.showPassword') | translate"
+ >
+ @if (showPassword()) {
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+ </svg>
+ } @else {
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+ <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+ </svg>
+ }
+ </button>
+ </div>
+ <p class="mt-2 text-sm text-gray-500">{{ 'auth.passwordHint' | translate }}</p>
+ </div>
+
+ <div>
+ <label for="inscription-password-confirm" class="block text-sm text-gray-700">
+ {{ 'auth.signup.passwordConfirm' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <div class="relative mt-2">
+ <input
+ id="inscription-password-confirm"
+ name="passwordConfirmation"
+ [type]="showPasswordConfirm() ? 'text' : 'password'"
+ autocomplete="new-password"
+ required
+ minlength="8"
+ [(ngModel)]="passwordConfirmation"
+ class="verga-field pr-12"
+ />
+ <button
+ type="button"
+ (click)="togglePasswordConfirm()"
+ class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-gray-700"
+ [attr.aria-label]="(showPasswordConfirm() ? 'aria.hidePassword' : 'aria.showPassword') | translate"
+ >
+ @if (showPasswordConfirm()) {
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+ </svg>
+ } @else {
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+ <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+ </svg>
+ }
+ </button>
+ </div>
+ </div>
+ }
  } @else {
  <div class="grid gap-5 sm:grid-cols-2">
  <div>
@@ -188,15 +343,57 @@
  class="verga-field mt-2"
  />
  </div>
- }
 
  <div>
- <label for="inscription-password" class="block text-sm text-gray-700">
+ <label for="inscription-individual-address" class="block text-sm text-gray-700">
+ {{ 'auth.signup.address' | translate }}
+ </label>
+ <input
+ id="inscription-individual-address"
+ name="address"
+ type="text"
+ autocomplete="street-address"
+ [(ngModel)]="address"
+ class="verga-field mt-2"
+ />
+ </div>
+
+ <div class="grid gap-5 sm:grid-cols-2">
+ <div>
+ <label for="inscription-city" class="block text-sm text-gray-700">
+ {{ 'auth.signup.city' | translate }}
+ </label>
+ <input
+ id="inscription-city"
+ name="city"
+ type="text"
+ autocomplete="address-level2"
+ [(ngModel)]="city"
+ class="verga-field mt-2"
+ />
+ </div>
+ <div>
+ <label for="inscription-country" class="block text-sm text-gray-700">
+ {{ 'auth.signup.country' | translate }}
+ </label>
+ <input
+ id="inscription-country"
+ name="country"
+ type="text"
+ autocomplete="country-name"
+ [(ngModel)]="country"
+ class="verga-field mt-2"
+ />
+ </div>
+ </div>
+
+ <div>
+ <label for="inscription-individual-password" class="block text-sm text-gray-700">
  {{ 'auth.password' | translate }} <span class="text-verga-primary">*</span>
  </label>
  <div class="relative mt-2">
  <input
- id="inscription-password"
+ id="inscription-individual-password"
  name="password"
  [type]="showPassword() ? 'text' : 'password'"
  autocomplete="new-password"
@@ -225,7 +422,55 @@
  </div>
  <p class="mt-2 text-sm text-gray-500">{{ 'auth.passwordHint' | translate }}</p>
  </div>
+
+ @if (formType() === 'particulier') {
+ <div>
+ <label for="inscription-password-confirm" class="block text-sm text-gray-700">
+ {{ 'auth.signup.passwordConfirm' | translate }} <span class="text-verga-primary">*</span>
+ </label>
+ <div class="relative mt-2">
+ <input
+ id="inscription-password-confirm"
+ name="passwordConfirmation"
+ [type]="showPasswordConfirm() ? 'text' : 'password'"
+ autocomplete="new-password"
+ required
+ minlength="8"
+ [(ngModel)]="passwordConfirmation"
+ class="verga-field pr-12"
+ />
+ <button
+ type="button"
+ (click)="togglePasswordConfirm()"
+ class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-gray-700"
+ [attr.aria-label]="(showPasswordConfirm() ? 'aria.hidePassword' : 'aria.showPassword') | translate"
+ >
+ @if (showPasswordConfirm()) {
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+ </svg>
+ } @else {
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+ <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+ </svg>
+ }
+ </button>
  </div>
+ </div>
+ }
+ }
+ </div>
+
+ @if (errorMessage()) {
+ <p class="mt-4 text-sm font-medium text-red-600" role="alert">
+ @if (errorMessage().startsWith('auth.')) {
+ {{ errorMessage() | translate }}
+ } @else {
+ {{ errorMessage() }}
+ }
+ </p>
+ }
 
  <p class="mt-5 text-sm text-gray-600 leading-relaxed">
  {{ 'auth.legalPrefix' | translate }}
@@ -234,13 +479,24 @@
  <a href="#" class="verga-link underline">{{ 'auth.terms' | translate }}</a>.
  </p>
 
- <button type="submit" class="verga-btn mt-6">
- @if (formType() === 'entreprise') {
+ <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+ @if (formType() === 'entreprise' && companyStep() === 2) {
+ <button type="button" class="verga-btn !w-auto flex-1 bg-white !text-verga-primary border border-verga-border" (click)="previousCompanyStep()" [disabled]="submitting()">
+ {{ 'auth.signup.previousStep' | translate }}
+ </button>
+ }
+ <button type="submit" class="verga-btn flex-1" [disabled]="submitting() || (formType() === 'entreprise' && companyStep() === 1 && typeAgenceOptions().length === 0)">
+ @if (submitting()) {
+ {{ 'auth.signup.submitting' | translate }}
+ } @else if (formType() === 'entreprise' && companyStep() === 1) {
+ {{ 'auth.signup.nextStep' | translate }}
+ } @else if (formType() === 'entreprise') {
  {{ 'auth.signup.submitCompany' | translate }}
  } @else {
  {{ 'auth.signup.submitIndividual' | translate }}
  }
  </button>
+ </div>
 
  <p class="mt-auto pt-10 text-center text-sm text-gray-700">
  {{ 'auth.signup.hasAccount' | translate }}

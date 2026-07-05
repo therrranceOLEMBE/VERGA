@@ -12,11 +12,13 @@ import { CreerCollaborateur } from './pages/creer-collaborateur/creer-collaborat
 
 import { CreerOffre } from './pages/creer-offre/creer-offre';
 
+import { ColisClient } from './pages/colis-client/colis-client';
+
+import { CommandesClient } from './pages/commandes-client/commandes-client';
+
 import { DashboardClient } from './pages/dashboard-client/dashboard-client';
 
 import { HistoriqueOffres } from './pages/historique-offres/historique-offres';
-
-import { HistoriqueTransactionsClient } from './pages/historique-transactions-client/historique-transactions-client';
 
 import { ListeCollaborateurs } from './pages/liste-collaborateurs/liste-collaborateurs';
 
@@ -25,6 +27,8 @@ import { DetailOffre } from './pages/detail-offre/detail-offre';
 import { Faq } from './pages/faq/faq';
 
 import { Inscription } from './pages/inscription/inscription';
+
+import { MotDePasseClient } from './pages/mot-de-passe-client/mot-de-passe-client';
 
 import { MotDePasse } from './pages/mot-de-passe/mot-de-passe';
 
@@ -38,6 +42,8 @@ import { Profil } from './pages/profil/profil';
 
 import { ProfilClient } from './pages/profil-client/profil-client';
 
+import { ReclamationsClient } from './pages/reclamations-client/reclamations-client';
+
 import { QuiSommesNous } from './pages/qui-sommes-nous/qui-sommes-nous';
 
 import { TableauDeBord } from './pages/tableau-de-bord/tableau-de-bord';
@@ -49,6 +55,8 @@ import { Paiements } from './pages/paiements/paiements';
 import { SupportLogistique } from './pages/support-logistique/support-logistique';
 
 import { Transactions } from './pages/transactions/transactions';
+
+import { clientAuthGuard } from './guards/client-auth-guard';
 
 
 
@@ -114,15 +122,25 @@ export const routes: Routes = [
 
     component: ClientBackofficeLayout,
 
+    canActivate: [clientAuthGuard],
+
     children: [
 
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 
       { path: 'dashboard', component: DashboardClient },
 
-      { path: 'historique-transactions', component: HistoriqueTransactionsClient },
+      { path: 'commandes', component: CommandesClient },
+
+      { path: 'colis', component: ColisClient },
+
+      { path: 'reclamations', component: ReclamationsClient },
+
+      { path: 'historique-transactions', redirectTo: 'commandes', pathMatch: 'full' },
 
       { path: 'profil', component: ProfilClient },
+
+      { path: 'mot-de-passe', component: MotDePasseClient },
 
       { path: 'notifications', component: NotificationsClient },
 

@@ -4,41 +4,93 @@
  <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.profile.subtitle' | translate }}</p>
  </div>
 
- <form class="space-y-6 border border-verga-border bg-white p-4 sm:p-8" (ngSubmit)="onSubmit($event)">
- <div class="flex flex-col items-start gap-4 border-b border-verga-border pb-6 sm:flex-row sm:items-center">
- <span class="flex h-16 w-16 items-center justify-center bg-verga-primary text-xl font-bold text-white">TE</span>
+ @if (loading()) {
+ <p class="text-sm text-verga-muted">{{ 'backoffice.profile.loading' | translate }}</p>
+ } @else {
+ @if (errorMessage()) {
+ <p class="mb-4 text-sm font-medium text-red-600" role="alert">{{ errorMessage() | translate }}</p>
+ }
+
+ <div class="space-y-6">
+ <section class="border border-verga-border bg-white p-4 sm:p-8">
+ <div class="flex flex-col gap-4 border-b border-verga-border pb-6 sm:flex-row sm:items-start sm:justify-between">
+ <div class="flex items-start gap-4">
+ <span class="flex h-16 w-16 shrink-0 items-center justify-center bg-verga-primary text-xl font-bold text-white">{{ initials }}</span>
  <div>
- <p class="font-bold text-gray-900">{{ companyName }}</p>
- <p class="text-sm text-verga-muted">{{ 'backoffice.profile.accountType' | translate }} : {{ accountType }}</p>
+ <h2 class="text-xl font-bold text-gray-900">{{ displayValue(profile().companyName) }}</h2>
+ <div class="mt-2 flex flex-wrap items-center gap-2">
+ @if (profile().statusLabelKey) {
+ <span class="inline-block px-2.5 py-1 text-xs font-semibold uppercase" [class]="profile().statusClass">
+ {{ profile().statusLabelKey | translate }}
+ </span>
+ } @else if (profile().status) {
+ <span class="inline-block bg-verga-surface px-2.5 py-1 text-xs font-semibold uppercase text-verga-muted">
+ {{ profile().status }}
+ </span>
+ }
+ @if (profile().typeAgence) {
+ <span class="inline-block bg-verga-primary-muted px-2.5 py-1 text-xs font-semibold text-verga-primary">
+ {{ profile().typeAgence }}
+ </span>
+ }
+ </div>
+ @if (profile().memberSince) {
+ <p class="mt-2 text-sm text-verga-muted">
+ {{ 'backoffice.profile.memberSince' | translate }} {{ profile().memberSince }}
+ </p>
+ }
+ </div>
  </div>
  </div>
 
+ <div class="mt-6">
+ <h3 class="text-sm font-semibold uppercase tracking-wide text-verga-muted">{{ 'backoffice.profile.informationSection' | translate }}</h3>
+ <dl class="mt-4 space-y-4">
  <div>
- <label for="profile-company" class="block text-sm font-medium text-gray-700">{{ 'backoffice.profile.companyName' | translate }}</label>
- <input id="profile-company" name="companyName" type="text" [(ngModel)]="companyName" class="verga-field mt-2" />
+ <dt class="text-sm font-medium text-gray-700">{{ 'backoffice.profile.email' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ displayValue(profile().email) }}</dd>
  </div>
+ <div>
+ <dt class="text-sm font-medium text-gray-700">{{ 'backoffice.profile.phone' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ displayValue(profile().phone) }}</dd>
+ </div>
+ <div>
+ <dt class="text-sm font-medium text-gray-700">{{ 'backoffice.profile.address' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ displayValue(profile().fullAddress || profile().address) }}</dd>
+ </div>
+ @if (profile().city || profile().country) {
+ <div class="grid gap-4 sm:grid-cols-2">
+ @if (profile().city) {
+ <div>
+ <dt class="text-sm font-medium text-gray-700">{{ 'auth.signup.city' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ displayValue(profile().city) }}</dd>
+ </div>
+ }
+ @if (profile().country) {
+ <div>
+ <dt class="text-sm font-medium text-gray-700">{{ 'auth.signup.country' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ displayValue(profile().country) }}</dd>
+ </div>
+ }
+ </div>
+ }
+ </dl>
+ </div>
+ </section>
 
- <div class="grid gap-5 sm:grid-cols-2">
+ <section class="border border-verga-border bg-white p-4 sm:p-8">
+ <h3 class="text-sm font-semibold uppercase tracking-wide text-verga-muted">{{ 'backoffice.profile.managerSection' | translate }}</h3>
+ <dl class="mt-4 space-y-4">
  <div>
- <label for="profile-email" class="block text-sm font-medium text-gray-700">{{ 'backoffice.profile.email' | translate }}</label>
- <input id="profile-email" name="email" type="email" [(ngModel)]="email" class="verga-field mt-2" />
+ <dt class="text-sm font-medium text-gray-700">{{ 'auth.signup.gerantName' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ displayValue(profile().gerantName) }}</dd>
  </div>
  <div>
- <label for="profile-phone" class="block text-sm font-medium text-gray-700">{{ 'backoffice.profile.phone' | translate }}</label>
- <input id="profile-phone" name="phone" type="tel" [(ngModel)]="phone" class="verga-field mt-2" />
+ <dt class="text-sm font-medium text-gray-700">{{ 'auth.signup.gerantEmail' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ displayValue(profile().gerantEmail) }}</dd>
  </div>
+ </dl>
+ </section>
  </div>
-
- <div>
- <label for="profile-address" class="block text-sm font-medium text-gray-700">{{ 'backoffice.profile.address' | translate }}</label>
- <input id="profile-address" name="address" type="text" [(ngModel)]="address" class="verga-field mt-2" />
- </div>
-
- <div>
- <label for="profile-description" class="block text-sm font-medium text-gray-700">{{ 'backoffice.profile.description' | translate }}</label>
- <textarea id="profile-description" name="description" rows="4" [(ngModel)]="description" class="verga-field mt-2 resize-y"></textarea>
- </div>
-
- <button type="submit" class="verga-btn !w-auto px-8">{{ 'backoffice.profile.save' | translate }}</button>
- </form>
+ }
 </div>
