@@ -1,89 +1,95 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Transaction } from '../../models/transaction.model';
+import { RouterLink } from '@angular/router';
+import { AgenceColis, AgenceColisDetail, AgenceColisStatut } from '../../models/agence-colis.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LanguageService } from '../../services/language.service';
-import { TransactionService } from '../../services/transaction.service';
+import { AgenceSessionService } from '../../services/agence-session.service';
+import { extractApiErrorMessage } from '../../utils/api-error.util';
+import { parseAgenceColisDetailResponse, parseAgenceColisListResponse, isAgenceColisStatut } from '../../utils/agence-colis.util';
 
 @Component({
   selector: 'app-support-logistique',
-  imports: [FormsModule, TranslatePipe],
+  imports: [FormsModule, RouterLink, TranslatePipe],
   templateUrl: './support-logistique.html',
   styleUrl: './support-logistique.css',
 })
-export class SupportLogistique {
+export class SupportLogistique implements OnInit {
   private readonly language = inject(LanguageService);
-  private readonly transactionService = inject(TransactionService);
+  private readonly agenceSession = inject(AgenceSessionService);
 
-  protected readonly filterName = signal('');
-  protected readonly filterCode = signal('');
-  protected readonly filterStatus = signal('');
-  protected readonly filterDate = signal('');
+  protected readonly loading = signal(true);
+  protected readonly errorMessage = signal('');
+  protected readonly unauthenticated = signal(false);
+  protected readonly filterSearch = signal('');
+  protected readonly filterStatut = signal<AgenceColisStatut | ''>('');
   protected readonly currentPage = signal(1);
-  protected readonly pageSize = 5;
+  protected readonly pageSize = 15;
 
-  protected readonly statusOptions = [
-    { value: '', labelKey: 'backoffice.transactions.allStatuses' },
-    { value: 'achete', labelKey: 'backoffice.transactions.status.achete' },
-    { value: 'reserve', labelKey: 'backoffice.transactions.status.reserve' },
-    { value: 'annule', labelKey: 'backoffice.transactions.status.annule' },
-  ];
+  protected readonly colis = signal<AgenceColis[]>([]);
+  protected readonly totalPages = signal(1);
+  protected readonly totalItems = signal(0);
+  protected readonly resultsFrom = signal(0);
+  protected readonly resultsTo = signal(0);
 
-  protected readonly filteredTransactions = computed(() => {
-    const name = this.filterName().trim().toLowerCase();
-    const code = this.filterCode().trim().toLowerCase();
-    const status = this.filterStatus();
-    const date = this.filterDate();
+  protected readonly detailOpen = signal(false);
+  protected readonly detailLoading = signal(false);
+  protected readonly detailError = signal('');
+  protected readonly selectedColis = signal<AgenceColisDetail | null>(null);
 
-    return this.transactionService.list().filter((tx) => {
-      if (name && !tx.name.toLowerCase().includes(name)) return false;
-      if (code && !tx.code.toLowerCase().includes(code)) return false;
-      if (status && tx.status !== status) return false;
-      if (date && tx.date !== date) return false;
-      return true;
-    });
-  });
-
-  protected readonly totalPages = computed(() =>
-    Math.max(1, Math.ceil(this.filteredTransactions().length / this.pageSize)),
-  );
+  protected readonly advanceOpen = signal(false);
+  protected readonly advanceLoading = signal(false);
+  protected readonly advanceError = signal('');
+  protected readonly advanceComment = signal('');
+  protected readonly advanceTarget = signal<AgenceColis | null>(null);
+  protected readonly updatingColisId = signal('');
 
   protected readonly pageNumbers = computed(() =>
-    Array.from({ length: this.totalPages() }, (_, i) => i + 1),
+    Array.from({ length: this.totalPages() }, (_, index) => index + 1),
   );
-
-  protected readonly displayedTransactions = computed(() => {
-    const list = this.filteredTransactions();
-    const totalPages = Math.max(1, Math.ceil(list.length / this.pageSize));
-    const page = Math.min(this.currentPage(), totalPages);
-    const start = (page - 1) * this.pageSize;
-    return list.slice(start, start + this.pageSize);
-  });
 
   protected readonly resultsLabel = computed(() => {
     this.language.lang();
-    const list = this.filteredTransactions();
-    const total = list.length;
+    const total = this.totalItems();
     if (total === 0) {
       return this.language.translate('backoffice.supportLogistics.empty');
     }
-    const page = Math.min(this.currentPage(), this.totalPages());
-    const start = (page - 1) * this.pageSize + 1;
-    const end = Math.min(page * this.pageSize, total);
-    return this.language.translate('backoffice.supportLogistics.results', { start, end, total });
+    return this.language.translate('backoffice.supportLogistics.results', {
+      start: this.resultsFrom(),
+      end: this.resultsTo(),
+      total,
+    });
   });
 
+  protected readonly statutOptions: Array<{ value: AgenceColisStatut | ''; labelKey: string }> = [
+    { value: '', labelKey: 'backoffice.supportLogistics.filterStatusAll' },
+    { value: 'déposé', labelKey: 'backoffice.supportLogistics.status.depose' },
+    { value: 'en_transit', labelKey: 'backoffice.supportLogistics.status.en_transit' },
+    { value: 'arrivé', labelKey: 'backoffice.supportLogistics.status.arrive' },
+    { value: 'récupéré', labelKey: 'backoffice.supportLogistics.status.recupere' },
+  ];
+
+  ngOnInit(): void {
+    this.loadColis();
+  }
+
   protected resetFilters(): void {
-    this.filterName.set('');
-    this.filterCode.set('');
-    this.filterStatus.set('');
-    this.filterDate.set('');
+    this.filterSearch.set('');
+    this.filterStatut.set('');
     this.currentPage.set(1);
+    this.loadColis();
+  }
+
+  protected onFilterChange(): void {
+    this.currentPage.set(1);
+    this.loadColis();
   }
 
   protected goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
+      this.loadColis();
     }
   }
 
@@ -95,39 +101,364 @@ export class SupportLogistique {
     this.goToPage(this.currentPage() + 1);
   }
 
-  protected onFilterChange(): void {
-    this.currentPage.set(1);
+  protected statusKey(statut: string): string {
+    if (statut === 'déposé') {
+      return 'backoffice.supportLogistics.status.depose';
+    }
+    if (statut === 'en_transit') {
+      return 'backoffice.supportLogistics.status.en_transit';
+    }
+    if (statut === 'arrivé') {
+      return 'backoffice.supportLogistics.status.arrive';
+    }
+    if (statut === 'récupéré') {
+      return 'backoffice.supportLogistics.status.recupere';
+    }
+    return 'backoffice.supportLogistics.status.unknown';
   }
 
-  protected statusKey(status: Transaction['status']): string {
-    return `backoffice.transactions.status.${status}`;
+  protected statusClass(statut: string): string {
+    if (statut === 'récupéré') {
+      return 'bg-verga-success-muted text-verga-success';
+    }
+    if (statut === 'arrivé') {
+      return 'bg-verga-primary-muted text-verga-primary';
+    }
+    if (statut === 'en_transit') {
+      return 'bg-amber-50 text-amber-700';
+    }
+    return 'bg-verga-surface text-verga-muted';
   }
 
-  protected yesNoKey(value: boolean): string {
-    return value ? 'backoffice.transactions.yes' : 'backoffice.transactions.no';
+  protected openDetail(item: AgenceColis): void {
+    this.detailOpen.set(true);
+    this.selectedColis.set(null);
+    this.detailLoading.set(true);
+    this.detailError.set('');
+
+    this.agenceSession.loadColisDetail(item.id).subscribe({
+      next: (response) => {
+        this.selectedColis.set(parseAgenceColisDetailResponse(response));
+        this.detailLoading.set(false);
+      },
+      error: (error: HttpErrorResponse | Error) => {
+        if (error instanceof Error && error.message === 'No agence token') {
+          this.detailError.set('backoffice.supportLogistics.authRequired');
+        } else {
+          this.detailError.set(this.resolveDetailError(error as HttpErrorResponse));
+        }
+        this.detailLoading.set(false);
+      },
+    });
   }
 
-  protected canValidateDeposited(tx: Transaction): boolean {
-    return tx.status !== 'annule' && !tx.depositedAtAgency;
+  protected closeDetail(): void {
+    this.detailOpen.set(false);
+    this.selectedColis.set(null);
+    this.detailLoading.set(false);
+    this.detailError.set('');
   }
 
-  protected canValidateArrived(tx: Transaction): boolean {
-    return tx.status !== 'annule' && tx.depositedAtAgency && !tx.arrivedInDestination;
+  protected onModalBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closeDetail();
+    }
   }
 
-  protected canValidatePickedUp(tx: Transaction): boolean {
-    return tx.status !== 'annule' && tx.arrivedInDestination && !tx.pickedUpByClient;
+  protected canAdvance(item: AgenceColis | AgenceColisDetail): boolean {
+    return Boolean(item.nextStatut?.trim());
   }
 
-  protected validateDeposited(tx: Transaction): void {
-    this.transactionService.validateDeposited(tx.id);
+  protected isUpdating(itemId: string): boolean {
+    return this.updatingColisId() === itemId;
   }
 
-  protected validateArrived(tx: Transaction): void {
-    this.transactionService.validateArrived(tx.id);
+  protected advanceActionLabel(nextStatut: string): string {
+    return this.language.translate('backoffice.supportLogistics.actionAdvanceTo', {
+      statut: this.language.translate(this.statusKey(nextStatut)),
+    });
   }
 
-  protected validatePickedUp(tx: Transaction): void {
-    this.transactionService.validatePickedUp(tx.id);
+  protected advanceModalSubtitle(target: AgenceColis): string {
+    return this.language.translate('backoffice.supportLogistics.advanceModalSubtitle', {
+      reference: target.reference,
+      statut: this.language.translate(this.statusKey(target.nextStatut)),
+    });
+  }
+
+  protected openAdvance(item: AgenceColis | AgenceColisDetail): void {
+    if (!this.canAdvance(item)) {
+      return;
+    }
+    this.advanceTarget.set({
+      id: item.id,
+      reference: item.reference,
+      commande: item.commande,
+      description: item.description,
+      agence: item.agence,
+      poids: item.poids,
+      statut: item.statut,
+      nextStatut: item.nextStatut,
+    });
+    this.advanceComment.set('');
+    this.advanceError.set('');
+    this.advanceOpen.set(true);
+  }
+
+  protected closeAdvance(): void {
+    this.advanceOpen.set(false);
+    this.advanceTarget.set(null);
+    this.advanceComment.set('');
+    this.advanceError.set('');
+    this.advanceLoading.set(false);
+  }
+
+  protected onAdvanceBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget && !this.advanceLoading()) {
+      this.closeAdvance();
+    }
+  }
+
+  protected confirmAdvance(): void {
+    const target = this.advanceTarget();
+    if (!target || !this.canAdvance(target)) {
+      return;
+    }
+
+    const nextStatut = target.nextStatut.trim();
+    if (!isAgenceColisStatut(nextStatut)) {
+      this.advanceError.set('backoffice.supportLogistics.advanceStatusInvalid');
+      return;
+    }
+
+    const commentaire = this.advanceComment().trim();
+    const payload = {
+      statut: nextStatut,
+      ...(commentaire ? { commentaire } : {}),
+    };
+
+    this.advanceLoading.set(true);
+    this.advanceError.set('');
+    this.updatingColisId.set(target.id);
+
+    this.agenceSession.advanceColisStatut(target.id, payload).subscribe({
+      next: (response) => {
+        const updated = parseAgenceColisDetailResponse(response);
+        this.applyColisUpdate(updated);
+        this.advanceLoading.set(false);
+        this.updatingColisId.set('');
+        this.closeAdvance();
+      },
+      error: (error: HttpErrorResponse | Error) => {
+        if (error instanceof Error && error.message === 'No agence token') {
+          this.advanceError.set('backoffice.supportLogistics.authRequired');
+        } else {
+          this.advanceError.set(this.resolveAdvanceError(error as HttpErrorResponse));
+        }
+        this.advanceLoading.set(false);
+        this.updatingColisId.set('');
+      },
+    });
+  }
+
+  protected exportExcel(): void {
+    const rows = this.buildExportRows();
+    if (rows.length <= 1) {
+      return;
+    }
+
+    const tableRows = rows
+      .map(
+        (row, index) =>
+          `<tr>${row.map((cell) => (index === 0 ? `<th>${this.escapeHtml(cell)}</th>` : `<td>${this.escapeHtml(cell)}</td>`)).join('')}</tr>`,
+      )
+      .join('');
+
+    const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1">${tableRows}</table></body></html>`;
+    this.downloadFile(html, 'colis-agence.xls', 'application/vnd.ms-excel;charset=utf-8');
+  }
+
+  protected exportPdf(): void {
+    const rows = this.buildExportRows();
+    if (rows.length <= 1) {
+      return;
+    }
+
+    const title = this.language.translate('backoffice.supportLogistics.title');
+    const tableRows = rows
+      .map(
+        (row, index) =>
+          `<tr>${row.map((cell) => (index === 0 ? `<th>${this.escapeHtml(cell)}</th>` : `<td>${this.escapeHtml(cell)}</td>`)).join('')}</tr>`,
+      )
+      .join('');
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) {
+      return;
+    }
+
+    printWindow.document.write(`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>${this.escapeHtml(title)}</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 24px; color: #111; }
+  h1 { font-size: 20px; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  th, td { border: 1px solid #ccc; padding: 6px 8px; text-align: left; }
+  th { background: #f3f4f6; }
+</style>
+</head>
+<body>
+<h1>${this.escapeHtml(title)}</h1>
+<table>${tableRows}</table>
+</body>
+</html>`);
+    printWindow.document.close();
+    printWindow.focus();
+    printWindow.print();
+  }
+
+  private loadColis(): void {
+    if (!this.agenceSession.isAuthenticated()) {
+      this.loading.set(false);
+      this.unauthenticated.set(true);
+      this.errorMessage.set('backoffice.supportLogistics.authRequired');
+      this.colis.set([]);
+      return;
+    }
+
+    this.loading.set(true);
+    this.errorMessage.set('');
+    this.unauthenticated.set(false);
+
+    const statut = this.filterStatut();
+    this.agenceSession
+      .loadColis({
+        search: this.filterSearch().trim() || undefined,
+        statut: statut || undefined,
+        page: this.currentPage(),
+        per_page: this.pageSize,
+      })
+      .subscribe({
+        next: (response) => {
+          const page = parseAgenceColisListResponse(response);
+          this.colis.set(page.items);
+          this.currentPage.set(page.currentPage);
+          this.totalPages.set(page.lastPage);
+          this.totalItems.set(page.total);
+          this.resultsFrom.set(page.from);
+          this.resultsTo.set(page.to);
+          this.loading.set(false);
+        },
+        error: (error: HttpErrorResponse | Error) => {
+          if (error instanceof Error && error.message === 'No agence token') {
+            this.unauthenticated.set(true);
+            this.errorMessage.set('backoffice.supportLogistics.authRequired');
+          } else {
+            this.errorMessage.set(this.resolveLoadError(error as HttpErrorResponse));
+          }
+          this.colis.set([]);
+          this.loading.set(false);
+        },
+      });
+  }
+
+  private buildExportRows(): string[][] {
+    const t = (key: string) => this.language.translate(key);
+    const header = [
+      t('backoffice.supportLogistics.colReference'),
+      t('backoffice.supportLogistics.colCommande'),
+      t('backoffice.supportLogistics.colDescription'),
+      t('backoffice.supportLogistics.colAgence'),
+      t('backoffice.supportLogistics.colPoids'),
+      t('backoffice.supportLogistics.colStatus'),
+    ];
+
+    const data = this.colis().map((item) => [
+      item.reference,
+      item.commande,
+      item.description,
+      item.agence,
+      item.poids,
+      item.statut ? t(this.statusKey(item.statut)) : '—',
+    ]);
+
+    return [header, ...data];
+  }
+
+  private escapeHtml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  private downloadFile(content: string, filename: string, mimeType: string): void {
+    const blob = new Blob(['\ufeff', content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
+  }
+
+  private applyColisUpdate(updated: AgenceColisDetail): void {
+    this.colis.update((items) =>
+      items.map((item) =>
+        item.id === updated.id
+          ? {
+              id: updated.id,
+              reference: updated.reference,
+              commande: updated.commande,
+              description: updated.description,
+              agence: updated.agence,
+              poids: updated.poids,
+              statut: updated.statut,
+              nextStatut: updated.nextStatut,
+            }
+          : item,
+      ),
+    );
+
+    if (this.selectedColis()?.id === updated.id) {
+      this.selectedColis.set(updated);
+    }
+  }
+
+  private resolveLoadError(error: HttpErrorResponse): string {
+    if (error.status === 401) {
+      return 'backoffice.supportLogistics.authRequired';
+    }
+    const apiMessage = extractApiErrorMessage(error);
+    return apiMessage ?? 'backoffice.supportLogistics.loadError';
+  }
+
+  private resolveDetailError(error: HttpErrorResponse): string {
+    if (error.status === 401) {
+      return 'backoffice.supportLogistics.authRequired';
+    }
+    if (error.status === 404) {
+      return 'backoffice.supportLogistics.detailNotFound';
+    }
+    const apiMessage = extractApiErrorMessage(error);
+    return apiMessage ?? 'backoffice.supportLogistics.detailLoadError';
+  }
+
+  private resolveAdvanceError(error: HttpErrorResponse): string {
+    if (error.status === 401) {
+      return 'backoffice.supportLogistics.authRequired';
+    }
+    if (error.status === 404) {
+      return 'backoffice.supportLogistics.detailNotFound';
+    }
+    if (error.status === 422) {
+      return 'backoffice.supportLogistics.advanceStatusInvalid';
+    }
+    const apiMessage = extractApiErrorMessage(error);
+    return apiMessage ?? 'backoffice.supportLogistics.advanceStatusError';
   }
 }

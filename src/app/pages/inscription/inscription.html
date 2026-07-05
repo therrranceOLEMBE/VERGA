@@ -80,7 +80,7 @@
  >
  <option value="">{{ 'auth.signup.typeAgencePlaceholder' | translate }}</option>
  @for (option of typeAgenceOptions(); track option.id) {
- <option [value]="option.id">{{ option.label }}</option>
+ <option [value]="option.id" [title]="option.description || ''">{{ option.label }}</option>
  }
  </select>
  @if (loadingTypeAgences()) {

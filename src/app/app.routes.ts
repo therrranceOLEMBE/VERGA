@@ -6,6 +6,8 @@ import { BackofficeLayout } from './pages/backoffice-layout/backoffice-layout';
 
 import { ClientBackofficeLayout } from './pages/client-backoffice-layout/client-backoffice-layout';
 
+import { Commandes } from './pages/commandes/commandes';
+
 import { Connexion } from './pages/connexion/connexion';
 
 import { CreerCollaborateur } from './pages/creer-collaborateur/creer-collaborateur';
@@ -52,9 +54,9 @@ import { Tarifs } from './pages/tarifs/tarifs';
 
 import { Paiements } from './pages/paiements/paiements';
 
-import { SupportLogistique } from './pages/support-logistique/support-logistique';
+import { Reclamations } from './pages/reclamations/reclamations';
 
-import { Transactions } from './pages/transactions/transactions';
+import { SupportLogistique } from './pages/support-logistique/support-logistique';
 
 import { clientAuthGuard } from './guards/client-auth-guard';
 
@@ -96,9 +98,13 @@ export const routes: Routes = [
 
       { path: 'historique-offres', component: HistoriqueOffres },
 
-      { path: 'transactions', component: Transactions },
+      { path: 'commandes', component: Commandes },
+
+      { path: 'transactions', redirectTo: 'paiements', pathMatch: 'full' },
 
       { path: 'paiements', component: Paiements },
+
+      { path: 'reclamations', component: Reclamations },
 
       { path: 'support-logistique', component: SupportLogistique },
 

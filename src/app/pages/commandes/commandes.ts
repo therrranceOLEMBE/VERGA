@@ -1,21 +1,22 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { AgencePaiement, AgencePaiementStatut } from '../../models/agence-paiement.model';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { AgenceCommande, AgenceCommandeDetail, AgenceCommandeStatut } from '../../models/agence-commande.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LanguageService } from '../../services/language.service';
 import { AgenceSessionService } from '../../services/agence-session.service';
 import { extractApiErrorMessage } from '../../utils/api-error.util';
-import { parseAgencePaiementsListResponse } from '../../utils/agence-paiement.util';
+import { parseAgenceCommandeDetailResponse, parseAgenceCommandesListResponse } from '../../utils/agence-commande.util';
 
 @Component({
-  selector: 'app-paiements',
+  selector: 'app-commandes',
   imports: [FormsModule, RouterLink, TranslatePipe],
-  templateUrl: './paiements.html',
-  styleUrl: './paiements.css',
+  templateUrl: './commandes.html',
+  styleUrl: './commandes.css',
 })
-export class Paiements implements OnInit {
+export class Commandes implements OnInit {
+  private readonly route = inject(ActivatedRoute);
   private readonly language = inject(LanguageService);
   private readonly agenceSession = inject(AgenceSessionService);
 
@@ -23,15 +24,20 @@ export class Paiements implements OnInit {
   protected readonly errorMessage = signal('');
   protected readonly unauthenticated = signal(false);
   protected readonly filterSearch = signal('');
-  protected readonly filterStatut = signal<AgencePaiementStatut | ''>('');
+  protected readonly filterStatut = signal<AgenceCommandeStatut | ''>('');
   protected readonly currentPage = signal(1);
   protected readonly pageSize = 15;
 
-  protected readonly paiements = signal<AgencePaiement[]>([]);
+  protected readonly commandes = signal<AgenceCommande[]>([]);
   protected readonly totalPages = signal(1);
   protected readonly totalItems = signal(0);
   protected readonly resultsFrom = signal(0);
   protected readonly resultsTo = signal(0);
+
+  protected readonly detailOpen = signal(false);
+  protected readonly detailLoading = signal(false);
+  protected readonly detailError = signal('');
+  protected readonly selectedCommande = signal<AgenceCommandeDetail | null>(null);
 
   protected readonly pageNumbers = computed(() =>
     Array.from({ length: this.totalPages() }, (_, index) => index + 1),
@@ -41,43 +47,47 @@ export class Paiements implements OnInit {
     this.language.lang();
     const total = this.totalItems();
     if (total === 0) {
-      return this.language.translate('backoffice.payments.empty');
+      return this.language.translate('backoffice.commandes.empty');
     }
-    return this.language.translate('backoffice.payments.results', {
+    return this.language.translate('backoffice.commandes.results', {
       start: this.resultsFrom(),
       end: this.resultsTo(),
       total,
     });
   });
 
-  protected readonly statutOptions: Array<{ value: AgencePaiementStatut | ''; labelKey: string }> = [
-    { value: '', labelKey: 'backoffice.payments.filterStatusAll' },
-    { value: 'en_attente', labelKey: 'backoffice.payments.status.en_attente' },
-    { value: 'validé', labelKey: 'backoffice.payments.status.valide' },
-    { value: 'remboursé', labelKey: 'backoffice.payments.status.rembourse' },
-    { value: 'échec', labelKey: 'backoffice.payments.status.echec' },
+  protected readonly statutOptions: Array<{ value: AgenceCommandeStatut | ''; labelKey: string }> = [
+    { value: '', labelKey: 'backoffice.commandes.filterStatusAll' },
+    { value: 'en_attente', labelKey: 'backoffice.commandes.status.en_attente' },
+    { value: 'réservée', labelKey: 'backoffice.commandes.status.reservee' },
+    { value: 'confirmée', labelKey: 'backoffice.commandes.status.confirmee' },
+    { value: 'annulée', labelKey: 'backoffice.commandes.status.annulee' },
   ];
 
   ngOnInit(): void {
-    this.loadPaiements();
+    const search = this.route.snapshot.queryParamMap.get('search');
+    if (search) {
+      this.filterSearch.set(search);
+    }
+    this.loadCommandes();
   }
 
   protected resetFilters(): void {
     this.filterSearch.set('');
     this.filterStatut.set('');
     this.currentPage.set(1);
-    this.loadPaiements();
+    this.loadCommandes();
   }
 
   protected onFilterChange(): void {
     this.currentPage.set(1);
-    this.loadPaiements();
+    this.loadCommandes();
   }
 
   protected goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
-      this.loadPaiements();
+      this.loadCommandes();
     }
   }
 
@@ -89,36 +99,70 @@ export class Paiements implements OnInit {
     this.goToPage(this.currentPage() + 1);
   }
 
+  protected openDetail(commande: AgenceCommande): void {
+    this.detailOpen.set(true);
+    this.selectedCommande.set(null);
+    this.detailLoading.set(true);
+    this.detailError.set('');
+
+    this.agenceSession.loadCommande(commande.id).subscribe({
+      next: (response) => {
+        this.selectedCommande.set(parseAgenceCommandeDetailResponse(response));
+        this.detailLoading.set(false);
+      },
+      error: (error: HttpErrorResponse | Error) => {
+        if (error instanceof Error && error.message === 'No agence token') {
+          this.detailError.set('backoffice.commandes.authRequired');
+        } else {
+          this.detailError.set(this.resolveDetailError(error as HttpErrorResponse));
+        }
+        this.detailLoading.set(false);
+      },
+    });
+  }
+
+  protected closeDetail(): void {
+    this.detailOpen.set(false);
+    this.selectedCommande.set(null);
+    this.detailLoading.set(false);
+    this.detailError.set('');
+  }
+
+  protected onModalBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closeDetail();
+    }
+  }
+
   protected statusKey(statut: string): string {
-    if (statut === 'en_attente') {
-      return 'backoffice.payments.status.en_attente';
+    const normalized = statut.trim().toLowerCase();
+    if (normalized === 'confirmée' || normalized === 'confirmee') {
+      return 'backoffice.commandes.status.confirmee';
     }
-    if (statut === 'validé') {
-      return 'backoffice.payments.status.valide';
+    if (normalized === 'annulée' || normalized === 'annulee') {
+      return 'backoffice.commandes.status.annulee';
     }
-    if (statut === 'remboursé') {
-      return 'backoffice.payments.status.rembourse';
+    if (normalized === 'réservée' || normalized === 'reservee') {
+      return 'backoffice.commandes.status.reservee';
     }
-    if (statut === 'échec') {
-      return 'backoffice.payments.status.echec';
+    if (normalized === 'en_attente') {
+      return 'backoffice.commandes.status.en_attente';
     }
-    return 'backoffice.payments.status.unknown';
+    return 'backoffice.commandes.status.unknown';
   }
 
   protected statusClass(statut: string): string {
-    if (statut === 'validé') {
+    const normalized = statut.trim().toLowerCase();
+    if (normalized === 'confirmée' || normalized === 'confirmee') {
       return 'bg-verga-success-muted text-verga-success';
     }
-    if (statut === 'en_attente') {
-      return 'bg-verga-primary-muted text-verga-primary';
-    }
-    if (statut === 'remboursé') {
-      return 'bg-amber-50 text-amber-700';
-    }
-    if (statut === 'échec') {
+    if (normalized === 'annulée' || normalized === 'annulee') {
       return 'bg-verga-surface text-verga-muted';
     }
-    return 'bg-verga-surface text-verga-muted';
+    if (normalized === 'réservée' || normalized === 'reservee') {
+      return 'bg-verga-primary-muted text-verga-primary';
+    }
+    return 'bg-amber-50 text-amber-800';
   }
 
   protected exportExcel(): void {
@@ -135,7 +179,7 @@ export class Paiements implements OnInit {
       .join('');
 
     const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body><table border="1">${tableRows}</table></body></html>`;
-    this.downloadFile(html, 'paiements-agence.xls', 'application/vnd.ms-excel;charset=utf-8');
+    this.downloadFile(html, 'commandes-agence.xls', 'application/vnd.ms-excel;charset=utf-8');
   }
 
   protected exportPdf(): void {
@@ -144,7 +188,7 @@ export class Paiements implements OnInit {
       return;
     }
 
-    const title = this.language.translate('backoffice.payments.title');
+    const title = this.language.translate('backoffice.commandes.title');
     const tableRows = rows
       .map(
         (row, index) =>
@@ -180,12 +224,12 @@ export class Paiements implements OnInit {
     printWindow.print();
   }
 
-  private loadPaiements(): void {
+  private loadCommandes(): void {
     if (!this.agenceSession.isAuthenticated()) {
       this.loading.set(false);
       this.unauthenticated.set(true);
-      this.errorMessage.set('backoffice.payments.authRequired');
-      this.paiements.set([]);
+      this.errorMessage.set('backoffice.commandes.authRequired');
+      this.commandes.set([]);
       return;
     }
 
@@ -195,7 +239,7 @@ export class Paiements implements OnInit {
 
     const statut = this.filterStatut();
     this.agenceSession
-      .loadPaiements({
+      .loadCommandes({
         search: this.filterSearch().trim() || undefined,
         statut: statut || undefined,
         page: this.currentPage(),
@@ -203,8 +247,8 @@ export class Paiements implements OnInit {
       })
       .subscribe({
         next: (response) => {
-          const page = parseAgencePaiementsListResponse(response);
-          this.paiements.set(page.items);
+          const page = parseAgenceCommandesListResponse(response);
+          this.commandes.set(page.items);
           this.currentPage.set(page.currentPage);
           this.totalPages.set(page.lastPage);
           this.totalItems.set(page.total);
@@ -215,11 +259,11 @@ export class Paiements implements OnInit {
         error: (error: HttpErrorResponse | Error) => {
           if (error instanceof Error && error.message === 'No agence token') {
             this.unauthenticated.set(true);
-            this.errorMessage.set('backoffice.payments.authRequired');
+            this.errorMessage.set('backoffice.commandes.authRequired');
           } else {
             this.errorMessage.set(this.resolveLoadError(error as HttpErrorResponse));
           }
-          this.paiements.set([]);
+          this.commandes.set([]);
           this.loading.set(false);
         },
       });
@@ -228,23 +272,21 @@ export class Paiements implements OnInit {
   private buildExportRows(): string[][] {
     const t = (key: string) => this.language.translate(key);
     const header = [
-      t('backoffice.payments.colCodeVerga'),
-      t('backoffice.payments.colBambooRef'),
-      t('backoffice.payments.colCommande'),
-      t('backoffice.payments.colAmount'),
-      t('backoffice.payments.colMethod'),
-      t('backoffice.payments.colStatus'),
-      t('backoffice.payments.colDate'),
+      t('backoffice.commandes.colCode'),
+      t('backoffice.commandes.colClient'),
+      t('backoffice.commandes.colQuantity'),
+      t('backoffice.commandes.colAmount'),
+      t('backoffice.commandes.colStatus'),
+      t('backoffice.commandes.colDate'),
     ];
 
-    const data = this.paiements().map((paiement) => [
-      paiement.codeVerga,
-      paiement.refBamboo,
-      paiement.commande,
-      paiement.montant,
-      paiement.methode,
-      paiement.statut ? t(this.statusKey(paiement.statut)) : '—',
-      paiement.date,
+    const data = this.commandes().map((commande) => [
+      commande.code,
+      commande.client || '—',
+      commande.quantite,
+      commande.montant,
+      t(this.statusKey(commande.statut)),
+      commande.date,
     ]);
 
     return [header, ...data];
@@ -270,9 +312,20 @@ export class Paiements implements OnInit {
 
   private resolveLoadError(error: HttpErrorResponse): string {
     if (error.status === 401) {
-      return 'backoffice.payments.authRequired';
+      return 'backoffice.commandes.authRequired';
     }
     const apiMessage = extractApiErrorMessage(error);
-    return apiMessage ?? 'backoffice.payments.loadError';
+    return apiMessage ?? 'backoffice.commandes.loadError';
+  }
+
+  private resolveDetailError(error: HttpErrorResponse): string {
+    if (error.status === 401) {
+      return 'backoffice.commandes.authRequired';
+    }
+    if (error.status === 404) {
+      return 'backoffice.commandes.detailNotFound';
+    }
+    const apiMessage = extractApiErrorMessage(error);
+    return apiMessage ?? 'backoffice.commandes.detailLoadError';
   }
 }

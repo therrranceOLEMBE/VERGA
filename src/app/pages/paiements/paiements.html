@@ -1,95 +1,186 @@
-<div class="mx-auto max-w-[1600px]">
+<div class="paiements-page mx-auto max-w-[1400px]">
  <div class="mb-8">
  <h1 class="text-2xl font-bold text-gray-900">{{ 'backoffice.payments.title' | translate }}</h1>
  <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.payments.subtitle' | translate }}</p>
  </div>
 
- <section class="mb-6 border border-verga-border bg-white p-5 sm:p-6">
+ @if (loading()) {
+ <p class="text-sm text-verga-muted">{{ 'backoffice.payments.loading' | translate }}</p>
+ } @else {
+ @if (errorMessage()) {
+ <div class="mb-4 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+ <p>
+ @if (errorMessage().startsWith('backoffice.')) {
+ {{ errorMessage() | translate }}
+ } @else {
+ {{ errorMessage() }}
+ }
+ </p>
+ @if (unauthenticated()) {
+ <a routerLink="/connexion" class="mt-2 inline-block font-semibold text-verga-primary hover:underline">
+ {{ 'backoffice.dashboard.goToLogin' | translate }}
+ </a>
+ }
+ </div>
+ }
+
+ <section class="paiements-panel border border-verga-border bg-white">
+ <div class="paiements-panel-filters border-b border-verga-border p-4 sm:p-6">
  <h2 class="text-sm font-bold uppercase tracking-wide text-gray-900">{{ 'backoffice.payments.filters' | translate }}</h2>
- <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+ <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
  <div>
- <label for="filter-client" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.payments.filterClient' | translate }}</label>
- <input id="filter-client" type="text" [ngModel]="filterClient()" (ngModelChange)="filterClient.set($event); onFilterChange()" class="verga-field mt-1.5" [placeholder]="'backoffice.payments.filterClientPh' | translate" />
+ <label for="filter-paiement-search" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.payments.filterReference' | translate }}</label>
+ <input
+ id="filter-paiement-search"
+ type="search"
+ [ngModel]="filterSearch()"
+ (ngModelChange)="filterSearch.set($event); onFilterChange()"
+ class="verga-field mt-1.5"
+ [placeholder]="'backoffice.payments.filterReferencePh' | translate"
+ />
  </div>
  <div>
- <label for="filter-reference" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.payments.filterReference' | translate }}</label>
- <input id="filter-reference" type="text" [ngModel]="filterReference()" (ngModelChange)="filterReference.set($event); onFilterChange()" class="verga-field mt-1.5" placeholder="TXN-2026-..." />
- </div>
- <div>
- <label for="filter-status" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.payments.colStatus' | translate }}</label>
- <select id="filter-status" [ngModel]="filterStatus()" (ngModelChange)="filterStatus.set($event); onFilterChange()" class="verga-field mt-1.5 appearance-none bg-white">
- @for (opt of statusOptions; track opt.value) {
- <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
+ <label for="filter-paiement-statut" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.payments.filterStatus' | translate }}</label>
+ <select
+ id="filter-paiement-statut"
+ [ngModel]="filterStatut()"
+ (ngModelChange)="filterStatut.set($event); onFilterChange()"
+ class="verga-field mt-1.5 appearance-none bg-white"
+ >
+ @for (option of statutOptions; track option.value) {
+ <option [ngValue]="option.value">{{ option.labelKey | translate }}</option>
  }
  </select>
  </div>
- <div>
- <label for="filter-date" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.payments.filterDate' | translate }}</label>
- <input id="filter-date" type="date" [ngModel]="filterDate()" (ngModelChange)="filterDate.set($event); onFilterChange()" class="verga-field mt-1.5" />
  </div>
- </div>
- <button type="button" (click)="resetFilters()" class="mt-4 text-sm font-semibold text-verga-primary hover:underline">
+ <div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+ <button type="button" (click)="resetFilters()" class="self-start text-sm font-semibold text-verga-primary hover:underline">
  {{ 'backoffice.payments.reset' | translate }}
  </button>
- </section>
+ <div class="flex flex-wrap items-center gap-2">
+ <span class="text-xs font-semibold uppercase tracking-wide text-verga-muted">{{ 'backoffice.transactions.export' | translate }}</span>
+ <button
+ type="button"
+ (click)="exportExcel()"
+ [disabled]="paiements().length === 0"
+ class="paiements-export-btn border border-verga-border bg-white px-3 py-2 text-xs font-semibold uppercase text-verga-primary transition hover:bg-verga-primary-muted disabled:cursor-not-allowed disabled:opacity-40"
+ >
+ {{ 'backoffice.payments.exportExcel' | translate }}
+ </button>
+ <button
+ type="button"
+ (click)="exportPdf()"
+ [disabled]="paiements().length === 0"
+ class="paiements-export-btn border border-verga-border bg-white px-3 py-2 text-xs font-semibold uppercase text-verga-primary transition hover:bg-verga-primary-muted disabled:cursor-not-allowed disabled:opacity-40"
+ >
+ {{ 'backoffice.payments.exportPdf' | translate }}
+ </button>
+ </div>
+ </div>
+ </div>
 
- <div class="payments-table-wrap overflow-x-auto border border-verga-border bg-white">
- <table class="payments-table min-w-full text-left text-sm">
- <thead class="border-b border-verga-border bg-verga-surface text-xs font-semibold uppercase tracking-wide text-verga-muted">
- <tr>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.payments.colDate' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.payments.colClient' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.payments.colAmount' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.payments.colBambooRef' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 sm:px-4">{{ 'backoffice.payments.colStatus' | translate }}</th>
- <th class="min-w-[12rem] px-3 py-3 sm:px-4">{{ 'backoffice.payments.colMessage' | translate }}</th>
+ <div class="paiements-table-wrap overflow-x-auto">
+ <table class="paiements-table w-full table-fixed text-left text-sm">
+ <colgroup>
+ <col class="paiements-col-code" />
+ <col class="paiements-col-bamboo" />
+ <col class="paiements-col-commande" />
+ <col class="paiements-col-amount" />
+ <col class="paiements-col-method" />
+ <col class="paiements-col-status" />
+ <col class="paiements-col-date" />
+ </colgroup>
+ <thead>
+ <tr class="paiements-table-head">
+ <th scope="col">{{ 'backoffice.payments.colCodeVerga' | translate }}</th>
+ <th scope="col">{{ 'backoffice.payments.colBambooRef' | translate }}</th>
+ <th scope="col">{{ 'backoffice.payments.colCommande' | translate }}</th>
+ <th scope="col" class="text-right">{{ 'backoffice.payments.colAmount' | translate }}</th>
+ <th scope="col">{{ 'backoffice.payments.colMethod' | translate }}</th>
+ <th scope="col">{{ 'backoffice.payments.colStatus' | translate }}</th>
+ <th scope="col">{{ 'backoffice.payments.colDate' | translate }}</th>
  </tr>
  </thead>
  <tbody class="divide-y divide-verga-border">
- @for (payment of displayedPayments(); track payment.id) {
- <tr class="hover:bg-verga-primary-muted/30">
- <td class="whitespace-nowrap px-3 py-3 text-gray-600 sm:px-4">{{ payment.date }}</td>
- <td class="whitespace-nowrap px-3 py-3 font-medium text-gray-900 sm:px-4">{{ payment.clientName }}</td>
- <td class="whitespace-nowrap px-3 py-3 font-semibold text-gray-900 sm:px-4">{{ payment.amount }}</td>
- <td class="whitespace-nowrap px-3 py-3 font-mono text-xs text-gray-600 sm:px-4">{{ payment.bambooBillingId }}</td>
- <td class="whitespace-nowrap px-3 py-3 sm:px-4">
- <span
- class="inline-block px-2.5 py-1 text-xs font-semibold uppercase"
- [class.bg-verga-success-muted]="isSuccess(payment.statut)"
- [class.text-verga-success]="isSuccess(payment.statut)"
- [class.bg-verga-primary-muted]="isPending(payment.statut)"
- [class.text-verga-primary]="isPending(payment.statut)"
- [class.bg-verga-surface]="isFailed(payment.statut)"
- [class.text-verga-muted]="isFailed(payment.statut)"
- >
- {{ statusKey(payment.statut) | translate }}
- </span>
+ @for (paiement of paiements(); track paiement.id) {
+ <tr class="paiements-table-row transition hover:bg-verga-primary-muted/30">
+ <td class="font-mono text-xs font-semibold text-verga-primary">{{ paiement.codeVerga }}</td>
+ <td class="font-mono text-xs text-gray-600">{{ paiement.refBamboo }}</td>
+ <td>
+ <span class="paiement-cell-truncate" [attr.title]="paiement.commande">{{ paiement.commande }}</span>
  </td>
- <td class="max-w-xs px-3 py-3 text-gray-600 sm:px-4" [attr.title]="payment.message">{{ payment.message }}</td>
+ <td class="text-right font-semibold text-gray-900 tabular-nums">{{ paiement.montant }}</td>
+ <td>
+ <span class="paiement-cell-truncate" [attr.title]="paiement.methode">{{ paiement.methode }}</span>
+ </td>
+ <td>
+ @if (paiement.statut) {
+ <span class="inline-block px-2.5 py-1 text-xs font-semibold uppercase" [class]="statusClass(paiement.statut)">
+ {{ statusKey(paiement.statut) | translate }}
+ </span>
+ } @else {
+ —
+ }
+ </td>
+ <td class="text-gray-600">{{ paiement.date }}</td>
  </tr>
  } @empty {
  <tr>
- <td colspan="6" class="px-4 py-10 text-center text-sm text-verga-muted">{{ 'backoffice.payments.empty' | translate }}</td>
+ <td colspan="7" class="paiements-empty">{{ 'backoffice.payments.empty' | translate }}</td>
  </tr>
  }
  </tbody>
  </table>
  </div>
 
- @if (filteredPayments().length > 0) {
- <div class="mt-6 flex flex-col items-center gap-4">
+ @if (totalItems() > 0) {
+ <div class="paiements-panel-footer border-t border-verga-border px-4 py-5 sm:px-6">
+ <div class="flex flex-col items-center gap-4">
  <nav class="flex flex-wrap items-center justify-center gap-1" [attr.aria-label]="'aria.navigation' | translate">
- <button type="button" (click)="previousPage()" [disabled]="currentPage() === 1" class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40" [attr.aria-label]="'aria.prevPage' | translate">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+ <button
+ type="button"
+ (click)="previousPage()"
+ [disabled]="currentPage() === 1"
+ class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
+ [attr.aria-label]="'aria.prevPage' | translate"
+ >
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+ </svg>
  </button>
  @for (page of pageNumbers(); track page) {
- <button type="button" (click)="goToPage(page)" class="flex h-9 min-w-9 items-center justify-center px-2 text-sm font-medium transition" [class.bg-verga-primary]="currentPage() === page" [class.text-white]="currentPage() === page" [class.border]="currentPage() !== page" [class.border-verga-border]="currentPage() !== page" [class.bg-white]="currentPage() !== page" [class.text-verga-primary]="currentPage() !== page" [class.hover:bg-verga-primary/10]="currentPage() !== page" [attr.aria-current]="currentPage() === page ? 'page' : null">{{ page }}</button>
+ <button
+ type="button"
+ (click)="goToPage(page)"
+ class="flex h-9 min-w-9 items-center justify-center px-2 text-sm font-medium transition"
+ [class.bg-verga-primary]="currentPage() === page"
+ [class.text-white]="currentPage() === page"
+ [class.border]="currentPage() !== page"
+ [class.border-verga-border]="currentPage() !== page"
+ [class.bg-white]="currentPage() !== page"
+ [class.text-verga-primary]="currentPage() !== page"
+ [class.hover:bg-verga-primary/10]="currentPage() !== page"
+ [attr.aria-current]="currentPage() === page ? 'page' : null"
+ >
+ {{ page }}
+ </button>
  }
- <button type="button" (click)="nextPage()" [disabled]="currentPage() === totalPages()" class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40" [attr.aria-label]="'aria.nextPage' | translate">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" /></svg>
+ <button
+ type="button"
+ (click)="nextPage()"
+ [disabled]="currentPage() === totalPages()"
+ class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
+ [attr.aria-label]="'aria.nextPage' | translate"
+ >
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
+ </svg>
  </button>
  </nav>
  <p class="text-center text-sm text-gray-600">{{ resultsLabel() }}</p>
  </div>
+ </div>
+ }
+ </section>
  }
 </div>

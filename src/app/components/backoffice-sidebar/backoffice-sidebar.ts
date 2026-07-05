@@ -7,7 +7,7 @@ import { AgenceService } from '../../services/agence.service';
 interface NavItem {
   labelKey: string;
   path: string;
-  icon: 'dashboard' | 'transactions' | 'logistics' | 'payments';
+  icon: 'dashboard' | 'commandes' | 'logistics' | 'payments' | 'reclamations';
 }
 
 interface OfferItem {
@@ -47,8 +47,9 @@ export class BackofficeSidebar {
 
   protected readonly mainNav: NavItem[] = [
     { labelKey: 'backoffice.nav.dashboard', path: '/backoffice/tableau-de-bord', icon: 'dashboard' },
-    { labelKey: 'backoffice.nav.transactions', path: '/backoffice/transactions', icon: 'transactions' },
+    { labelKey: 'backoffice.nav.commandes', path: '/backoffice/commandes', icon: 'commandes' },
     { labelKey: 'backoffice.nav.payments', path: '/backoffice/paiements', icon: 'payments' },
+    { labelKey: 'backoffice.nav.reclamations', path: '/backoffice/reclamations', icon: 'reclamations' },
     { labelKey: 'backoffice.nav.parcelTracking', path: '/backoffice/support-logistique', icon: 'logistics' },
   ];
 

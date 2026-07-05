@@ -6,6 +6,13 @@ export interface AgenceOffreRaw {
   titre?: string;
   title?: string;
   type?: string;
+  type_offre_id?: string;
+  type_offre?: {
+    id?: string | number;
+    nom?: string;
+    name?: string;
+    code?: string;
+  } | null;
   prix?: number | string | null;
   origine?: string;
   destination?: string;

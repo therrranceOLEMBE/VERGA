@@ -1,13 +1,101 @@
-.support-table-wrap {
+.colis-panel {
+  overflow: hidden;
+}
+
+.colis-table-wrap {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
+  width: 100%;
 }
 
-.support-table {
-  min-width: 80rem;
+.colis-table {
+  border-collapse: collapse;
+  min-width: 100%;
 }
 
-.support-action-btn {
+.colis-table-head th {
+  background: var(--color-verga-surface, #f8fafc);
+  border-bottom: 1px solid var(--color-verga-border, #e2e8f0);
+  color: var(--verga-muted, #64748b);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.875rem 1rem;
+  text-transform: uppercase;
+  vertical-align: middle;
   white-space: nowrap;
+}
+
+.colis-table-row td {
+  padding: 0.875rem 1rem;
+  vertical-align: middle;
+}
+
+.colis-col-reference {
+  width: 14%;
+}
+
+.colis-col-commande {
+  width: 14%;
+}
+
+.colis-col-description {
+  width: 26%;
+}
+
+.colis-col-agence {
+  width: 18%;
+}
+
+.colis-col-poids {
+  width: 12%;
+}
+
+.colis-col-status {
+  width: 14%;
+}
+
+.colis-col-actions {
+  width: 14%;
+}
+
+.colis-cell-truncate {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.colis-empty {
+  color: var(--verga-muted, #64748b);
+  font-size: 0.875rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+}
+
+.colis-export-btn {
+  min-width: 4.5rem;
+}
+
+.colis-action-btn {
+  white-space: normal;
   text-align: left;
+  line-height: 1.25;
+}
+
+.colis-actions .colis-action-btn {
+  width: 100%;
+}
+
+.colis-modal-backdrop {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
+@media (max-width: 1023px) {
+  .colis-table {
+    min-width: 64rem;
+    table-layout: auto;
+  }
 }

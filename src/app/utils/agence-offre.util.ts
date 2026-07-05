@@ -2,11 +2,25 @@ import {
   AgenceOffre,
   AgenceOffreDetailResponse,
   AgenceOffreRaw,
+  AgenceOffreStatut,
   AgenceOffresListPayload,
   AgenceOffresListResponse,
   AgenceOffresPage,
   AgenceOffresPaginationMeta,
 } from '../models/agence-offre.model';
+
+export interface AgenceOffreEditForm {
+  id: string;
+  titre: string;
+  typeOffreId: string;
+  type: string;
+  prix: number | null;
+  capaciteTotale: number | null;
+  origine: string;
+  destination: string;
+  description: string;
+  statut: AgenceOffreStatut;
+}
 
 function unwrapOffreRaw(response: AgenceOffreDetailResponse | AgenceOffreRaw): AgenceOffreRaw {
   if ('data' in response && response.data) {
@@ -137,6 +151,31 @@ function resolveTypeLabelKey(type: string): string {
   return '';
 }
 
+function normalizeStatut(value: string | undefined): AgenceOffreStatut {
+  const normalized = (value ?? '').trim().toLowerCase();
+  if (normalized === 'inactive' || normalized === 'inactif') {
+    return 'inactive';
+  }
+  if (normalized === 'archivée' || normalized === 'archivee' || normalized === 'archived') {
+    return 'archivée';
+  }
+  return 'active';
+}
+
+function resolveTypeOffreId(record: Record<string, unknown>): string {
+  const direct = record['type_offre_id'] ?? record['typeOffreId'];
+  if (typeof direct === 'string' || typeof direct === 'number') {
+    return String(direct).trim();
+  }
+
+  const nested = asRecord(record['type_offre']);
+  if (nested?.['id'] != null) {
+    return String(nested['id']).trim();
+  }
+
+  return '';
+}
+
 function resolveStatutLabelKey(statut: string): string {
   const normalized = statut.trim().toLowerCase();
 
@@ -179,6 +218,25 @@ export function mapOffreToRow(raw: AgenceOffreRaw): AgenceOffre {
 
 export function parseOffreDetailResponse(response: AgenceOffreDetailResponse): AgenceOffre {
   return mapOffreToRow(unwrapOffreRaw(response));
+}
+
+export function parseOffreEditForm(response: AgenceOffreDetailResponse): AgenceOffreEditForm {
+  const source = flattenOffreRaw(unwrapOffreRaw(response));
+  const record = source as Record<string, unknown>;
+  const type = source.type?.trim() ?? '';
+
+  return {
+    id: String(source.id ?? ''),
+    titre: (source.titre ?? source.title)?.trim() ?? '',
+    typeOffreId: resolveTypeOffreId(record),
+    type,
+    prix: toNumber(source.prix),
+    capaciteTotale: readNumberField(record, ['capacite_totale', 'capaciteTotale', 'capacite_totale_kg']),
+    origine: source.origine?.trim() ?? '',
+    destination: source.destination?.trim() ?? '',
+    description: source.description?.trim() ?? '',
+    statut: normalizeStatut(source.statut),
+  };
 }
 
 function extractOffreItems(response: AgenceOffresListResponse): AgenceOffreRaw[] {

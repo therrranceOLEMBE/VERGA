@@ -4,38 +4,73 @@
  <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.createOffer.subtitle' | translate }}</p>
  </div>
 
+ @if (unauthenticated()) {
+ <div class="mb-6 border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+ {{ 'backoffice.createOffer.authRequired' | translate }}
+ <a routerLink="/connexion" class="ml-1 font-semibold text-verga-primary underline">{{ 'auth.login.title' | translate }}</a>
+ </div>
+ }
+
+ @if (errorMessage()) {
+ <div class="mb-6 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+ {{ errorMessage() | translate }}
+ </div>
+ }
+
+ @if (successMessage()) {
+ <div class="mb-6 border border-verga-success/30 bg-verga-success-muted px-4 py-3 text-sm text-verga-success">
+ {{ successMessage() | translate }}
+ </div>
+ }
+
  <form class="space-y-6 border border-verga-border bg-white p-4 sm:p-8" (ngSubmit)="onSubmit($event)">
  <div>
  <label for="offer-title" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.offerTitle' | translate }} *</label>
- <input id="offer-title" name="title" type="text" required [(ngModel)]="title" class="verga-field mt-2" />
+ <input id="offer-title" name="titre" type="text" required [(ngModel)]="titre" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.offerTitlePh' | translate" />
  </div>
 
  <div>
- <label for="offer-type" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.offerType' | translate }} *</label>
- <select id="offer-type" name="offerType" required [(ngModel)]="offerType" class="verga-field mt-2 appearance-none bg-white">
- @for (opt of offerTypeOptions; track opt.value) {
- <option [value]="opt.value" [disabled]="opt.value === ''">{{ opt.labelKey | translate }}</option>
+ <label for="offer-type-offre" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.offerType' | translate }} *</label>
+ <select
+ id="offer-type-offre"
+ name="typeOffreId"
+ required
+ [(ngModel)]="typeOffreId"
+ (ngModelChange)="onTypeOffreChange()"
+ class="verga-field mt-2 appearance-none bg-white"
+ [disabled]="loadingTypeOffres() || typeOffreOptions().length === 0"
+ >
+ <option value="">{{ 'backoffice.createOffer.selectOfferType' | translate }}</option>
+ @for (option of typeOffreOptions(); track option.id) {
+ <option [value]="option.id" [title]="option.description || ''">{{ option.label }}</option>
  }
  </select>
- </div>
-
- <div>
- <label for="offer-transport-type" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.transportType' | translate }} *</label>
- <select id="offer-transport-type" name="transportType" required [(ngModel)]="transportType" class="verga-field mt-2 appearance-none bg-white">
- @for (opt of transportTypeOptions; track opt.value) {
- <option [value]="opt.value" [disabled]="opt.value === ''">{{ opt.labelKey | translate }}</option>
+ @if (loadingTypeOffres()) {
+ <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.createOffer.typeOffreLoading' | translate }}</p>
+ } @else if (typeOffreOptions().length === 0) {
+ <p class="mt-2 text-sm text-amber-700">{{ 'backoffice.createOffer.typeOffreLoadError' | translate }}</p>
  }
- </select>
  </div>
 
  <div class="grid gap-5 sm:grid-cols-2">
  <div>
- <label for="offer-departure-country" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.departureCountry' | translate }} *</label>
- <input id="offer-departure-country" name="departureCountry" type="text" required [(ngModel)]="departureCountry" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.departureCountryPh' | translate" />
+ <label for="offer-origine" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.origine' | translate }} *</label>
+ <input id="offer-origine" name="origine" type="text" required [(ngModel)]="origine" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.originePh' | translate" />
  </div>
  <div>
- <label for="offer-destination-country" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.destinationCountry' | translate }} *</label>
- <input id="offer-destination-country" name="destinationCountry" type="text" required [(ngModel)]="destinationCountry" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.destinationCountryPh' | translate" />
+ <label for="offer-destination" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.destination' | translate }} *</label>
+ <input id="offer-destination" name="destination" type="text" required [(ngModel)]="destination" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.destinationPh' | translate" />
+ </div>
+ </div>
+
+ <div class="grid gap-5 sm:grid-cols-2">
+ <div>
+ <label for="offer-prix" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.price' | translate }} *</label>
+ <input id="offer-prix" name="prix" type="number" min="1" step="1" required [(ngModel)]="prix" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.pricePh' | translate" />
+ </div>
+ <div>
+ <label for="offer-capacite" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.capaciteTotale' | translate }} *</label>
+ <input id="offer-capacite" name="capaciteTotale" type="number" min="1" step="1" required [(ngModel)]="capaciteTotale" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.capaciteTotalePh' | translate" />
  </div>
  </div>
 
@@ -44,50 +79,19 @@
  <textarea id="offer-description" name="description" rows="5" required [(ngModel)]="description" class="verga-field mt-2 min-h-[120px] resize-y"></textarea>
  </div>
 
- @if (offerType === 'kilo') {
- <div class="grid gap-5 sm:grid-cols-2">
- <div>
- <label for="offer-price" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.pricePerKg' | translate }} *</label>
- <input id="offer-price" name="pricePerKg" type="text" required [(ngModel)]="pricePerKg" class="verga-field mt-2" placeholder="5 000 F CFA / kg" />
- </div>
- <div>
- <label for="offer-kg" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.availableKg' | translate }} *</label>
- <input id="offer-kg" name="availableKg" type="number" min="1" required [(ngModel)]="availableKg" class="verga-field mt-2" />
- </div>
- </div>
+ <div class="flex flex-wrap gap-3">
+ <button
+ type="submit"
+ class="verga-btn !w-auto px-8"
+ [disabled]="submitting() || loadingTypeOffres() || typeOffreOptions().length === 0"
+ >
+ @if (submitting()) {
+ {{ 'backoffice.createOffer.submitting' | translate }}
+ } @else {
+ {{ 'backoffice.createOffer.publish' | translate }}
  }
-
- @if (offerType === 'container') {
- <div>
- <label for="offer-container-price" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.containerPrice' | translate }} *</label>
- <input id="offer-container-price" name="containerPrice" type="text" required [(ngModel)]="containerPrice" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.containerPricePh' | translate" />
+ </button>
+ <a routerLink="/backoffice/historique-offres" class="verga-btn !w-auto bg-white !text-verga-primary border border-verga-border px-6">{{ 'backoffice.createOffer.cancel' | translate }}</a>
  </div>
- }
-
- @if (offerType === 'metreCube') {
- <div class="grid gap-5 sm:grid-cols-2">
- <div>
- <label for="offer-cubic-price" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.pricePerCubicMeter' | translate }} *</label>
- <input id="offer-cubic-price" name="pricePerCubicMeter" type="text" required [(ngModel)]="pricePerCubicMeter" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.pricePerCubicMeterPh' | translate" />
- </div>
- <div>
- <label for="offer-cubic-qty" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.availableCubicMeters' | translate }} *</label>
- <input id="offer-cubic-qty" name="availableCubicMeters" type="number" min="1" step="0.01" required [(ngModel)]="availableCubicMeters" class="verga-field mt-2" />
- </div>
- </div>
- }
-
- <div class="grid gap-5 sm:grid-cols-2">
- <div>
- <label for="offer-departure-date" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.departureDate' | translate }} *</label>
- <input id="offer-departure-date" name="departureDate" type="date" required [(ngModel)]="departureDate" class="verga-field mt-2" />
- </div>
- <div>
- <label for="offer-arrival-date" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.arrivalDate' | translate }} *</label>
- <input id="offer-arrival-date" name="arrivalDate" type="date" required [(ngModel)]="arrivalDate" class="verga-field mt-2" />
- </div>
- </div>
-
- <button type="submit" class="verga-btn !w-auto px-8">{{ 'backoffice.createOffer.publish' | translate }}</button>
  </form>
 </div>

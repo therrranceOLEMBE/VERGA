@@ -3,11 +3,14 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AgenceOffre, AgenceOffreStatut } from '../../models/agence-offre.model';
+import { AgenceOffreUpdateRequest } from '../../models/agence-offre-create.model';
+import { TypeOffre } from '../../models/type-offre.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LanguageService } from '../../services/language.service';
+import { AgenceService } from '../../services/agence.service';
 import { AgenceSessionService } from '../../services/agence-session.service';
 import { extractApiErrorMessage } from '../../utils/api-error.util';
-import { parseOffreDetailResponse, parseOffresListResponse } from '../../utils/agence-offre.util';
+import { parseOffreDetailResponse, parseOffreEditForm, parseOffresListResponse } from '../../utils/agence-offre.util';
 
 @Component({
   selector: 'app-historique-offres',
@@ -18,6 +21,7 @@ import { parseOffreDetailResponse, parseOffresListResponse } from '../../utils/a
 export class HistoriqueOffres implements OnInit {
   private readonly language = inject(LanguageService);
   private readonly agenceSession = inject(AgenceSessionService);
+  private readonly agenceService = inject(AgenceService);
 
   protected readonly loading = signal(true);
   protected readonly errorMessage = signal('');
@@ -36,6 +40,30 @@ export class HistoriqueOffres implements OnInit {
   protected readonly detailOpen = signal(false);
   protected readonly detailLoading = signal(false);
   protected readonly detailError = signal('');
+
+  protected readonly editOpen = signal(false);
+  protected readonly editLoading = signal(false);
+  protected readonly editSubmitting = signal(false);
+  protected readonly editError = signal('');
+  protected readonly editingOfferId = signal('');
+
+  protected editTitre = '';
+  protected editTypeOffreId = '';
+  protected editType = '';
+  protected editPrix: number | null = null;
+  protected editCapaciteTotale: number | null = null;
+  protected editOrigine = '';
+  protected editDestination = '';
+  protected editDescription = '';
+  protected editStatut: AgenceOffreStatut = 'active';
+
+  protected readonly loadingTypeOffres = signal(false);
+  protected readonly typeOffreOptions = signal<TypeOffre[]>([]);
+
+  protected readonly deleteOpen = signal(false);
+  protected readonly deleteSubmitting = signal(false);
+  protected readonly deleteError = signal('');
+  protected readonly deletingOffer = signal<AgenceOffre | null>(null);
 
   protected readonly pageNumbers = computed(() =>
     Array.from({ length: this.totalPages() }, (_, index) => index + 1),
@@ -61,8 +89,15 @@ export class HistoriqueOffres implements OnInit {
     { value: 'archivée', labelKey: 'backoffice.offerHistory.status.archived' },
   ];
 
+  protected readonly editStatutOptions: Array<{ value: AgenceOffreStatut; labelKey: string }> = [
+    { value: 'active', labelKey: 'backoffice.offerHistory.status.active' },
+    { value: 'inactive', labelKey: 'backoffice.offerHistory.status.inactive' },
+    { value: 'archivée', labelKey: 'backoffice.offerHistory.status.archived' },
+  ];
+
   ngOnInit(): void {
     this.loadOffres();
+    this.loadTypeOffres();
   }
 
   protected resetFilters(): void {
@@ -131,6 +166,159 @@ export class HistoriqueOffres implements OnInit {
     if (event.target === event.currentTarget) {
       this.closeDetail();
     }
+  }
+
+  protected onEditModalBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closeEdit();
+    }
+  }
+
+  protected openEditFromDetail(): void {
+    const offer = this.selectedOffer();
+    if (offer) {
+      this.openEdit(offer);
+    }
+  }
+
+  protected openDeleteFromDetail(): void {
+    const offer = this.selectedOffer();
+    if (offer) {
+      this.openDelete(offer);
+    }
+  }
+
+  protected openDelete(offer: AgenceOffre): void {
+    this.closeDetail();
+    this.closeEdit();
+    this.deleteError.set('');
+    this.deleteSubmitting.set(false);
+    this.deletingOffer.set(offer);
+    this.deleteOpen.set(true);
+  }
+
+  protected closeDelete(): void {
+    this.deleteOpen.set(false);
+    this.deleteSubmitting.set(false);
+    this.deleteError.set('');
+    this.deletingOffer.set(null);
+  }
+
+  protected onDeleteModalBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget && !this.deleteSubmitting()) {
+      this.closeDelete();
+    }
+  }
+
+  protected confirmDelete(): void {
+    const offer = this.deletingOffer();
+    if (!offer) {
+      return;
+    }
+
+    this.deleteError.set('');
+    this.deleteSubmitting.set(true);
+
+    this.agenceSession.deleteOffre(offer.id).subscribe({
+      next: () => {
+        this.deleteSubmitting.set(false);
+        this.closeDelete();
+        this.loadOffres();
+      },
+      error: (error: HttpErrorResponse | Error) => {
+        if (error instanceof Error && error.message === 'No agence token') {
+          this.deleteError.set('backoffice.offerHistory.authRequired');
+        } else {
+          this.deleteError.set(this.resolveDeleteError(error as HttpErrorResponse));
+        }
+        this.deleteSubmitting.set(false);
+      },
+    });
+  }
+
+  protected openEdit(offer: AgenceOffre): void {
+    this.closeDetail();
+    this.editOpen.set(true);
+    this.editLoading.set(true);
+    this.editSubmitting.set(false);
+    this.editError.set('');
+    this.editingOfferId.set(offer.id);
+    this.resetEditForm();
+
+    if (this.typeOffreOptions().length === 0) {
+      this.loadTypeOffres();
+    }
+
+    this.agenceSession.loadOffre(offer.id).subscribe({
+      next: (response) => {
+        const form = parseOffreEditForm(response);
+        this.applyEditForm(form);
+        this.editLoading.set(false);
+      },
+      error: (error: HttpErrorResponse | Error) => {
+        if (error instanceof Error && error.message === 'No agence token') {
+          this.editError.set('backoffice.offerHistory.authRequired');
+        } else {
+          this.editError.set(this.resolveDetailError(error as HttpErrorResponse));
+        }
+        this.editLoading.set(false);
+      },
+    });
+  }
+
+  protected closeEdit(): void {
+    this.editOpen.set(false);
+    this.editLoading.set(false);
+    this.editSubmitting.set(false);
+    this.editError.set('');
+    this.editingOfferId.set('');
+    this.resetEditForm();
+  }
+
+  protected onEditTypeOffreChange(): void {
+    const selected = this.typeOffreOptions().find((option) => option.id === this.editTypeOffreId);
+    this.editType = selected?.code ?? '';
+  }
+
+  protected onEditSubmit(event: Event): void {
+    event.preventDefault();
+    this.editError.set('');
+
+    if (!this.isEditFormValid()) {
+      this.editError.set('backoffice.offerHistory.validationError');
+      return;
+    }
+
+    const selected = this.typeOffreOptions().find((option) => option.id === this.editTypeOffreId);
+    const payload: AgenceOffreUpdateRequest = {
+      titre: this.editTitre.trim(),
+      type_offre_id: this.editTypeOffreId,
+      type: (selected?.code ?? this.editType).trim(),
+      prix: Number(this.editPrix),
+      capacite_totale: Number(this.editCapaciteTotale),
+      origine: this.editOrigine.trim(),
+      destination: this.editDestination.trim(),
+      description: this.editDescription.trim(),
+      statut: this.editStatut,
+    };
+
+    this.editSubmitting.set(true);
+
+    this.agenceSession.updateOffre(this.editingOfferId(), payload).subscribe({
+      next: () => {
+        this.editSubmitting.set(false);
+        this.closeEdit();
+        this.loadOffres();
+      },
+      error: (error: HttpErrorResponse | Error) => {
+        if (error instanceof Error && error.message === 'No agence token') {
+          this.editError.set('backoffice.offerHistory.authRequired');
+        } else {
+          this.editError.set(this.resolveUpdateError(error as HttpErrorResponse));
+        }
+        this.editSubmitting.set(false);
+      },
+    });
   }
 
   protected statusClass(statut: string): string {
@@ -220,5 +408,115 @@ export class HistoriqueOffres implements OnInit {
       return apiMessage;
     }
     return 'backoffice.offerHistory.detailLoadError';
+  }
+
+  private loadTypeOffres(): void {
+    if (this.loadingTypeOffres()) {
+      return;
+    }
+
+    this.loadingTypeOffres.set(true);
+    this.agenceService.getTypeOffres().subscribe({
+      next: (options) => {
+        this.typeOffreOptions.set(options);
+        this.syncEditTypeOffreSelection();
+        this.loadingTypeOffres.set(false);
+      },
+      error: () => {
+        this.typeOffreOptions.set([]);
+        this.loadingTypeOffres.set(false);
+      },
+    });
+  }
+
+  private applyEditForm(form: ReturnType<typeof parseOffreEditForm>): void {
+    this.editTitre = form.titre;
+    this.editTypeOffreId = form.typeOffreId;
+    this.editType = form.type;
+    this.editPrix = form.prix;
+    this.editCapaciteTotale = form.capaciteTotale;
+    this.editOrigine = form.origine;
+    this.editDestination = form.destination;
+    this.editDescription = form.description;
+    this.editStatut = form.statut;
+    this.syncEditTypeOffreSelection();
+  }
+
+  private syncEditTypeOffreSelection(): void {
+    if (this.editTypeOffreId) {
+      const selected = this.typeOffreOptions().find((option) => option.id === this.editTypeOffreId);
+      if (selected) {
+        this.editType = selected.code;
+        return;
+      }
+    }
+
+    if (!this.editType) {
+      return;
+    }
+
+    const match = this.typeOffreOptions().find((option) => option.code === this.editType);
+    if (match) {
+      this.editTypeOffreId = match.id;
+    }
+  }
+
+  private resetEditForm(): void {
+    this.editTitre = '';
+    this.editTypeOffreId = '';
+    this.editType = '';
+    this.editPrix = null;
+    this.editCapaciteTotale = null;
+    this.editOrigine = '';
+    this.editDestination = '';
+    this.editDescription = '';
+    this.editStatut = 'active';
+  }
+
+  private isEditFormValid(): boolean {
+    return (
+      !!this.editingOfferId() &&
+      !!this.editTitre.trim() &&
+      !!this.editTypeOffreId &&
+      !!this.editType.trim() &&
+      this.editPrix != null &&
+      this.editPrix > 0 &&
+      this.editCapaciteTotale != null &&
+      this.editCapaciteTotale > 0 &&
+      !!this.editOrigine.trim() &&
+      !!this.editDestination.trim() &&
+      !!this.editDescription.trim() &&
+      !!this.editStatut
+    );
+  }
+
+  private resolveUpdateError(error: HttpErrorResponse): string {
+    if (error.status === 401) {
+      return 'backoffice.offerHistory.authRequired';
+    }
+    if (error.status === 404) {
+      return 'backoffice.offerHistory.detailNotFound';
+    }
+    if (error.status === 422) {
+      const apiMessage = extractApiErrorMessage(error);
+      return apiMessage ?? 'backoffice.offerHistory.validationError';
+    }
+    const apiMessage = extractApiErrorMessage(error);
+    return apiMessage ?? 'backoffice.offerHistory.updateError';
+  }
+
+  private resolveDeleteError(error: HttpErrorResponse): string {
+    if (error.status === 401) {
+      return 'backoffice.offerHistory.authRequired';
+    }
+    if (error.status === 404) {
+      return 'backoffice.offerHistory.detailNotFound';
+    }
+    if (error.status === 422) {
+      const apiMessage = extractApiErrorMessage(error);
+      return apiMessage ?? 'backoffice.offerHistory.deleteLinkedOrders';
+    }
+    const apiMessage = extractApiErrorMessage(error);
+    return apiMessage ?? 'backoffice.offerHistory.deleteError';
   }
 }

@@ -104,6 +104,7 @@
  }
  </td>
  <td class="whitespace-nowrap px-4 py-3.5">
+ <div class="flex flex-wrap gap-2">
  <button
  type="button"
  (click)="openDetail(offer)"
@@ -111,6 +112,21 @@
  >
  {{ 'backoffice.offerHistory.actionDetail' | translate }}
  </button>
+ <button
+ type="button"
+ (click)="openEdit(offer)"
+ class="offer-action-btn border border-verga-border bg-white px-2.5 py-1 text-xs font-semibold text-gray-700 transition hover:bg-verga-surface"
+ >
+ {{ 'backoffice.offerHistory.actionEdit' | translate }}
+ </button>
+ <button
+ type="button"
+ (click)="openDelete(offer)"
+ class="offer-action-btn border border-red-200 bg-white px-2.5 py-1 text-xs font-semibold text-red-600 transition hover:bg-red-50"
+ >
+ {{ 'backoffice.offerHistory.actionDelete' | translate }}
+ </button>
+ </div>
  </td>
  </tr>
  } @empty {
@@ -251,9 +267,236 @@
  </dl>
  }
 
+ @if (selectedOffer()) {
+ <div class="border-t border-verga-border px-5 py-4 sm:px-6">
+ <div class="flex flex-wrap gap-3">
+ <button type="button" (click)="openEditFromDetail()" class="verga-btn !w-auto px-6">{{ 'backoffice.offerHistory.actionEdit' | translate }}</button>
+ <button type="button" (click)="openDeleteFromDetail()" class="verga-btn !w-auto bg-white !text-red-600 border border-red-200 px-6">{{ 'backoffice.offerHistory.actionDelete' | translate }}</button>
+ <button type="button" (click)="closeDetail()" class="verga-btn !w-auto bg-white !text-verga-primary border border-verga-border px-6">{{ 'backoffice.offerHistory.close' | translate }}</button>
+ </div>
+ </div>
+ } @else {
  <div class="border-t border-verga-border px-5 py-4 sm:px-6">
  <button type="button" (click)="closeDetail()" class="verga-btn !w-auto px-6">{{ 'backoffice.offerHistory.close' | translate }}</button>
  </div>
+ }
  </div>
 </div>
+}
+
+@if (editOpen()) {
+<div
+ class="offer-modal-backdrop fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 py-8 sm:items-center"
+ role="dialog"
+ aria-modal="true"
+ (click)="onEditModalBackdropClick($event)"
+>
+ <div class="w-full max-w-2xl border border-verga-border bg-white shadow-lg" (click)="$event.stopPropagation()">
+ <div class="flex items-center justify-between border-b border-verga-border px-5 py-4 sm:px-6">
+ <h2 class="text-lg font-bold text-gray-900">{{ 'backoffice.offerHistory.modalEditTitle' | translate }}</h2>
+ <button type="button" (click)="closeEdit()" class="text-verga-muted transition hover:text-gray-900" [attr.aria-label]="'aria.close' | translate">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+ </button>
+ </div>
+
+ @if (editLoading()) {
+ <p class="px-5 py-8 text-sm text-verga-muted sm:px-6">{{ 'backoffice.offerHistory.detailLoading' | translate }}</p>
+ } @else {
+ @if (editError()) {
+ <div class="mx-5 mt-5 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:mx-6" role="alert">
+ @if (editError().startsWith('backoffice.')) {
+ {{ editError() | translate }}
+ } @else {
+ {{ editError() }}
+ }
+ </div>
+ }
+
+ <form class="space-y-5 px-5 py-6 sm:px-6" (ngSubmit)="onEditSubmit($event)">
+ <div>
+ <label for="edit-offer-title" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.offerTitle' | translate }} *</label>
+ <input id="edit-offer-title" name="editTitre" type="text" required [(ngModel)]="editTitre" class="verga-field mt-2" />
+ </div>
+
+ <div>
+ <label for="edit-offer-type" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.offerType' | translate }} *</label>
+ <select
+ id="edit-offer-type"
+ name="editTypeOffreId"
+ required
+ [(ngModel)]="editTypeOffreId"
+ (ngModelChange)="onEditTypeOffreChange()"
+ class="verga-field mt-2 appearance-none bg-white"
+ [disabled]="loadingTypeOffres() || typeOffreOptions().length === 0"
+ >
+ <option value="">{{ 'backoffice.createOffer.selectOfferType' | translate }}</option>
+ @for (option of typeOffreOptions(); track option.id) {
+ <option [value]="option.id" [title]="option.description || ''">{{ option.label }}</option>
+ }
+ </select>
+ @if (loadingTypeOffres()) {
+ <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.createOffer.typeOffreLoading' | translate }}</p>
+ } @else if (typeOffreOptions().length === 0) {
+ <p class="mt-2 text-sm text-amber-700">{{ 'backoffice.createOffer.typeOffreLoadError' | translate }}</p>
+ }
+ </div>
+
+ <div class="grid gap-5 sm:grid-cols-2">
+ <div>
+ <label for="edit-offer-origine" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.origine' | translate }} *</label>
+ <input id="edit-offer-origine" name="editOrigine" type="text" required [(ngModel)]="editOrigine" class="verga-field mt-2" />
+ </div>
+ <div>
+ <label for="edit-offer-destination" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.destination' | translate }} *</label>
+ <input id="edit-offer-destination" name="editDestination" type="text" required [(ngModel)]="editDestination" class="verga-field mt-2" />
+ </div>
+ </div>
+
+ <div class="grid gap-5 sm:grid-cols-2">
+ <div>
+ <label for="edit-offer-prix" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.price' | translate }} *</label>
+ <input id="edit-offer-prix" name="editPrix" type="number" min="1" step="1" required [(ngModel)]="editPrix" class="verga-field mt-2" />
+ </div>
+ <div>
+ <label for="edit-offer-capacite" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.capaciteTotale' | translate }} *</label>
+ <input id="edit-offer-capacite" name="editCapaciteTotale" type="number" min="1" step="1" required [(ngModel)]="editCapaciteTotale" class="verga-field mt-2" />
+ </div>
+ </div>
+
+ <div>
+ <label for="edit-offer-description" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.description' | translate }} *</label>
+ <textarea id="edit-offer-description" name="editDescription" rows="4" required [(ngModel)]="editDescription" class="verga-field mt-2 min-h-[100px] resize-y"></textarea>
+ </div>
+
+ <div>
+ <label for="edit-offer-statut" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.statut' | translate }} *</label>
+ <select id="edit-offer-statut" name="editStatut" required [(ngModel)]="editStatut" class="verga-field mt-2 appearance-none bg-white">
+ @for (opt of editStatutOptions; track opt.value) {
+ <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
+ }
+ </select>
+ </div>
+
+ <div class="flex flex-wrap gap-3 border-t border-verga-border pt-4">
+ <button
+ type="submit"
+ class="verga-btn !w-auto px-8"
+ [disabled]="editSubmitting() || loadingTypeOffres() || typeOffreOptions().length === 0"
+ >
+ @if (editSubmitting()) {
+ {{ 'backoffice.offerHistory.editSaving' | translate }}
+ } @else {
+ {{ 'backoffice.offerHistory.save' | translate }}
+ }
+ </button>
+ <button type="button" (click)="closeEdit()" class="verga-btn !w-auto bg-white !text-verga-primary border border-verga-border px-6">{{ 'backoffice.offerHistory.cancel' | translate }}</button>
+ </div>
+ </form>
+ }
+ </div>
+</div>
+}
+
+@if (deleteOpen()) {
+@if (deletingOffer(); as offer) {
+<div
+ class="offer-modal-backdrop fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 py-8 sm:items-center"
+ role="dialog"
+ aria-modal="true"
+ (click)="onDeleteModalBackdropClick($event)"
+>
+ <div class="w-full max-w-md border border-verga-border bg-white shadow-lg" (click)="$event.stopPropagation()">
+ <div class="flex items-center justify-between border-b border-verga-border px-5 py-4 sm:px-6">
+ <h2 class="text-lg font-bold text-gray-900">{{ 'backoffice.offerHistory.modalDeleteTitle' | translate }}</h2>
+ <button type="button" (click)="closeDelete()" class="text-verga-muted transition hover:text-gray-900" [attr.aria-label]="'aria.close' | translate" [disabled]="deleteSubmitting()">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+ </button>
+ </div>
+
+ <div class="px-5 py-6 sm:px-6">
+ @if (deleteError()) {
+ <div class="mb-4 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+ @if (deleteError().startsWith('backoffice.')) {
+ {{ deleteError() | translate }}
+ } @else {
+ {{ deleteError() }}
+ }
+ </div>
+ }
+
+ <p class="text-sm text-gray-700">{{ 'backoffice.offerHistory.modalDeleteMessage' | translate }}</p>
+
+ <dl class="mt-4 space-y-3 border border-verga-border bg-verga-surface/40 p-4 text-sm">
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colTitle' | translate }}</dt>
+ <dd class="mt-1 font-medium text-gray-900">{{ offer.titre }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colOfferType' | translate }}</dt>
+ <dd class="mt-1 text-gray-900">
+ @if (offer.typeLabelKey) {
+ {{ offer.typeLabelKey | translate }}
+ } @else {
+ {{ offer.type || '—' }}
+ }
+ </dd>
+ </div>
+ <div class="grid grid-cols-2 gap-3">
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colOrigin' | translate }}</dt>
+ <dd class="mt-1 text-gray-900">{{ offer.origine }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colDestination' | translate }}</dt>
+ <dd class="mt-1 text-gray-900">{{ offer.destination }}</dd>
+ </div>
+ </div>
+ <div class="grid grid-cols-2 gap-3">
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colPrice' | translate }}</dt>
+ <dd class="mt-1 font-semibold text-gray-900">{{ offer.prix }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colStock' | translate }}</dt>
+ <dd class="mt-1 text-gray-900">{{ offer.stock }}</dd>
+ </div>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colStatus' | translate }}</dt>
+ <dd class="mt-1 text-gray-900">
+ @if (offer.statutLabelKey) {
+ {{ offer.statutLabelKey | translate }}
+ } @else {
+ {{ offer.statut || '—' }}
+ }
+ </dd>
+ </div>
+ </dl>
+
+ <div class="mt-6 flex flex-wrap gap-3">
+ <button
+ type="button"
+ (click)="confirmDelete()"
+ class="verga-btn !w-auto bg-red-600 px-6 hover:bg-red-700"
+ [disabled]="deleteSubmitting()"
+ >
+ @if (deleteSubmitting()) {
+ {{ 'backoffice.offerHistory.deleteSaving' | translate }}
+ } @else {
+ {{ 'backoffice.offerHistory.confirmDelete' | translate }}
+ }
+ </button>
+ <button
+ type="button"
+ (click)="closeDelete()"
+ class="verga-btn !w-auto bg-white !text-verga-primary border border-verga-border px-6"
+ [disabled]="deleteSubmitting()"
+ >
+ {{ 'backoffice.offerHistory.cancel' | translate }}
+ </button>
+ </div>
+ </div>
+ </div>
+</div>
+}
 }

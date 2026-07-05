@@ -8,7 +8,6 @@ import { extractApiErrorMessage } from '../../utils/api-error.util';
 import {
   AgenceDashboardStatusCount,
   AgenceDashboardView,
-  formatDashboardKg,
   formatDashboardMoney,
   parseAgenceDashboardResponse,
 } from '../../utils/agence-dashboard.util';
@@ -96,7 +95,6 @@ export class TableauDeBord implements OnInit {
         titleKey: 'backoffice.dashboard.sectionOperations',
         metrics: [
           { labelKey: 'backoffice.dashboard.totalOffers', value: this.formatCount(stats.nb_offres) },
-          { labelKey: 'backoffice.dashboard.availableCapacity', value: formatDashboardKg(stats.capacite_disponible_totale) },
           { labelKey: 'backoffice.dashboard.pendingOrders', value: this.formatCount(stats.nb_commandes_en_attente) },
           { labelKey: 'backoffice.dashboard.confirmedOrders', value: this.formatCount(stats.nb_commandes_confirmees) },
           { labelKey: 'backoffice.dashboard.totalParcels', value: this.formatCount(stats.nb_colis) },
