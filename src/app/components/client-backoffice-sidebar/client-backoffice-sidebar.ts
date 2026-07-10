@@ -1,6 +1,7 @@
 import { Component, inject, input, output } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { AuthRedirectService } from '../../services/auth-redirect.service';
 import { ClientSessionService } from '../../services/client-session.service';
 import { ParticulierService } from '../../services/particulier.service';
 
@@ -17,7 +18,7 @@ interface ClientNavItem {
   styleUrl: './client-backoffice-sidebar.css',
 })
 export class ClientBackofficeSidebar {
-  private readonly router = inject(Router);
+  private readonly authRedirect = inject(AuthRedirectService);
   private readonly clientSession = inject(ClientSessionService);
   private readonly particulierService = inject(ParticulierService);
 
@@ -42,7 +43,7 @@ export class ClientBackofficeSidebar {
     const finishLogout = (): void => {
       this.clientSession.clearSession();
       this.onNavigate();
-      void this.router.navigate(['/connexion']);
+      this.authRedirect.redirectToLogin('client');
     };
 
     if (!token) {

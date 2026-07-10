@@ -204,6 +204,14 @@ export class Paiements implements OnInit {
       .subscribe({
         next: (response) => {
           const page = parseAgencePaiementsListResponse(response);
+          console.log('[AgencePaiements] Paiements récupérés:', page.items);
+          console.log('[AgencePaiements] Pagination:', {
+            currentPage: page.currentPage,
+            lastPage: page.lastPage,
+            total: page.total,
+            from: page.from,
+            to: page.to,
+          });
           this.paiements.set(page.items);
           this.currentPage.set(page.currentPage);
           this.totalPages.set(page.lastPage);

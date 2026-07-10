@@ -1,8 +1,10 @@
-<div class="paiements-page mx-auto max-w-[1400px]">
- <div class="mb-8">
- <h1 class="text-2xl font-bold text-gray-900">{{ 'backoffice.payments.title' | translate }}</h1>
- <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.payments.subtitle' | translate }}</p>
+<div class="paiements-page bo-page mx-auto max-w-[1400px]">
+ <header class="bo-page-header">
+ <div class="bo-page-header__copy">
+ <h1 class="bo-page-title">{{ 'backoffice.payments.title' | translate }}</h1>
+ <p class="bo-page-subtitle">{{ 'backoffice.payments.subtitle' | translate }}</p>
  </div>
+ </header>
 
  @if (loading()) {
  <p class="text-sm text-verga-muted">{{ 'backoffice.payments.loading' | translate }}</p>

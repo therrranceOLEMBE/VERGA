@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, catchError, map, of } from 'rxjs';
+import { Observable, catchError, map, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
   AgenceLoginRequest,
@@ -45,6 +45,11 @@ import {
   AgencePaiementsListResponse,
   AgencePaiementsQueryParams,
 } from '../models/agence-paiement.model';
+import {
+  AgenceReversementsListResponse,
+  AgenceReversementsQueryParams,
+} from '../models/agence-reversement.model';
+import { AgenceSoldeResponse } from '../models/agence-solde.model';
 import {
   AgenceReclamationsListResponse,
   AgenceReclamationsQueryParams,
@@ -193,7 +198,16 @@ export class AgenceService {
     return this.http.get<AgenceColisListResponse>(`${this.baseUrl}/colis`, {
       headers: this.authHeaders(token),
       params: httpParams,
-    });
+    }).pipe(
+      map((response) => {
+        console.log('[AgenceService] getColis — réponse:', JSON.stringify(response?.data));
+        return response;
+      }),
+      catchError((error) => {
+        console.error('[AgenceService] getColis — erreur:', error);
+        return throwError(() => error);
+      }),
+    );
   }
 
   getColisDetail(token: string, colisId: string): Observable<AgenceColisDetailResponse> {
@@ -209,6 +223,37 @@ export class AgenceService {
   ): Observable<AgenceColisStatutUpdateResponse> {
     return this.http.patch<AgenceColisStatutUpdateResponse>(`${this.baseUrl}/colis/${colisId}/statut`, body, {
       headers: this.authHeaders(token),
+    });
+  }
+
+  getSolde(token: string): Observable<AgenceSoldeResponse> {
+    return this.http.get<AgenceSoldeResponse>(`${this.baseUrl}/solde`, {
+      headers: this.authHeaders(token),
+    });
+  }
+
+  getReversements(
+    token: string,
+    params: AgenceReversementsQueryParams = {},
+  ): Observable<AgenceReversementsListResponse> {
+    let httpParams = new HttpParams();
+
+    if (params.statut) {
+      httpParams = httpParams.set('statut', params.statut);
+    }
+    if (params.periode?.trim()) {
+      httpParams = httpParams.set('periode', params.periode.trim());
+    }
+    if (params.page) {
+      httpParams = httpParams.set('page', String(params.page));
+    }
+    if (params.per_page) {
+      httpParams = httpParams.set('per_page', String(params.per_page));
+    }
+
+    return this.http.get<AgenceReversementsListResponse>(`${this.baseUrl}/reversements`, {
+      headers: this.authHeaders(token),
+      params: httpParams,
     });
   }
 
@@ -231,7 +276,16 @@ export class AgenceService {
     return this.http.get<AgencePaiementsListResponse>(`${this.baseUrl}/paiements`, {
       headers: this.authHeaders(token),
       params: httpParams,
-    });
+    }).pipe(
+      map((response) => {
+        console.log('[AgenceService] getPaiements — réponse:', JSON.stringify(response?.data));
+        return response;
+      }),
+      catchError((error) => {
+        console.error('[AgenceService] getPaiements — erreur:', error);
+        return throwError(() => error);
+      }),
+    );
   }
 
   getReclamations(token: string, params: AgenceReclamationsQueryParams = {}): Observable<AgenceReclamationsListResponse> {

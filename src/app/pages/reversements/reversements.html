@@ -1,0 +1,180 @@
+<div class="reversements-page bo-page mx-auto max-w-[1400px]">
+  <header class="bo-page-header">
+    <div class="bo-page-header__copy">
+      <h1 class="bo-page-title">{{ 'backoffice.reversements.title' | translate }}</h1>
+      <p class="bo-page-subtitle">{{ 'backoffice.reversements.subtitle' | translate }}</p>
+    </div>
+  </header>
+
+  @if (loading()) {
+    <p class="text-sm text-verga-muted">{{ 'backoffice.reversements.loading' | translate }}</p>
+  } @else {
+    @if (errorMessage()) {
+      <div class="mb-4 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+        <p>
+          @if (errorMessage().startsWith('backoffice.')) {
+            {{ errorMessage() | translate }}
+          } @else {
+            {{ errorMessage() }}
+          }
+        </p>
+        @if (unauthenticated()) {
+          <a routerLink="/connexion" class="mt-2 inline-block font-semibold text-verga-primary hover:underline">
+            {{ 'backoffice.dashboard.goToLogin' | translate }}
+          </a>
+        }
+      </div>
+    }
+
+    <section class="reversements-panel border border-verga-border bg-white">
+      <div class="reversements-panel-filters border-b border-verga-border p-4 sm:p-6">
+        <h2 class="text-sm font-bold uppercase tracking-wide text-gray-900">{{ 'backoffice.reversements.filters' | translate }}</h2>
+        <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <label for="filter-reversement-statut" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.reversements.filterStatus' | translate }}</label>
+            <select
+              id="filter-reversement-statut"
+              [ngModel]="filterStatut()"
+              (ngModelChange)="filterStatut.set($event); onFilterChange()"
+              class="verga-field mt-1.5 appearance-none bg-white"
+            >
+              @for (option of statutOptions; track option.value) {
+                <option [ngValue]="option.value">{{ option.labelKey | translate }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label for="filter-reversement-periode" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.reversements.filterPeriod' | translate }}</label>
+            <input
+              id="filter-reversement-periode"
+              type="month"
+              [ngModel]="filterPeriode()"
+              (ngModelChange)="filterPeriode.set($event); onFilterChange()"
+              class="verga-field mt-1.5"
+            />
+          </div>
+        </div>
+        <div class="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <button type="button" (click)="resetFilters()" class="self-start text-sm font-semibold text-verga-primary hover:underline">
+            {{ 'backoffice.reversements.reset' | translate }}
+          </button>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-xs font-semibold uppercase tracking-wide text-verga-muted">{{ 'backoffice.transactions.export' | translate }}</span>
+            <button
+              type="button"
+              (click)="exportExcel()"
+              [disabled]="reversements().length === 0"
+              class="reversements-export-btn border border-verga-border bg-white px-3 py-2 text-xs font-semibold uppercase text-verga-primary transition hover:bg-verga-primary-muted disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {{ 'backoffice.reversements.exportExcel' | translate }}
+            </button>
+            <button
+              type="button"
+              (click)="exportPdf()"
+              [disabled]="reversements().length === 0"
+              class="reversements-export-btn border border-verga-border bg-white px-3 py-2 text-xs font-semibold uppercase text-verga-primary transition hover:bg-verga-primary-muted disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              {{ 'backoffice.reversements.exportPdf' | translate }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="reversements-table-wrap overflow-x-auto">
+        <table class="reversements-table w-full table-fixed text-left text-sm">
+          <colgroup>
+            <col class="reversements-col-id" />
+            <col class="reversements-col-amount" />
+            <col class="reversements-col-period" />
+            <col class="reversements-col-status" />
+            <col class="reversements-col-effectue" />
+            <col class="reversements-col-created" />
+          </colgroup>
+          <thead>
+            <tr class="reversements-table-head">
+              <th scope="col">{{ 'backoffice.reversements.colId' | translate }}</th>
+              <th scope="col" class="text-right">{{ 'backoffice.reversements.colAmount' | translate }}</th>
+              <th scope="col">{{ 'backoffice.reversements.colPeriod' | translate }}</th>
+              <th scope="col">{{ 'backoffice.reversements.colStatus' | translate }}</th>
+              <th scope="col">{{ 'backoffice.reversements.colEffectueLe' | translate }}</th>
+              <th scope="col">{{ 'backoffice.reversements.colCreatedAt' | translate }}</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-verga-border">
+            @for (item of reversements(); track item.id) {
+              <tr class="reversements-table-row transition hover:bg-verga-primary-muted/30">
+                <td class="font-mono text-xs font-semibold text-verga-primary">{{ item.id }}</td>
+                <td class="text-right font-semibold text-gray-900 tabular-nums">{{ item.montant }}</td>
+                <td>{{ item.periode }}</td>
+                <td>
+                  @if (item.statut) {
+                    <span class="inline-block px-2.5 py-1 text-xs font-semibold uppercase" [class]="statusClass(item.statut)">
+                      {{ statusKey(item.statut) | translate }}
+                    </span>
+                  } @else {
+                    —
+                  }
+                </td>
+                <td class="text-gray-600">{{ item.effectueLe }}</td>
+                <td class="text-gray-600">{{ item.createdAt }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="reversements-empty">{{ 'backoffice.reversements.empty' | translate }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      @if (totalItems() > 0) {
+        <div class="reversements-panel-footer border-t border-verga-border px-4 py-5 sm:px-6">
+          <div class="flex flex-col items-center gap-4">
+            <nav class="flex flex-wrap items-center justify-center gap-1" [attr.aria-label]="'aria.navigation' | translate">
+              <button
+                type="button"
+                (click)="previousPage()"
+                [disabled]="currentPage() === 1"
+                class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
+                [attr.aria-label]="'aria.prevPage' | translate"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                </svg>
+              </button>
+              @for (page of pageNumbers(); track page) {
+                <button
+                  type="button"
+                  (click)="goToPage(page)"
+                  class="flex h-9 min-w-9 items-center justify-center px-2 text-sm font-medium transition"
+                  [class.bg-verga-primary]="currentPage() === page"
+                  [class.text-white]="currentPage() === page"
+                  [class.border]="currentPage() !== page"
+                  [class.border-verga-border]="currentPage() !== page"
+                  [class.bg-white]="currentPage() !== page"
+                  [class.text-verga-primary]="currentPage() !== page"
+                  [class.hover:bg-verga-primary/10]="currentPage() !== page"
+                  [attr.aria-current]="currentPage() === page ? 'page' : null"
+                >
+                  {{ page }}
+                </button>
+              }
+              <button
+                type="button"
+                (click)="nextPage()"
+                [disabled]="currentPage() === totalPages()"
+                class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
+                [attr.aria-label]="'aria.nextPage' | translate"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
+                </svg>
+              </button>
+            </nav>
+            <p class="text-center text-sm text-gray-600">{{ resultsLabel() }}</p>
+          </div>
+        </div>
+      }
+    </section>
+  }
+</div>

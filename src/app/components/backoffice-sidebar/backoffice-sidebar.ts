@@ -1,13 +1,14 @@
 import { Component, HostListener, inject, input, output, signal } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { AuthRedirectService } from '../../services/auth-redirect.service';
 import { AgenceSessionService } from '../../services/agence-session.service';
 import { AgenceService } from '../../services/agence.service';
 
 interface NavItem {
   labelKey: string;
   path: string;
-  icon: 'dashboard' | 'commandes' | 'logistics' | 'payments' | 'reclamations';
+  icon: 'dashboard' | 'commandes' | 'logistics' | 'payments' | 'finances' | 'reversements' | 'reclamations';
 }
 
 interface OfferItem {
@@ -36,6 +37,7 @@ interface AccountItem {
 })
 export class BackofficeSidebar {
   private readonly router = inject(Router);
+  private readonly authRedirect = inject(AuthRedirectService);
   private readonly agenceSession = inject(AgenceSessionService);
   private readonly agenceService = inject(AgenceService);
   readonly open = input(false);
@@ -48,6 +50,8 @@ export class BackofficeSidebar {
   protected readonly mainNav: NavItem[] = [
     { labelKey: 'backoffice.nav.dashboard', path: '/backoffice/tableau-de-bord', icon: 'dashboard' },
     { labelKey: 'backoffice.nav.commandes', path: '/backoffice/commandes', icon: 'commandes' },
+    { labelKey: 'backoffice.nav.finances', path: '/backoffice/finances', icon: 'finances' },
+    { labelKey: 'backoffice.nav.reversements', path: '/backoffice/reversements', icon: 'reversements' },
     { labelKey: 'backoffice.nav.payments', path: '/backoffice/paiements', icon: 'payments' },
     { labelKey: 'backoffice.nav.reclamations', path: '/backoffice/reclamations', icon: 'reclamations' },
     { labelKey: 'backoffice.nav.parcelTracking', path: '/backoffice/support-logistique', icon: 'logistics' },
@@ -140,7 +144,7 @@ export class BackofficeSidebar {
       this.agenceSession.clearSession();
       this.loggingOut.set(false);
       this.onNavigate();
-      void this.router.navigate(['/connexion']);
+      this.authRedirect.redirectToLogin('agence');
     };
 
     if (!token) {

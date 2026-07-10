@@ -1,8 +1,10 @@
-<div class="mx-auto max-w-3xl">
- <div class="mb-8">
- <h1 class="text-2xl font-bold text-gray-900">{{ 'backoffice.createOffer.title' | translate }}</h1>
- <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.createOffer.subtitle' | translate }}</p>
+<div class="bo-page mx-auto max-w-3xl">
+ <header class="bo-page-header">
+ <div class="bo-page-header__copy">
+ <h1 class="bo-page-title">{{ 'backoffice.createOffer.title' | translate }}</h1>
+ <p class="bo-page-subtitle">{{ 'backoffice.createOffer.subtitle' | translate }}</p>
  </div>
+ </header>
 
  @if (unauthenticated()) {
  <div class="mb-6 border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">

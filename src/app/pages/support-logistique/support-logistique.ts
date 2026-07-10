@@ -64,6 +64,7 @@ export class SupportLogistique implements OnInit {
 
   protected readonly statutOptions: Array<{ value: AgenceColisStatut | ''; labelKey: string }> = [
     { value: '', labelKey: 'backoffice.supportLogistics.filterStatusAll' },
+    { value: 'chez_client', labelKey: 'backoffice.supportLogistics.status.chez_client' },
     { value: 'déposé', labelKey: 'backoffice.supportLogistics.status.depose' },
     { value: 'en_transit', labelKey: 'backoffice.supportLogistics.status.en_transit' },
     { value: 'arrivé', labelKey: 'backoffice.supportLogistics.status.arrive' },
@@ -102,6 +103,9 @@ export class SupportLogistique implements OnInit {
   }
 
   protected statusKey(statut: string): string {
+    if (statut === 'chez_client') {
+      return 'backoffice.supportLogistics.status.chez_client';
+    }
     if (statut === 'déposé') {
       return 'backoffice.supportLogistics.status.depose';
     }
@@ -127,12 +131,15 @@ export class SupportLogistique implements OnInit {
     if (statut === 'en_transit') {
       return 'bg-amber-50 text-amber-700';
     }
+    if (statut === 'chez_client') {
+      return 'bg-sky-50 text-sky-700';
+    }
     return 'bg-verga-surface text-verga-muted';
   }
 
   protected openDetail(item: AgenceColis): void {
     this.detailOpen.set(true);
-    this.selectedColis.set(null);
+    this.selectedColis.set({ ...item, historique: [] });
     this.detailLoading.set(true);
     this.detailError.set('');
 
@@ -144,9 +151,16 @@ export class SupportLogistique implements OnInit {
       error: (error: HttpErrorResponse | Error) => {
         if (error instanceof Error && error.message === 'No agence token') {
           this.detailError.set('backoffice.supportLogistics.authRequired');
-        } else {
-          this.detailError.set(this.resolveDetailError(error as HttpErrorResponse));
+          this.detailLoading.set(false);
+          return;
         }
+        const httpError = error as HttpErrorResponse;
+        if (httpError.status === 404) {
+          this.selectedColis.set({ ...item, historique: [] });
+          this.detailLoading.set(false);
+          return;
+        }
+        this.detailError.set(this.resolveDetailError(httpError));
         this.detailLoading.set(false);
       },
     });
@@ -194,10 +208,15 @@ export class SupportLogistique implements OnInit {
       id: item.id,
       reference: item.reference,
       commande: item.commande,
+      commandeId: item.commandeId,
+      commandeQuantite: item.commandeQuantite,
       description: item.description,
       agence: item.agence,
       poids: item.poids,
+      volume: item.volume,
       statut: item.statut,
+      createdAt: item.createdAt,
+      photos: item.photos,
       nextStatut: item.nextStatut,
     });
     this.advanceComment.set('');
@@ -344,6 +363,14 @@ export class SupportLogistique implements OnInit {
       .subscribe({
         next: (response) => {
           const page = parseAgenceColisListResponse(response);
+          console.log('[AgenceColis] Colis récupérés:', page.items);
+          console.log('[AgenceColis] Pagination:', {
+            currentPage: page.currentPage,
+            lastPage: page.lastPage,
+            total: page.total,
+            from: page.from,
+            to: page.to,
+          });
           this.colis.set(page.items);
           this.currentPage.set(page.currentPage);
           this.totalPages.set(page.lastPage);
@@ -371,7 +398,6 @@ export class SupportLogistique implements OnInit {
       t('backoffice.supportLogistics.colReference'),
       t('backoffice.supportLogistics.colCommande'),
       t('backoffice.supportLogistics.colDescription'),
-      t('backoffice.supportLogistics.colAgence'),
       t('backoffice.supportLogistics.colPoids'),
       t('backoffice.supportLogistics.colStatus'),
     ];
@@ -380,7 +406,6 @@ export class SupportLogistique implements OnInit {
       item.reference,
       item.commande,
       item.description,
-      item.agence,
       item.poids,
       item.statut ? t(this.statusKey(item.statut)) : '—',
     ]);
@@ -407,21 +432,10 @@ export class SupportLogistique implements OnInit {
   }
 
   private applyColisUpdate(updated: AgenceColisDetail): void {
+    const { historique: _historique, ...row } = updated;
+
     this.colis.update((items) =>
-      items.map((item) =>
-        item.id === updated.id
-          ? {
-              id: updated.id,
-              reference: updated.reference,
-              commande: updated.commande,
-              description: updated.description,
-              agence: updated.agence,
-              poids: updated.poids,
-              statut: updated.statut,
-              nextStatut: updated.nextStatut,
-            }
-          : item,
-      ),
+      items.map((item) => (item.id === updated.id ? row : item)),
     );
 
     if (this.selectedColis()?.id === updated.id) {

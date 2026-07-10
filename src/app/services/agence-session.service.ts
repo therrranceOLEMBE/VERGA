@@ -11,6 +11,8 @@ import {
 } from '../models/agence-colis.model';
 import { AgenceCommandesListResponse, AgenceCommandesQueryParams, AgenceCommandeDetailResponse } from '../models/agence-commande.model';
 import { AgencePaiementsListResponse, AgencePaiementsQueryParams } from '../models/agence-paiement.model';
+import { AgenceReversementsListResponse, AgenceReversementsQueryParams } from '../models/agence-reversement.model';
+import { AgenceSoldeResponse } from '../models/agence-solde.model';
 import { AgenceReclamationsListResponse, AgenceReclamationsQueryParams, AgenceReclamationDetailResponse, AgenceReclamationStatutUpdateRequest, AgenceReclamationStatutUpdateResponse, AgenceReclamationCreateRequest, AgenceReclamationCreateResponse } from '../models/agence-reclamation.model';
 import { AgenceOffreCreateRequest, AgenceOffreCreateResponse, AgenceOffreDeleteResponse, AgenceOffreUpdateRequest, AgenceOffreUpdateResponse } from '../models/agence-offre-create.model';
 import { mapAgenceMeToProfile } from '../utils/agence-me.util';
@@ -208,6 +210,24 @@ export class AgenceSessionService {
     }
 
     return this.agenceService.getPaiements(token, params);
+  }
+
+  loadSolde(): Observable<AgenceSoldeResponse> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No agence token'));
+    }
+
+    return this.agenceService.getSolde(token);
+  }
+
+  loadReversements(params: AgenceReversementsQueryParams = {}): Observable<AgenceReversementsListResponse> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No agence token'));
+    }
+
+    return this.agenceService.getReversements(token, params);
   }
 
   loadReclamations(params: AgenceReclamationsQueryParams = {}): Observable<AgenceReclamationsListResponse> {

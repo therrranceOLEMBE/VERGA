@@ -1,0 +1,99 @@
+<div class="finances-page bo-page mx-auto max-w-[1280px]">
+  <header class="bo-page-header finances-header">
+    <div class="bo-page-header__copy">
+      <h1 class="bo-page-title">{{ 'backoffice.finances.title' | translate }}</h1>
+      <p class="bo-page-subtitle">{{ 'backoffice.finances.subtitle' | translate }}</p>
+    </div>
+    <button
+      type="button"
+      (click)="refresh()"
+      [disabled]="loading()"
+      class="finances-refresh-btn border border-verga-border bg-white px-4 py-2 text-sm font-semibold text-verga-primary transition hover:bg-verga-primary-muted disabled:cursor-not-allowed disabled:opacity-40"
+    >
+      {{ 'backoffice.finances.refresh' | translate }}
+    </button>
+  </header>
+
+  @if (loading()) {
+    <div class="finances-skeleton" aria-hidden="true">
+      <div class="finances-skeleton-highlights">
+        <div class="finances-skeleton-card"></div>
+        <div class="finances-skeleton-card"></div>
+        <div class="finances-skeleton-card"></div>
+      </div>
+      <div class="finances-skeleton-panel"></div>
+    </div>
+    <p class="mt-4 text-sm text-verga-muted">{{ 'backoffice.finances.loading' | translate }}</p>
+  } @else {
+    @if (errorMessage()) {
+      <div class="mb-6 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+        <p>
+          @if (errorMessage().startsWith('backoffice.')) {
+            {{ errorMessage() | translate }}
+          } @else {
+            {{ errorMessage() }}
+          }
+        </p>
+        @if (unauthenticated()) {
+          <a routerLink="/connexion" class="mt-2 inline-block font-semibold text-verga-primary hover:underline">
+            {{ 'backoffice.dashboard.goToLogin' | translate }}
+          </a>
+        }
+      </div>
+    }
+
+    @if (solde()) {
+      <section class="finances-highlights" [attr.aria-label]="'backoffice.finances.sectionHighlights' | translate">
+        @for (item of highlights(); track item.labelKey) {
+          <article class="finances-highlight" [class]="'finances-highlight--' + item.accent">
+            <p class="finances-highlight-label">{{ item.labelKey | translate }}</p>
+            <p class="finances-highlight-value">{{ item.value }}</p>
+            <p class="finances-highlight-hint">{{ item.hintKey | translate }}</p>
+          </article>
+        }
+      </section>
+
+      <section class="finances-panel border border-verga-border bg-white">
+        <div class="border-b border-verga-border px-4 py-5 sm:px-6">
+          <h2 class="text-sm font-bold uppercase tracking-wide text-gray-900">
+            {{ 'backoffice.finances.sectionBreakdown' | translate }}
+          </h2>
+          <p class="mt-1 text-sm text-verga-muted">{{ 'backoffice.finances.sectionBreakdownHint' | translate }}</p>
+        </div>
+
+        <div class="finances-breakdown">
+          @for (item of breakdown(); track item.labelKey) {
+            <div class="finances-breakdown-row">
+              <div>
+                <p class="finances-breakdown-label">{{ item.labelKey | translate }}</p>
+                <p class="finances-breakdown-hint">{{ item.hintKey | translate }}</p>
+              </div>
+              <p class="finances-breakdown-value">{{ item.value }}</p>
+            </div>
+          }
+        </div>
+
+        <div class="border-t border-verga-border px-4 py-4 sm:px-6 flex flex-wrap gap-4">
+          <a
+            routerLink="/backoffice/reversements"
+            class="inline-flex items-center gap-2 text-sm font-semibold text-verga-primary transition hover:underline"
+          >
+            {{ 'backoffice.finances.viewReversements' | translate }}
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
+          </a>
+          <a
+            routerLink="/backoffice/paiements"
+            class="inline-flex items-center gap-2 text-sm font-semibold text-verga-primary transition hover:underline"
+          >
+            {{ 'backoffice.finances.viewPayments' | translate }}
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+            </svg>
+          </a>
+        </div>
+      </section>
+    }
+  }
+</div>

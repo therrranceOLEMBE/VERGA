@@ -1,4 +1,18 @@
-export type AgenceColisStatut = 'déposé' | 'en_transit' | 'arrivé' | 'récupéré';
+export type AgenceColisStatut = 'chez_client' | 'déposé' | 'en_transit' | 'arrivé' | 'récupéré';
+
+export interface AgenceColisPhotoRaw {
+  id?: string | number;
+  chemin?: string;
+  url?: string;
+  ordre?: number;
+}
+
+export interface AgenceColisCommandeRaw {
+  id?: string | number;
+  code?: string;
+  quantite?: number | string | null;
+  quantite_label?: string | null;
+}
 
 export interface AgenceColisRaw {
   id?: string | number;
@@ -8,10 +22,11 @@ export interface AgenceColisRaw {
   statut?: AgenceColisStatut | string;
   poids?: number | string | null;
   poids_kg?: number | string | null;
-  commande?: {
-    id?: string | number;
-    code?: string;
-  } | string | null;
+  poids_label?: string | null;
+  quantite_label?: string | null;
+  volume?: number | string | null;
+  created_at?: string | null;
+  commande?: AgenceColisCommandeRaw | string | null;
   commande_id?: string | number | null;
   description?: string | null;
   contenu?: string | null;
@@ -21,6 +36,7 @@ export interface AgenceColisRaw {
     nom?: string;
     name?: string;
   } | string | null;
+  photos?: AgenceColisPhotoRaw[] | null;
   next_statut?: AgenceColisStatut | string | null;
 }
 
@@ -62,14 +78,25 @@ export interface AgenceColisQueryParams {
   per_page?: number;
 }
 
+export interface AgenceColisPhoto {
+  id: string;
+  url: string;
+  ordre: number;
+}
+
 export interface AgenceColis {
   id: string;
   reference: string;
   commande: string;
+  commandeId: string;
+  commandeQuantite: string;
   description: string;
   agence: string;
   poids: string;
+  volume: string;
   statut: string;
+  createdAt: string;
+  photos: AgenceColisPhoto[];
   nextStatut: string;
 }
 
@@ -121,14 +148,6 @@ export interface AgenceColisHistoriqueItem {
   commentaire: string;
 }
 
-export interface AgenceColisDetail {
-  id: string;
-  reference: string;
-  commande: string;
-  description: string;
-  agence: string;
-  poids: string;
-  statut: string;
-  nextStatut: string;
+export interface AgenceColisDetail extends AgenceColis {
   historique: AgenceColisHistoriqueItem[];
 }

@@ -7,17 +7,25 @@ import {
   HostListener,
   inject,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { RouterLink } from '@angular/router';
 import { Footer } from '../../components/footer/footer';
 import { Header } from '../../components/header/header';
 import { OfferCard } from '../../components/offer-card/offer-card';
+import { Offer } from '../../models/offer.model';
+import { OfferDestinationRoute } from '../../models/offer.model';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { ClientOfferCatalogService } from '../../services/client-offre-catalog.service';
 import { OfferFiltersService } from '../../services/offer-filters.service';
 import { LanguageService } from '../../services/language.service';
-import { OfferService } from '../../services/offer.service';
-import { TranslatePipe } from '../../pipes/translate.pipe';
-import { OfferDestinationRoute } from '../../models/offer.model';
-import { matchesDestinationRoute } from '../../utils/offer-destination.util';
+import { extractApiErrorMessage } from '../../utils/api-error.util';
+import {
+  buildClientOffresQueryFromFilters,
+  OFFER_DESTINATION_FILTERS,
+} from '../../utils/client-offre-filters.util';
 
 interface DestinationFilter {
   value: '' | OfferDestinationRoute;
@@ -27,42 +35,57 @@ interface DestinationFilter {
 
 @Component({
   selector: 'app-accueil',
-  imports: [Header, Footer, OfferCard, TranslatePipe],
+  imports: [Header, Footer, OfferCard, TranslatePipe, RouterLink],
   templateUrl: './accueil.html',
   styleUrl: './accueil.css',
 })
 export class Accueil {
   private readonly filtersService = inject(OfferFiltersService);
   private readonly language = inject(LanguageService);
-  private readonly offerService = inject(OfferService);
+  private readonly catalogService = inject(ClientOfferCatalogService);
 
   private readonly destinationScroll = viewChild<ElementRef<HTMLElement>>('destinationScroll');
 
+  protected readonly loading = signal(true);
+  protected readonly errorMessage = signal('');
   protected readonly showScrollTop = signal(false);
   protected readonly currentPage = signal(1);
-  protected readonly pageSize = 50;
+  protected readonly pageSize = 15;
 
-  protected readonly destinationFilters: DestinationFilter[] = [
-    { value: '', labelKey: 'home.destination.all', icon: 'all' },
-    { value: 'gabon-chine', labelKey: 'home.destination.gabonChine', icon: 'route' },
-    { value: 'gabon-france', labelKey: 'home.destination.gabonFrance', icon: 'route' },
-    { value: 'gabon-senegal', labelKey: 'home.destination.gabonSenegal', icon: 'route' },
-    { value: 'gabon-maroc', labelKey: 'home.destination.gabonMaroc', icon: 'route' },
-    { value: 'gabon-etats-unis', labelKey: 'home.destination.gabonEtatsUnis', icon: 'route' },
-    { value: 'gabon-canada', labelKey: 'home.destination.gabonCanada', icon: 'route' },
-    { value: 'gabon-burkina', labelKey: 'home.destination.gabonBurkina', icon: 'route' },
-    { value: 'libreville-port-gentil', labelKey: 'home.destination.librevillePortGentil', icon: 'route' },
-    { value: 'libreville-franceville', labelKey: 'home.destination.librevilleFranceville', icon: 'route' },
-  ];
+  protected readonly offers = signal<Offer[]>([]);
+  protected readonly totalPages = signal(1);
+  protected readonly totalItems = signal(0);
+  protected readonly resultsFrom = signal(0);
+  protected readonly resultsTo = signal(0);
+
+  private activeFilterKey = '';
+
+  protected readonly destinationFilters: DestinationFilter[] = OFFER_DESTINATION_FILTERS.map(
+    (dest) => ({
+      ...dest,
+      icon: dest.value ? ('route' as const) : ('all' as const),
+    }),
+  );
 
   constructor() {
     afterNextRender(() => this.updateScrollTopVisibility());
 
     effect(() => {
-      const maxPage = this.totalPages();
-      if (this.currentPage() > maxPage) {
-        this.currentPage.set(maxPage);
-      }
+      const page = this.currentPage();
+      const filterKey = JSON.stringify(this.filtersService.filters());
+      untracked(() => {
+        const filtersChanged =
+          this.activeFilterKey !== '' && filterKey !== this.activeFilterKey;
+
+        if (filtersChanged && page !== 1) {
+          this.activeFilterKey = filterKey;
+          this.currentPage.set(1);
+          return;
+        }
+
+        this.activeFilterKey = filterKey;
+        this.loadOffers(page);
+      });
     });
   }
 
@@ -72,79 +95,34 @@ export class Accueil {
   }
 
   protected readonly selectedDestination = computed(
-    () => this.filtersService.filters().destination,
+    () => this.filtersService.filters().destinationRoute,
   );
 
-  protected readonly filteredOffers = computed(() => {
-    this.language.lang();
-    const f = this.filtersService.filters();
-    let list = [...this.offerService.getAll()];
-
-    if (f.destination) {
-      const route = f.destination as OfferDestinationRoute;
-      list = list.filter((o) => matchesDestinationRoute(o, route));
-    }
-    if (f.verifiedOnly) {
-      list = list.filter((o) => o.verified);
-    }
-    if (f.location) {
-      const q = f.location.toLowerCase();
-      list = list.filter((o) => o.location.toLowerCase().includes(q));
-    }
-    if (f.category) {
-      const map: Record<string, string[]> = {
-        maritime: ['Fret maritime'],
-        aerien: ['Fret aérien'],
-        routier: ['Transport routier'],
-        entreposage: ['Logistique & entreposage'],
-      };
-      const allowed = map[f.category] ?? [];
-      if (allowed.length) {
-        list = list.filter((o) =>
-          allowed.some((c) => o.category.toLowerCase().includes(c.toLowerCase())),
-        );
-      }
-    }
-
-    return list;
+  protected readonly selectedDestinationLabelKey = computed(() => {
+    const value = this.selectedDestination();
+    const match = this.destinationFilters.find((dest) => dest.value === value);
+    return match?.labelKey ?? 'home.destination.all';
   });
 
-  protected readonly totalPages = computed(() =>
-    Math.max(1, Math.ceil(this.filteredOffers().length / this.pageSize)),
+  protected readonly pageNumbers = computed(() =>
+    Array.from({ length: this.totalPages() }, (_, index) => index + 1),
   );
-
-  protected readonly pageNumbers = computed(() => {
-    const total = this.totalPages();
-    return Array.from({ length: total }, (_, i) => i + 1);
-  });
-
-  protected readonly activePage = computed(() =>
-    Math.min(this.currentPage(), this.totalPages()),
-  );
-
-  protected readonly displayedOffers = computed(() => {
-    const list = this.filteredOffers();
-    const totalPages = Math.max(1, Math.ceil(list.length / this.pageSize));
-    const page = Math.min(this.currentPage(), totalPages);
-    const start = (page - 1) * this.pageSize;
-    return list.slice(start, start + this.pageSize);
-  });
 
   protected readonly resultsLabel = computed(() => {
     this.language.lang();
-    const total = this.filteredOffers().length;
+    const total = this.totalItems();
     if (total === 0) {
       return this.language.translate('home.noResults');
     }
-    const page = this.activePage();
-    const start = (page - 1) * this.pageSize + 1;
-    const end = Math.min(page * this.pageSize, total);
-    return this.language.translate('home.results', { start, end, total });
+    return this.language.translate('home.results', {
+      start: this.resultsFrom(),
+      end: this.resultsTo(),
+      total,
+    });
   });
 
   protected selectDestination(value: '' | OfferDestinationRoute): void {
-    this.filtersService.apply({ ...this.filtersService.filters(), destination: value });
-    this.currentPage.set(1);
+    this.filtersService.patch({ destinationRoute: value });
   }
 
   protected scrollDestinations(direction: 'left' | 'right'): void {
@@ -170,6 +148,39 @@ export class Accueil {
 
   protected scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  private loadOffers(page = this.currentPage()): void {
+    this.loading.set(true);
+    this.errorMessage.set('');
+
+    this.catalogService
+      .loadOffres(buildClientOffresQueryFromFilters(this.filtersService.filters(), page, this.pageSize))
+      .subscribe({
+      next: (result) => {
+        this.offers.set(result.items);
+        this.currentPage.set(result.currentPage);
+        this.totalPages.set(result.lastPage);
+        this.totalItems.set(result.total);
+        this.resultsFrom.set(result.from);
+        this.resultsTo.set(result.to);
+        this.loading.set(false);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.offers.set([]);
+        this.totalItems.set(0);
+        this.totalPages.set(1);
+        this.resultsFrom.set(0);
+        this.resultsTo.set(0);
+        this.errorMessage.set(this.resolveLoadError(error));
+        this.loading.set(false);
+      },
+    });
+  }
+
+  private resolveLoadError(error: HttpErrorResponse): string {
+    const apiMessage = extractApiErrorMessage(error);
+    return apiMessage ?? 'home.loadError';
   }
 
   private updateScrollTopVisibility(): void {

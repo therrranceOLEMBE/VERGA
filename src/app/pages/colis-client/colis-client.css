@@ -4,7 +4,7 @@
 }
 
 .client-colis-table {
-  min-width: 52rem;
+  min-width: 58rem;
   table-layout: fixed;
 }
 
@@ -21,8 +21,8 @@
   width: 9.5rem;
 }
 
-.client-col-agence {
-  width: 11rem;
+.client-col-description {
+  width: 12rem;
 }
 
 .client-col-poids {
@@ -61,8 +61,22 @@
   background: color-mix(in srgb, var(--color-verga-primary, #1d4ed8) 10%, white);
 }
 
+.client-colis-modal-backdrop {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}
+
+.client-colis-photo-link {
+  aspect-ratio: 1;
+}
+
+.client-colis-photo-link img {
+  height: 100%;
+  min-height: 7rem;
+}
+
 @media (max-width: 639px) {
   .client-colis-table {
-    min-width: 42rem;
+    min-width: 46rem;
   }
 }

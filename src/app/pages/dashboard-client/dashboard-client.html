@@ -1,59 +1,194 @@
-<div class="mx-auto max-w-[1200px]">
- <div class="mb-8">
- <h1 class="text-2xl font-bold text-gray-900">{{ 'clientBackoffice.dashboard.title' | translate }}</h1>
- <p class="mt-2 text-sm text-verga-muted">{{ 'clientBackoffice.dashboard.welcome' | translate:{ name: clientName() } }}</p>
+<div class="dashboard-page mx-auto max-w-[1200px]">
+ <header class="dashboard-header">
+ <div class="dashboard-header-main">
+ <a routerLink="/accueil" class="dashboard-back-home">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4 shrink-0" aria-hidden="true">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+ </svg>
+ {{ 'clientBackoffice.dashboard.backHome' | translate }}
+ </a>
+ <p class="dashboard-eyebrow">{{ 'clientBackoffice.dashboard.title' | translate }}</p>
+ @if (dashboard()?.profilName) {
+ <h1 class="dashboard-title">{{ displayName() }}</h1>
+ <div class="dashboard-meta">
+ @if (dashboard()!.profilTypeKey) {
+ <span class="dashboard-badge">{{ dashboard()!.profilTypeKey | translate }}</span>
+ } @else if (dashboard()!.profilType) {
+ <span class="dashboard-badge">{{ dashboard()!.profilType }}</span>
+ }
+ @if (dashboard()?.debut && dashboard()?.fin) {
+ <span class="dashboard-period-range">
+ {{ 'clientBackoffice.dashboard.periodRange' | translate }} : {{ dashboard()!.debut }} – {{ dashboard()!.fin }}
+ </span>
+ }
  </div>
-
- <div class="dashboard-client-metrics grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
- @for (metric of metrics(); track metric.labelKey) {
- <article class="border border-verga-border border-t-4 border-t-verga-primary bg-white p-4 sm:p-5">
- <p class="text-xs font-semibold uppercase tracking-wide text-verga-muted">{{ metric.labelKey | translate }}</p>
- <p class="mt-2 text-2xl font-bold text-gray-900">{{ metric.value }}</p>
- </article>
+ } @else {
+ <h1 class="dashboard-title">{{ 'clientBackoffice.dashboard.title' | translate }}</h1>
+ <p class="dashboard-subtitle">{{ 'clientBackoffice.dashboard.welcome' | translate:{ name: displayName() } }}</p>
  }
  </div>
 
- <section class="mt-8 border border-verga-border bg-white p-4 sm:p-6">
- <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
- <h2 class="text-lg font-bold text-gray-900">{{ 'clientBackoffice.dashboard.recentTransactions' | translate }}</h2>
+ <div class="dashboard-period-filter" role="group" [attr.aria-label]="'clientBackoffice.dashboard.periodFilter' | translate">
+ @for (option of periodOptions; track option.value) {
+ <button
+ type="button"
+ class="dashboard-period-btn"
+ [class.is-active]="selectedPeriode() === option.value"
+ [disabled]="loading()"
+ (click)="selectPeriode(option.value)"
+ >
+ {{ option.labelKey | translate }}
+ </button>
+ }
+ </div>
+ </header>
+
+ @if (loading()) {
+ <div class="dashboard-skeleton" aria-hidden="true">
+ <div class="dashboard-skeleton-highlights">
+ <div class="dashboard-skeleton-card"></div>
+ <div class="dashboard-skeleton-card"></div>
+ <div class="dashboard-skeleton-card"></div>
+ </div>
+ <div class="dashboard-skeleton-grid">
+ @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+ <div class="dashboard-skeleton-metric"></div>
+ }
+ </div>
+ </div>
+ <p class="dashboard-loading-text">{{ 'clientBackoffice.dashboard.loading' | translate }}</p>
+ } @else {
+ @if (errorMessage()) {
+ <div class="dashboard-alert" role="alert">
+ <p>
+ @if (errorMessage().startsWith('clientBackoffice.')) {
+ {{ errorMessage() | translate }}
+ } @else {
+ {{ errorMessage() }}
+ }
+ </p>
+ @if (unauthenticated()) {
+ <a routerLink="/connexion" class="dashboard-alert-link">{{ 'clientBackoffice.dashboard.goToLogin' | translate }}</a>
+ }
+ </div>
+ }
+
+ @if (dashboard()) {
+ <section class="dashboard-highlights" [attr.aria-label]="'clientBackoffice.dashboard.highlights' | translate">
+ @for (item of highlights(); track item.labelKey) {
+ <article class="dashboard-highlight" [class]="'dashboard-highlight--' + item.accent">
+ <p class="dashboard-highlight-label">{{ item.labelKey | translate }}</p>
+ <p class="dashboard-highlight-value">{{ item.value }}</p>
+ </article>
+ }
+ </section>
+
+ @for (group of metricGroups(); track group.titleKey) {
+ <section class="dashboard-section">
+ <div class="dashboard-section-head">
+ <h2 class="dashboard-section-title">{{ group.titleKey | translate }}</h2>
+ </div>
+ <div class="dashboard-metric-grid">
+ @for (metric of group.metrics; track metric.labelKey) {
+ <article class="dashboard-metric">
+ <p class="dashboard-metric-label">{{ metric.labelKey | translate }}</p>
+ <p class="dashboard-metric-value">{{ metric.value }}</p>
+ </article>
+ }
+ </div>
+ </section>
+ }
+
+ <div class="dashboard-panels">
+ <section class="dashboard-panel">
+ <h2 class="dashboard-panel-title">{{ 'clientBackoffice.dashboard.ordersByStatus' | translate }}</h2>
+ @if (commandesStatusBars().length > 0) {
+ <ul class="dashboard-status-list">
+ @for (item of commandesStatusBars(); track item.key) {
+ <li class="dashboard-status-item">
+ <div class="dashboard-status-row">
+ <span class="dashboard-status-label">{{ item.labelKey | translate }}</span>
+ <span class="dashboard-status-count">{{ item.count }}</span>
+ </div>
+ <div class="dashboard-status-track">
+ <span class="dashboard-status-fill" [style.width.%]="item.percent"></span>
+ </div>
+ </li>
+ }
+ </ul>
+ } @else {
+ <p class="dashboard-empty">{{ 'clientBackoffice.dashboard.emptyStatus' | translate }}</p>
+ }
+ </section>
+
+ <section class="dashboard-panel">
+ <h2 class="dashboard-panel-title">{{ 'clientBackoffice.dashboard.parcelsByStatus' | translate }}</h2>
+ @if (colisStatusBars().length > 0) {
+ <ul class="dashboard-status-list">
+ @for (item of colisStatusBars(); track item.key) {
+ <li class="dashboard-status-item">
+ <div class="dashboard-status-row">
+ <span class="dashboard-status-label">{{ item.labelKey | translate }}</span>
+ <span class="dashboard-status-count">{{ item.count }}</span>
+ </div>
+ <div class="dashboard-status-track">
+ <span class="dashboard-status-fill dashboard-status-fill--muted" [style.width.%]="item.percent"></span>
+ </div>
+ </li>
+ }
+ </ul>
+ } @else {
+ <p class="dashboard-empty">{{ 'clientBackoffice.dashboard.emptyStatus' | translate }}</p>
+ }
+ </section>
+ </div>
+
+ <section class="dashboard-panel dashboard-panel--table">
+ <div class="dashboard-section-head flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+ <h2 class="dashboard-panel-title !mb-0">{{ 'clientBackoffice.dashboard.recentOrders' | translate }}</h2>
  <a routerLink="/espace-client/commandes" class="text-sm font-semibold text-verga-primary hover:underline">
  {{ 'clientBackoffice.dashboard.viewAll' | translate }}
  </a>
  </div>
-
- <div class="mt-4 overflow-x-auto">
- <table class="min-w-full text-left text-sm">
- <thead class="border-b border-verga-border bg-verga-surface text-xs font-semibold uppercase tracking-wide text-verga-muted">
+ @if (dashboard()!.dernieresCommandes.length > 0) {
+ <div class="dashboard-table-wrap">
+ <table class="dashboard-table">
+ <thead>
  <tr>
- <th class="whitespace-nowrap px-3 py-3">{{ 'backoffice.transactions.colCode' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3">{{ 'backoffice.transactions.colDeparture' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3">{{ 'backoffice.transactions.colArrival' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3">{{ 'backoffice.transactions.colDate' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3 text-right">{{ 'backoffice.transactions.colAmount' | translate }}</th>
- <th class="whitespace-nowrap px-3 py-3">{{ 'backoffice.transactions.colStatus' | translate }}</th>
+ <th>{{ 'clientBackoffice.commandes.colCode' | translate }}</th>
+ <th>{{ 'clientBackoffice.commandes.colAgence' | translate }}</th>
+ <th class="text-right">{{ 'clientBackoffice.commandes.colQuantity' | translate }}</th>
+ <th class="text-right">{{ 'clientBackoffice.commandes.colAmount' | translate }}</th>
+ <th>{{ 'clientBackoffice.commandes.colStatus' | translate }}</th>
+ <th>{{ 'clientBackoffice.commandes.colDate' | translate }}</th>
  </tr>
  </thead>
- <tbody class="divide-y divide-verga-border">
- @for (tx of recentTransactions(); track tx.id) {
+ <tbody>
+ @for (commande of dashboard()!.dernieresCommandes; track commande.id) {
  <tr>
- <td class="whitespace-nowrap px-3 py-3 font-mono text-xs font-semibold text-verga-primary">{{ tx.code }}</td>
- <td class="whitespace-nowrap px-3 py-3 text-gray-600">{{ tx.departureCountry }}</td>
- <td class="whitespace-nowrap px-3 py-3 text-gray-600">{{ tx.arrivalCountry }}</td>
- <td class="whitespace-nowrap px-3 py-3 text-gray-600">{{ tx.date }}</td>
- <td class="whitespace-nowrap px-3 py-3 text-right font-semibold text-gray-900">{{ tx.amount }}</td>
- <td class="whitespace-nowrap px-3 py-3">
- <span class="inline-block px-2.5 py-1 text-xs font-semibold uppercase" [class.bg-verga-success-muted]="tx.status === 'achete'" [class.text-verga-success]="tx.status === 'achete'" [class.bg-verga-primary-muted]="tx.status === 'reserve'" [class.text-verga-primary]="tx.status === 'reserve'" [class.bg-verga-surface]="tx.status === 'annule'" [class.text-verga-muted]="tx.status === 'annule'">
- {{ statusKey(tx.status) | translate }}
+ <td class="dashboard-table-code">{{ commande.code }}</td>
+ <td>{{ commande.agence }}</td>
+ <td class="text-right tabular-nums">{{ commande.quantite }}</td>
+ <td class="text-right tabular-nums font-medium">{{ commande.montant }}</td>
+ <td>
+ @if (commande.statut) {
+ <span class="inline-block px-2.5 py-1 text-xs font-semibold uppercase" [class]="statusClass(commande.statut)">
+ {{ commande.statutKey | translate }}
  </span>
+ } @else {
+ —
+ }
  </td>
- </tr>
- } @empty {
- <tr>
- <td colspan="6" class="px-3 py-8 text-center text-sm text-verga-muted">{{ 'clientBackoffice.dashboard.noTransactions' | translate }}</td>
+ <td class="dashboard-table-date">{{ commande.date || '—' }}</td>
  </tr>
  }
  </tbody>
  </table>
  </div>
+ } @else {
+ <p class="dashboard-empty">{{ 'clientBackoffice.dashboard.noOrders' | translate }}</p>
+ }
  </section>
+ }
+ }
 </div>

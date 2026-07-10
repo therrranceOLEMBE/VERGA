@@ -12,3 +12,7 @@
   color: var(--color-verga-primary, #5eadd6);
   background: var(--color-verga-primary-muted, #e8f4fa);
 }
+
+.connexion-back-link {
+  max-width: calc(100vw - 2rem);
+}

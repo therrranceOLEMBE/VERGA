@@ -1,32 +1,68 @@
 import { Injectable, signal } from '@angular/core';
+import { ClientOffreLegacyType } from '../models/client-offre.model';
+import { OfferDestinationRoute } from '../models/offer.model';
 
 export interface OfferFilters {
-  category: string;
+  search: string;
   destination: string;
-  date: string;
-  location: string;
-  sortBy: string;
-  verifiedOnly: boolean;
+  destinationRoute: OfferDestinationRoute | '';
+  type: ClientOffreLegacyType | '';
+  type_offre_id: string;
+  date_debut: string;
+  date_fin: string;
 }
 
 export const DEFAULT_OFFER_FILTERS: OfferFilters = {
-  category: '',
+  search: '',
   destination: '',
-  date: '',
-  location: '',
-  sortBy: 'recommended',
-  verifiedOnly: false,
+  destinationRoute: '',
+  type: '',
+  type_offre_id: '',
+  date_debut: '',
+  date_fin: '',
 };
+
+function normalizeOfferFilters(filters: OfferFilters): OfferFilters {
+  return {
+    search: filters.search.trim(),
+    destination: filters.destination.trim(),
+    destinationRoute: filters.destinationRoute,
+    type: filters.type,
+    type_offre_id: filters.type_offre_id.trim(),
+    date_debut: filters.date_debut,
+    date_fin: filters.date_fin,
+  };
+}
+
+function areOfferFiltersEqual(a: OfferFilters, b: OfferFilters): boolean {
+  return (
+    JSON.stringify(normalizeOfferFilters(a)) === JSON.stringify(normalizeOfferFilters(b))
+  );
+}
 
 @Injectable({ providedIn: 'root' })
 export class OfferFiltersService {
   readonly filters = signal<OfferFilters>({ ...DEFAULT_OFFER_FILTERS });
 
-  apply(filters: OfferFilters): void {
-    this.filters.set({ ...filters });
+  apply(filters: OfferFilters): boolean {
+    return this.setIfChanged(normalizeOfferFilters(filters));
   }
 
-  reset(): void {
-    this.filters.set({ ...DEFAULT_OFFER_FILTERS });
+  patch(partial: Partial<OfferFilters>): boolean {
+    return this.setIfChanged(
+      normalizeOfferFilters({ ...this.filters(), ...partial }),
+    );
+  }
+
+  reset(): boolean {
+    return this.setIfChanged({ ...DEFAULT_OFFER_FILTERS });
+  }
+
+  private setIfChanged(next: OfferFilters): boolean {
+    if (areOfferFiltersEqual(this.filters(), next)) {
+      return false;
+    }
+    this.filters.set(next);
+    return true;
   }
 }

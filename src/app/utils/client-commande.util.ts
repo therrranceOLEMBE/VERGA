@@ -1,5 +1,6 @@
 import {
   ClientCommande,
+  ClientCommandeCreateResponse,
   ClientCommandeRaw,
   ClientCommandesListPayload,
   ClientCommandesListResponse,
@@ -101,4 +102,28 @@ export function parseCommandesListResponse(response: ClientCommandesListResponse
     from,
     to,
   };
+}
+
+export function unwrapCommandeCreateResponse(
+  response: ClientCommandeCreateResponse & { data?: ClientCommandeCreateResponse },
+): ClientCommandeCreateResponse {
+  return response.data ?? response;
+}
+
+export function resolvePaymentRedirectUrl(response: ClientCommandeCreateResponse): string {
+  const record = response as Record<string, unknown>;
+  const nested = record['data'];
+  const sources: Record<string, unknown>[] = [
+    record,
+    typeof nested === 'object' && nested != null ? (nested as Record<string, unknown>) : {},
+  ];
+
+  for (const source of sources) {
+    const redirect = source['redirect_url'] ?? source['redirectUrl'];
+    if (typeof redirect === 'string' && redirect.trim()) {
+      return redirect.trim();
+    }
+  }
+
+  return '';
 }

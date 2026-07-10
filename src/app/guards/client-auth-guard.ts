@@ -1,8 +1,8 @@
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateChildFn, CanActivateFn, Router } from '@angular/router';
 import { ClientSessionService } from '../services/client-session.service';
 
-export const clientAuthGuard: CanActivateFn = (_route, state) => {
+function checkClientAuth(stateUrl: string) {
   const clientSession = inject(ClientSessionService);
   const router = inject(Router);
 
@@ -11,6 +11,13 @@ export const clientAuthGuard: CanActivateFn = (_route, state) => {
   }
 
   return router.createUrlTree(['/connexion'], {
-    queryParams: { returnUrl: state.url },
+    queryParams: {
+      returnUrl: stateUrl,
+      scope: 'client',
+    },
   });
-};
+}
+
+export const clientAuthGuard: CanActivateFn = (_route, state) => checkClientAuth(state.url);
+
+export const clientAuthChildGuard: CanActivateChildFn = (_route, state) => checkClientAuth(state.url);

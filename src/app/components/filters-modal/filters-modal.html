@@ -1,151 +1,144 @@
 <div
-  class="fixed inset-0 z-[60] flex items-start justify-center bg-black/40 px-4 pt-24 pb-8 sm:items-center sm:pt-8"
+  class="filters-modal-backdrop fixed inset-0 z-[60] flex items-start justify-center px-4 pt-20 pb-8 sm:items-center sm:pt-8"
   role="dialog"
   aria-modal="true"
   aria-labelledby="filters-modal-title"
   (click)="onBackdropClick($event)"
 >
-  <div class="w-full max-w-2xl border border-verga-border bg-white shadow-lg" (click)="$event.stopPropagation()">
-    <!-- En-tête -->
-    <div class="flex items-center justify-between border-b border-verga-border px-6 py-4">
+  <div class="filters-modal w-full max-w-3xl" (click)="$event.stopPropagation()">
+    <div class="filters-modal__header flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <span class="text-verga-primary" aria-hidden="true">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-6 w-6">
+        <span class="filters-modal__icon" aria-hidden="true">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
           </svg>
         </span>
-        <h2 id="filters-modal-title" class="text-lg font-semibold text-verga-ink">{{ 'filters.title' | translate }}</h2>
+        <div>
+          <h2 id="filters-modal-title" class="filters-modal__title">{{ 'filters.title' | translate }}</h2>
+          <p class="filters-modal__subtitle">{{ 'filters.subtitle' | translate }}</p>
+        </div>
       </div>
       <button
         type="button"
-        class="text-verga-muted transition hover:text-verga-ink"
+        class="filters-modal__close"
         [attr.aria-label]="'aria.close' | translate"
         (click)="close()"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-6 w-6">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
         </svg>
       </button>
     </div>
 
-    <!-- Corps -->
-    <div class="px-6 py-6">
-      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <!-- Catégorie -->
-        <div>
-          <label for="filter-category" class="mb-2 flex items-center gap-2 text-sm font-medium text-verga-ink">
-            <span class="text-verga-success" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
-                <path fill-rule="evenodd" d="M5.25 2.25a3 3 0 0 0-3 3v4.318a3 3 0 0 0 .879 2.121l9.58 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L7.757 3.06A3 3 0 0 0 5.25 2.25Zm2.25 3a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" clip-rule="evenodd" />
-              </svg>
-            </span>
-            {{ 'filters.category' | translate }}
-          </label>
-          <select
-            id="filter-category"
-            class="verga-field appearance-none bg-white"
-            [ngModel]="category()"
-            (ngModelChange)="category.set($event)"
-          >
-            @for (opt of categories; track opt.value) {
-              <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
-            }
-          </select>
-        </div>
-
-        <!-- Date -->
-        <div>
-          <label for="filter-date" class="mb-2 flex items-center gap-2 text-sm font-medium text-verga-ink">
-            <span class="text-verga-primary" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
-                <path d="M12 6.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 0 1.5h-.75A.75.75 0 0 1 12 6.75ZM12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25ZM12.75 9a.75.75 0 0 0-1.5 0v3.75c0 .414.336.75.75.75h3.75a.75.75 0 0 0 0-1.5h-3v-3Z" />
-              </svg>
-            </span>
-            {{ 'filters.date' | translate }}
-          </label>
+    <div class="filters-modal__body max-h-[70vh] overflow-y-auto">
+      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div class="sm:col-span-2">
+          <label for="filter-search" class="filters-modal__label">{{ 'filters.search' | translate }}</label>
           <input
-            id="filter-date"
-            type="date"
-            class="verga-field"
-            [ngModel]="date()"
-            (ngModelChange)="date.set($event)"
+            id="filter-search"
+            type="search"
+            class="verga-field mt-1.5"
+            [placeholder]="'filters.searchPh' | translate"
+            [ngModel]="search()"
+            (ngModelChange)="search.set($event)"
           />
+          <p class="filters-modal__hint">{{ 'filters.searchHint' | translate }}</p>
         </div>
 
-        <!-- Près de -->
         <div>
-          <label for="filter-location" class="mb-2 flex items-center gap-2 text-sm font-medium text-verga-ink">
-            <span class="text-verga-primary-dark" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
-                <path fill-rule="evenodd" d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clip-rule="evenodd" />
-              </svg>
-            </span>
-            {{ 'filters.near' | translate }}
-          </label>
+          <label for="filter-destination" class="filters-modal__label">{{ 'filters.destination' | translate }}</label>
           <input
-            id="filter-location"
+            id="filter-destination"
             type="text"
-            class="verga-field"
-            [placeholder]="'filters.nearPlaceholder' | translate"
-            [ngModel]="location()"
-            (ngModelChange)="location.set($event)"
+            class="verga-field mt-1.5"
+            [placeholder]="'filters.destinationPh' | translate"
+            [ngModel]="destination()"
+            (ngModelChange)="destination.set($event)"
           />
+          <p class="filters-modal__hint">{{ 'filters.destinationHint' | translate }}</p>
         </div>
 
-        <!-- Trier par -->
         <div>
-          <label for="filter-sort" class="mb-2 flex items-center gap-2 text-sm font-medium text-verga-ink">
-            <span class="text-verga-primary-light" aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-4 w-4">
-                <path fill-rule="evenodd" d="M2.25 4.511a1.125 1.125 0 0 1 1.06-.073l7.5 4.441a.75.75 0 0 1 0 1.338l-7.5 4.441a1.125 1.125 0 0 1-1.06-.073l-3.375-2.25a1.125 1.125 0 0 1-.525-1.06V6.82a1.125 1.125 0 0 1 .525-1.06l3.375-2.25Zm10.5 0a1.125 1.125 0 0 1 1.06-.073l7.5 4.441a.75.75 0 0 1 0 1.338l-7.5 4.441a1.125 1.125 0 0 1-1.06-.073l-3.375-2.25a1.125 1.125 0 0 1-.525-1.06V6.82a1.125 1.125 0 0 1 .525-1.06l3.375-2.25Z" clip-rule="evenodd" />
-              </svg>
-            </span>
-            {{ 'filters.sortBy' | translate }}
-          </label>
+          <label for="filter-type-offre" class="filters-modal__label">{{ 'filters.typeOffre' | translate }}</label>
           <select
-            id="filter-sort"
-            class="verga-field appearance-none bg-white"
-            [ngModel]="sortBy()"
-            (ngModelChange)="sortBy.set($event)"
+            id="filter-type-offre"
+            class="verga-field mt-1.5 appearance-none bg-white"
+            [ngModel]="typeOffreId()"
+            (ngModelChange)="typeOffreId.set($event)"
+            [disabled]="loadingTypeOffres()"
           >
-            @for (opt of sortOptions; track opt.value) {
+            <option value="">{{ 'filters.typeOffreAll' | translate }}</option>
+            @for (option of typeOffreOptions(); track option.id) {
+              <option [value]="option.id">{{ option.label }}</option>
+            }
+          </select>
+          @if (loadingTypeOffres()) {
+            <p class="filters-modal__hint">{{ 'filters.typeOffreLoading' | translate }}</p>
+          }
+        </div>
+
+        <div>
+          <label for="filter-legacy-type" class="filters-modal__label">{{ 'filters.legacyType' | translate }}</label>
+          <select
+            id="filter-legacy-type"
+            class="verga-field mt-1.5 appearance-none bg-white"
+            [ngModel]="type()"
+            (ngModelChange)="type.set($event)"
+          >
+            @for (opt of legacyTypeOptions; track opt.value) {
               <option [value]="opt.value">{{ opt.labelKey | translate }}</option>
             }
           </select>
+        </div>
+
+        <div>
+          <label for="filter-date-debut" class="filters-modal__label">{{ 'filters.dateFrom' | translate }}</label>
+          <input
+            id="filter-date-debut"
+            type="date"
+            class="verga-field mt-1.5"
+            [ngModel]="dateDebut()"
+            (ngModelChange)="dateDebut.set($event)"
+          />
+        </div>
+
+        <div>
+          <label for="filter-date-fin" class="filters-modal__label">{{ 'filters.dateTo' | translate }}</label>
+          <input
+            id="filter-date-fin"
+            type="date"
+            class="verga-field mt-1.5"
+            [ngModel]="dateFin()"
+            (ngModelChange)="dateFin.set($event)"
+          />
+          <p class="filters-modal__hint">{{ 'filters.dateHint' | translate }}</p>
         </div>
       </div>
 
-      <label class="mt-6 flex cursor-pointer items-center gap-2">
-        <input
-          type="checkbox"
-          class="h-4 w-4 border-verga-border text-verga-primary focus:ring-verga-primary/40"
-          [ngModel]="verifiedOnly()"
-          (ngModelChange)="verifiedOnly.set($event)"
-        />
-        <span class="text-sm text-verga-ink">{{ 'filters.verified' | translate }}</span>
-      </label>
+      <div class="mt-6">
+        <p class="filters-modal__label">{{ 'home.destination.title' | translate }}</p>
+        <p class="filters-modal__hint mb-3">{{ 'filters.routeHint' | translate }}</p>
+        <div class="filters-modal__routes">
+          @for (dest of destinationFilters; track dest.value) {
+            <button
+              type="button"
+              class="filters-modal__route"
+              [class.filters-modal__route--active]="destinationRoute() === dest.value"
+              (click)="selectDestinationRoute(dest.value)"
+              [attr.aria-pressed]="destinationRoute() === dest.value"
+            >
+              {{ dest.labelKey | translate }}
+            </button>
+          }
+        </div>
+      </div>
     </div>
 
-    <!-- Actions -->
-    <div class="flex flex-wrap items-center justify-end gap-3 border-t border-verga-border px-6 py-4">
-      <button
-        type="button"
-        class="inline-flex items-center gap-2 border border-verga-primary px-5 py-2.5 text-sm font-semibold text-verga-primary transition hover:bg-verga-primary-muted"
-        (click)="reset()"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
-        </svg>
+    <div class="filters-modal__footer flex flex-wrap items-center justify-end gap-3">
+      <button type="button" class="filters-modal__btn filters-modal__btn--ghost" (click)="reset()">
         {{ 'filters.reset' | translate }}
       </button>
-      <button
-        type="button"
-        class="inline-flex items-center gap-2 bg-verga-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-verga-primary-dark"
-        (click)="apply()"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
-          <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9.75-9.75 9.75 9.75 6 6 19.5 12.75" />
-        </svg>
+      <button type="button" class="filters-modal__btn filters-modal__btn--primary" (click)="apply()">
         {{ 'filters.apply' | translate }}
       </button>
     </div>

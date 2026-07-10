@@ -30,4 +30,6 @@ export interface Offer {
   arrivalCountry: string;
   promotion?: boolean;
   verified?: boolean;
+  quantiteMin?: number;
+  quantiteEntier?: boolean;
 }

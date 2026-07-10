@@ -199,7 +199,7 @@ export class Inscription implements OnInit {
             email,
             phone: telephone,
           });
-          void this.router.navigate(['/espace-client/dashboard']);
+          void this.router.navigate(['/accueil'], { replaceUrl: true });
         },
         error: (error: HttpErrorResponse) => {
           this.errorMessage.set(this.resolveRegisterError(error));

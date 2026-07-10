@@ -1,8 +1,10 @@
-<div class="mx-auto max-w-3xl">
- <div class="mb-8">
- <h1 class="text-2xl font-bold text-gray-900">{{ 'backoffice.createCollaborator.title' | translate }}</h1>
- <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.createCollaborator.subtitle' | translate }}</p>
+<div class="bo-page mx-auto max-w-3xl">
+ <header class="bo-page-header">
+ <div class="bo-page-header__copy">
+ <h1 class="bo-page-title">{{ 'backoffice.createCollaborator.title' | translate }}</h1>
+ <p class="bo-page-subtitle">{{ 'backoffice.createCollaborator.subtitle' | translate }}</p>
  </div>
+ </header>
 
  <form class="space-y-6 border border-verga-border bg-white p-4 sm:p-8" (ngSubmit)="onSubmit($event)">
  <div class="grid gap-5 sm:grid-cols-2">

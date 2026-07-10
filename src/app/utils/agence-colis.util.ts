@@ -1,5 +1,6 @@
 import {
   AgenceColis,
+  AgenceColisCommandeRaw,
   AgenceColisDetail,
   AgenceColisDetailRaw,
   AgenceColisDetailResponse,
@@ -9,6 +10,8 @@ import {
   AgenceColisListResponse,
   AgenceColisPage,
   AgenceColisPaginationMeta,
+  AgenceColisPhoto,
+  AgenceColisPhotoRaw,
   AgenceColisRaw,
   AgenceColisStatut,
   AgenceColisStatutUpdateResponse,
@@ -78,6 +81,13 @@ function resolveLabel(value: unknown): string {
   return '';
 }
 
+function resolveCommande(raw: AgenceColisRaw): AgenceColisCommandeRaw | null {
+  if (raw.commande != null && typeof raw.commande === 'object') {
+    return raw.commande;
+  }
+  return null;
+}
+
 function formatPoids(value: number | string | null | undefined, fallback?: number | string | null): string {
   const raw = value ?? fallback;
   if (raw == null || raw === '') {
@@ -89,6 +99,56 @@ function formatPoids(value: number | string | null | undefined, fallback?: numbe
   }
   const text = String(raw).trim();
   return text.toLowerCase().includes('kg') ? text : `${text} kg`;
+}
+
+function resolvePoidsLabel(raw: AgenceColisRaw): string {
+  const commande = resolveCommande(raw);
+  const label =
+    raw.quantite_label?.trim() ||
+    raw.poids_label?.trim() ||
+    commande?.quantite_label?.trim() ||
+    '';
+
+  if (label) {
+    return label.toLowerCase().includes('kg') ? label : `${label} kg`;
+  }
+
+  return formatPoids(raw.poids, raw.poids_kg);
+}
+
+function resolveCommandeQuantite(raw: AgenceColisRaw): string {
+  const commande = resolveCommande(raw);
+  if (commande?.quantite_label?.trim()) {
+    const label = commande.quantite_label.trim();
+    return label.toLowerCase().includes('kg') ? label : `${label} kg`;
+  }
+  if (commande?.quantite != null && String(commande.quantite).trim() !== '') {
+    return formatPoids(commande.quantite);
+  }
+  return resolvePoidsLabel(raw);
+}
+
+function resolveVolume(raw: AgenceColisRaw): string {
+  if (raw.volume == null || raw.volume === '') {
+    return '—';
+  }
+  return String(raw.volume).trim();
+}
+
+function mapPhotos(raw: AgenceColisRaw): AgenceColisPhoto[] {
+  const items = raw.photos ?? [];
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  return items
+    .map((photo: AgenceColisPhotoRaw, index: number) => ({
+      id: String(photo.id ?? `photo-${index}`),
+      url: photo.url?.trim() ?? '',
+      ordre: typeof photo.ordre === 'number' ? photo.ordre : index,
+    }))
+    .filter((photo) => photo.url.length > 0)
+    .sort((left, right) => left.ordre - right.ordre);
 }
 
 function resolveDescription(raw: AgenceColisRaw): string {
@@ -131,24 +191,61 @@ function mapHistoriqueItem(raw: AgenceColisHistoriqueRaw, index: number): Agence
   };
 }
 
+export const AGENCE_COLIS_STATUT_FLOW: AgenceColisStatut[] = [
+  'chez_client',
+  'déposé',
+  'en_transit',
+  'arrivé',
+  'récupéré',
+];
+
+function normalizeStatutKey(value: string): string {
+  return value
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+}
+
+export function normalizeAgenceColisStatut(statut: string | undefined): string {
+  if (!statut?.trim()) {
+    return 'chez_client';
+  }
+
+  const key = normalizeStatutKey(statut);
+  const aliases: Record<string, AgenceColisStatut> = {
+    chez_client: 'chez_client',
+    depose: 'déposé',
+    en_transit: 'en_transit',
+    arrive: 'arrivé',
+    recupere: 'récupéré',
+  };
+
+  if (aliases[key]) {
+    return aliases[key];
+  }
+
+  const trimmed = statut.trim();
+  if (AGENCE_COLIS_STATUT_FLOW.includes(trimmed as AgenceColisStatut)) {
+    return trimmed;
+  }
+
+  return trimmed;
+}
+
 export function resolveNextStatutFromCurrent(statut: string | undefined): string {
-  const normalized = statut?.trim() ?? '';
-  if (normalized === 'déposé') {
-    return 'en_transit';
+  const normalized = normalizeAgenceColisStatut(statut);
+  const index = AGENCE_COLIS_STATUT_FLOW.indexOf(normalized as AgenceColisStatut);
+  if (index === -1 || index >= AGENCE_COLIS_STATUT_FLOW.length - 1) {
+    return '';
   }
-  if (normalized === 'en_transit') {
-    return 'arrivé';
-  }
-  if (normalized === 'arrivé') {
-    return 'récupéré';
-  }
-  return '';
+  return AGENCE_COLIS_STATUT_FLOW[index + 1];
 }
 
 function resolveNextStatut(raw: AgenceColisRaw, fallbackStatut?: string): string {
   const explicit = raw.next_statut;
   if (typeof explicit === 'string' && explicit.trim()) {
-    return explicit.trim();
+    return normalizeAgenceColisStatut(explicit.trim()) || explicit.trim();
   }
   return resolveNextStatutFromCurrent(fallbackStatut ?? raw.statut);
 }
@@ -159,7 +256,7 @@ function resolveResponseNextStatut(
 ): string {
   const rootNext = response.next_statut;
   if (typeof rootNext === 'string' && rootNext.trim()) {
-    return rootNext.trim();
+    return normalizeAgenceColisStatut(rootNext.trim()) || rootNext.trim();
   }
   if (rootNext === null) {
     return '';
@@ -168,18 +265,25 @@ function resolveResponseNextStatut(
 }
 
 export function mapAgenceColisToRow(raw: AgenceColisRaw): AgenceColis {
+  const commandeNested = resolveCommande(raw);
   const commande =
     resolveLabel(raw.commande) ||
+    commandeNested?.code?.trim() ||
     (raw.commande_id != null ? String(raw.commande_id) : '');
 
   return {
     id: String(raw.id ?? raw.reference ?? raw.ref ?? raw.code ?? ''),
     reference: (raw.reference ?? raw.ref ?? raw.code)?.trim() ?? '—',
     commande: commande || '—',
+    commandeId: commandeNested?.id != null ? String(commandeNested.id) : '',
+    commandeQuantite: resolveCommandeQuantite(raw),
     description: resolveDescription(raw),
     agence: resolveLabel(raw.agence) || '—',
-    poids: formatPoids(raw.poids, raw.poids_kg),
-    statut: raw.statut?.trim() ?? '',
+    poids: resolvePoidsLabel(raw),
+    volume: resolveVolume(raw),
+    statut: normalizeAgenceColisStatut(raw.statut),
+    createdAt: formatDate(raw.created_at),
+    photos: mapPhotos(raw),
     nextStatut: resolveNextStatut(raw),
   };
 }
@@ -219,5 +323,5 @@ export function parseAgenceColisDetailResponse(
 }
 
 export function isAgenceColisStatut(value: string): value is AgenceColisStatut {
-  return value === 'déposé' || value === 'en_transit' || value === 'arrivé' || value === 'récupéré';
+  return AGENCE_COLIS_STATUT_FLOW.includes(value as AgenceColisStatut);
 }

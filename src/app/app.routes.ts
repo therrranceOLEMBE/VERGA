@@ -52,13 +52,18 @@ import { TableauDeBord } from './pages/tableau-de-bord/tableau-de-bord';
 
 import { Tarifs } from './pages/tarifs/tarifs';
 
+import { Reversements } from './pages/reversements/reversements';
+
+import { Finances } from './pages/finances/finances';
+
 import { Paiements } from './pages/paiements/paiements';
 
 import { Reclamations } from './pages/reclamations/reclamations';
 
 import { SupportLogistique } from './pages/support-logistique/support-logistique';
 
-import { clientAuthGuard } from './guards/client-auth-guard';
+import { clientAuthChildGuard, clientAuthGuard } from './guards/client-auth-guard';
+import { agenceAuthChildGuard, agenceAuthGuard } from './guards/agence-auth-guard';
 
 
 
@@ -88,6 +93,10 @@ export const routes: Routes = [
 
     component: BackofficeLayout,
 
+    canActivate: [agenceAuthGuard],
+
+    canActivateChild: [agenceAuthChildGuard],
+
     children: [
 
       { path: '', redirectTo: 'tableau-de-bord', pathMatch: 'full' },
@@ -101,6 +110,10 @@ export const routes: Routes = [
       { path: 'commandes', component: Commandes },
 
       { path: 'transactions', redirectTo: 'paiements', pathMatch: 'full' },
+
+      { path: 'finances', component: Finances },
+
+      { path: 'reversements', component: Reversements },
 
       { path: 'paiements', component: Paiements },
 
@@ -129,6 +142,8 @@ export const routes: Routes = [
     component: ClientBackofficeLayout,
 
     canActivate: [clientAuthGuard],
+
+    canActivateChild: [clientAuthChildGuard],
 
     children: [
 

@@ -1,6 +1,13 @@
 <div
- class="connexion-page min-h-screen flex items-center justify-center bg-verga-surface p-4 font-sans sm:p-6 lg:p-10"
+ class="connexion-page relative min-h-screen flex items-center justify-center bg-verga-surface p-4 font-sans sm:p-6 lg:p-10"
 >
+ <a routerLink="/accueil" class="connexion-back-link absolute left-4 top-4 z-10 inline-flex items-center gap-2 text-sm font-medium text-verga-muted transition hover:text-verga-primary sm:left-6 sm:top-6 lg:left-10 lg:top-10">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4" aria-hidden="true">
+ <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+ </svg>
+ {{ 'auth.login.backHome' | translate }}
+ </a>
+
  <div
  class="flex w-full max-w-[1200px] min-h-[520px] flex-col overflow-hidden md:flex-row"
  >

@@ -15,6 +15,7 @@ import {
 interface DashboardMetric {
   labelKey: string;
   value: string;
+  icon: 'offers' | 'pending' | 'confirmed' | 'parcels' | 'transit' | 'claims' | 'payments' | 'commissions' | 'revenue' | 'payouts';
 }
 
 interface DashboardHighlight extends DashboardMetric {
@@ -23,6 +24,7 @@ interface DashboardHighlight extends DashboardMetric {
 
 interface MetricGroup {
   titleKey: string;
+  descriptionKey: string;
   metrics: DashboardMetric[];
 }
 
@@ -31,8 +33,15 @@ interface PeriodOption {
   labelKey: string;
 }
 
+interface QuickLink {
+  labelKey: string;
+  path: string;
+  icon: 'commandes' | 'finances' | 'colis' | 'offers';
+}
+
 interface StatusBarItem extends AgenceDashboardStatusCount {
   percent: number;
+  tone: 'primary' | 'success' | 'warning' | 'muted';
 }
 
 @Component({
@@ -59,6 +68,13 @@ export class TableauDeBord implements OnInit {
     { value: 'tout', labelKey: 'backoffice.dashboard.periodeAll' },
   ];
 
+  protected readonly quickLinks: QuickLink[] = [
+    { labelKey: 'backoffice.dashboard.quickCommandes', path: '/backoffice/commandes', icon: 'commandes' },
+    { labelKey: 'backoffice.dashboard.quickFinances', path: '/backoffice/finances', icon: 'finances' },
+    { labelKey: 'backoffice.dashboard.quickColis', path: '/backoffice/support-logistique', icon: 'colis' },
+    { labelKey: 'backoffice.dashboard.quickOffers', path: '/backoffice/historique-offres', icon: 'offers' },
+  ];
+
   protected readonly highlights = computed<DashboardHighlight[]>(() => {
     const stats = this.dashboard()?.stats;
     if (!stats) {
@@ -70,16 +86,19 @@ export class TableauDeBord implements OnInit {
         labelKey: 'backoffice.dashboard.netRevenue',
         value: formatDashboardMoney(stats.revenu_net_estime),
         accent: 'primary',
+        icon: 'revenue',
       },
       {
         labelKey: 'backoffice.dashboard.totalOrders',
         value: this.formatCount(stats.nb_commandes),
         accent: 'success',
+        icon: 'confirmed',
       },
       {
         labelKey: 'backoffice.dashboard.activeOffers',
         value: this.formatCount(stats.nb_offres_actives),
         accent: 'neutral',
+        icon: 'offers',
       },
     ];
   });
@@ -93,22 +112,24 @@ export class TableauDeBord implements OnInit {
     return [
       {
         titleKey: 'backoffice.dashboard.sectionOperations',
+        descriptionKey: 'backoffice.dashboard.sectionOperationsHint',
         metrics: [
-          { labelKey: 'backoffice.dashboard.totalOffers', value: this.formatCount(stats.nb_offres) },
-          { labelKey: 'backoffice.dashboard.pendingOrders', value: this.formatCount(stats.nb_commandes_en_attente) },
-          { labelKey: 'backoffice.dashboard.confirmedOrders', value: this.formatCount(stats.nb_commandes_confirmees) },
-          { labelKey: 'backoffice.dashboard.totalParcels', value: this.formatCount(stats.nb_colis) },
-          { labelKey: 'backoffice.dashboard.parcelsInTransit', value: this.formatCount(stats.nb_colis_en_transit) },
-          { labelKey: 'backoffice.dashboard.openClaims', value: this.formatCount(stats.nb_reclamations_ouvertes) },
+          { labelKey: 'backoffice.dashboard.totalOffers', value: this.formatCount(stats.nb_offres), icon: 'offers' },
+          { labelKey: 'backoffice.dashboard.pendingOrders', value: this.formatCount(stats.nb_commandes_en_attente), icon: 'pending' },
+          { labelKey: 'backoffice.dashboard.confirmedOrders', value: this.formatCount(stats.nb_commandes_confirmees), icon: 'confirmed' },
+          { labelKey: 'backoffice.dashboard.totalParcels', value: this.formatCount(stats.nb_colis), icon: 'parcels' },
+          { labelKey: 'backoffice.dashboard.parcelsInTransit', value: this.formatCount(stats.nb_colis_en_transit), icon: 'transit' },
+          { labelKey: 'backoffice.dashboard.openClaims', value: this.formatCount(stats.nb_reclamations_ouvertes), icon: 'claims' },
         ],
       },
       {
         titleKey: 'backoffice.dashboard.sectionFinance',
+        descriptionKey: 'backoffice.dashboard.sectionFinanceHint',
         metrics: [
-          { labelKey: 'backoffice.dashboard.totalPayments', value: formatDashboardMoney(stats.total_paiements) },
-          { labelKey: 'backoffice.dashboard.totalCommissions', value: formatDashboardMoney(stats.total_commissions) },
-          { labelKey: 'backoffice.dashboard.netRevenue', value: formatDashboardMoney(stats.revenu_net_estime) },
-          { labelKey: 'backoffice.dashboard.pendingPayouts', value: formatDashboardMoney(stats.reversements_en_attente) },
+          { labelKey: 'backoffice.dashboard.totalPayments', value: formatDashboardMoney(stats.total_paiements), icon: 'payments' },
+          { labelKey: 'backoffice.dashboard.totalCommissions', value: formatDashboardMoney(stats.total_commissions), icon: 'commissions' },
+          { labelKey: 'backoffice.dashboard.netRevenue', value: formatDashboardMoney(stats.revenu_net_estime), icon: 'revenue' },
+          { labelKey: 'backoffice.dashboard.pendingPayouts', value: formatDashboardMoney(stats.reversements_en_attente), icon: 'payouts' },
         ],
       },
     ];
@@ -119,6 +140,12 @@ export class TableauDeBord implements OnInit {
   );
 
   protected readonly colisStatusBars = computed(() => this.toStatusBars(this.dashboard()?.colisParStatut ?? []));
+
+  protected readonly selectedPeriodLabel = computed(() => {
+    const periode = this.selectedPeriode();
+    const option = this.periodOptions.find((item) => item.value === periode);
+    return option?.labelKey ?? 'backoffice.dashboard.periodeMonth';
+  });
 
   ngOnInit(): void {
     this.loadDashboard();
@@ -132,11 +159,18 @@ export class TableauDeBord implements OnInit {
     this.loadDashboard();
   }
 
-  protected statusPercent(count: number, total: number): number {
-    if (total <= 0) {
-      return 0;
+  protected statusBadgeClass(statut: string): string {
+    const value = statut.trim().toLowerCase();
+    if (value.includes('confirm') || value.includes('valid') || value.includes('actif') || value.includes('livré') || value.includes('livre')) {
+      return 'dash-badge dash-badge--success';
     }
-    return Math.round((count / total) * 100);
+    if (value.includes('attente') || value.includes('pending') || value.includes('en cours')) {
+      return 'dash-badge dash-badge--warning';
+    }
+    if (value.includes('annul') || value.includes('échec') || value.includes('echec') || value.includes('refus')) {
+      return 'dash-badge dash-badge--danger';
+    }
+    return 'dash-badge';
   }
 
   private loadDashboard(): void {
@@ -169,11 +203,20 @@ export class TableauDeBord implements OnInit {
   }
 
   private toStatusBars(items: AgenceDashboardStatusCount[]): StatusBarItem[] {
+    const tones: StatusBarItem['tone'][] = ['primary', 'success', 'warning', 'muted'];
     const total = items.reduce((sum, item) => sum + item.count, 0);
-    return items.map((item) => ({
+    return items.map((item, index) => ({
       ...item,
       percent: this.statusPercent(item.count, total),
+      tone: tones[index % tones.length],
     }));
+  }
+
+  private statusPercent(count: number, total: number): number {
+    if (total <= 0) {
+      return 0;
+    }
+    return Math.round((count / total) * 100);
   }
 
   private formatCount(value: number | null | undefined): string {

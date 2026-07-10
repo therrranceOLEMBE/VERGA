@@ -1,8 +1,16 @@
-<div class="commandes-page mx-auto max-w-[1400px]">
- <div class="mb-8">
- <h1 class="text-2xl font-bold text-gray-900">{{ 'backoffice.commandes.title' | translate }}</h1>
- <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.commandes.subtitle' | translate }}</p>
+<div class="commandes-page bo-page mx-auto max-w-[1400px]">
+ <header class="bo-page-header">
+ <div class="bo-page-header__copy">
+ <h1 class="bo-page-title">{{ 'backoffice.commandes.title' | translate }}</h1>
+ <p class="bo-page-subtitle">{{ 'backoffice.commandes.subtitle' | translate }}</p>
  </div>
+ </header>
+
+ @if (createSuccess()) {
+ <div class="mb-4 border border-verga-success/30 bg-verga-success-muted px-4 py-3 text-sm text-verga-success" role="status">
+ {{ createSuccess() | translate }}
+ </div>
+ }
 
  @if (loading()) {
  <p class="text-sm text-verga-muted">{{ 'backoffice.commandes.loading' | translate }}</p>
@@ -121,6 +129,7 @@
  </td>
  <td class="text-gray-600">{{ commande.date }}</td>
  <td>
+ <div class="flex flex-wrap gap-2">
  <button
  type="button"
  (click)="openDetail(commande)"
@@ -128,6 +137,14 @@
  >
  {{ 'backoffice.commandes.actionDetail' | translate }}
  </button>
+ <button
+ type="button"
+ (click)="openCreateReclamation(commande)"
+ class="commandes-action-btn border border-verga-border bg-white px-2.5 py-1 text-xs font-semibold text-verga-primary transition hover:bg-verga-primary-muted"
+ >
+ {{ 'backoffice.commandes.actionCreateReclamation' | translate }}
+ </button>
+ </div>
  </td>
  </tr>
  } @empty {
@@ -193,23 +210,23 @@
 
 @if (detailOpen()) {
 <div
- class="commandes-modal-backdrop fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 py-8 sm:items-center"
+ class="bo-modal-backdrop commandes-modal-backdrop fixed inset-0 z-50 flex items-start justify-center px-4 py-8 sm:items-center"
  role="dialog"
  aria-modal="true"
  (click)="onModalBackdropClick($event)"
 >
- <div class="w-full max-w-2xl border border-verga-border bg-white shadow-lg" (click)="$event.stopPropagation()">
- <div class="flex items-center justify-between border-b border-verga-border px-5 py-4 sm:px-6">
+ <div class="bo-modal w-full max-w-2xl" (click)="$event.stopPropagation()">
+ <div class="bo-modal__header flex items-center justify-between">
  <h2 class="text-lg font-bold text-gray-900">{{ 'backoffice.commandes.modalDetailTitle' | translate }}</h2>
- <button type="button" (click)="closeDetail()" class="text-verga-muted transition hover:text-gray-900" [attr.aria-label]="'aria.close' | translate">
+ <button type="button" (click)="closeDetail()" class="bo-modal__close text-verga-muted transition hover:text-gray-900" [attr.aria-label]="'aria.close' | translate">
  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
  </button>
  </div>
 
  @if (detailLoading()) {
- <p class="px-5 py-8 text-sm text-verga-muted sm:px-6">{{ 'backoffice.commandes.detailLoading' | translate }}</p>
+ <p class="bo-modal__body text-sm text-verga-muted">{{ 'backoffice.commandes.detailLoading' | translate }}</p>
  } @else if (detailError()) {
- <div class="px-5 py-6 text-sm text-red-600 sm:px-6" role="alert">
+ <div class="bo-modal__body text-sm text-red-600" role="alert">
  @if (detailError().startsWith('backoffice.')) {
  {{ detailError() | translate }}
  } @else {
@@ -217,9 +234,9 @@
  }
  </div>
  } @else if (selectedCommande(); as commande) {
- <div class="max-h-[70vh] overflow-y-auto px-5 py-6 sm:px-6">
+ <div class="bo-modal__body max-h-[70vh] overflow-y-auto">
  <section class="mb-6">
- <h3 class="text-xs font-bold uppercase tracking-wide text-verga-muted">{{ 'backoffice.commandes.sectionOrder' | translate }}</h3>
+ <h3 class="bo-modal__section-title">{{ 'backoffice.commandes.sectionOrder' | translate }}</h3>
  <dl class="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
  <div>
  <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.colCode' | translate }}</dt>
@@ -242,8 +259,16 @@
  <dd class="mt-1 text-sm text-gray-900">{{ commande.quantite }}</dd>
  </div>
  <div>
- <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.colAmount' | translate }}</dt>
- <dd class="mt-1 text-sm font-semibold text-gray-900">{{ commande.montant }}</dd>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.quantitePayee' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ commande.quantitePayee }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.quantiteRestante' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ commande.quantiteRestante }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.montantSousTotal' | translate }}</dt>
+ <dd class="mt-1 text-sm font-semibold text-gray-900">{{ commande.montantSousTotal }}</dd>
  </div>
  <div>
  <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.colDate' | translate }}</dt>
@@ -253,8 +278,16 @@
  </section>
 
  <section class="mb-6 border-t border-verga-border pt-6">
- <h3 class="text-xs font-bold uppercase tracking-wide text-verga-muted">{{ 'backoffice.commandes.sectionClient' | translate }}</h3>
+ <h3 class="bo-modal__section-title">{{ 'backoffice.commandes.sectionClient' | translate }}</h3>
  <dl class="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.clientPrenom' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ commande.clientPrenom || '—' }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.clientNom' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ commande.clientNom || '—' }}</dd>
+ </div>
  <div class="sm:col-span-2">
  <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.colClient' | translate }}</dt>
  <dd class="mt-1 text-sm text-gray-900">{{ commande.clientName || '—' }}</dd>
@@ -275,11 +308,29 @@
  </section>
 
  <section class="mb-6 border-t border-verga-border pt-6">
- <h3 class="text-xs font-bold uppercase tracking-wide text-verga-muted">{{ 'backoffice.commandes.sectionOffer' | translate }}</h3>
+ <h3 class="bo-modal__section-title">{{ 'backoffice.commandes.sectionOffer' | translate }}</h3>
  <dl class="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
  <div class="sm:col-span-2">
  <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.offerHistory.colTitle' | translate }}</dt>
  <dd class="mt-1 text-sm text-gray-900">{{ commande.offreTitre || '—' }}</dd>
+ </div>
+ @if (commande.offreDescription) {
+ <div class="sm:col-span-2">
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.offreDescription' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ commande.offreDescription }}</dd>
+ </div>
+ }
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.offreType' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ commande.offreType || '—' }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.offreTypeNom' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ commande.offreTypeNom || '—' }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.offreTypeUnite' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ commande.offreTypeUnite || '—' }}</dd>
  </div>
  <div>
  <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.createOffer.origine' | translate }}</dt>
@@ -290,14 +341,34 @@
  <dd class="mt-1 text-sm text-gray-900">{{ commande.offreDestination || '—' }}</dd>
  </div>
  <div>
- <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.colAmount' | translate }}</dt>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.offrePrix' | translate }}</dt>
  <dd class="mt-1 text-sm font-semibold text-gray-900">{{ commande.offrePrix }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.offreCapaciteTotale' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ commande.offreCapaciteTotale }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.offreCapaciteDisponible' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ commande.offreCapaciteDisponible }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.colStatus' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ commande.offreStatut || '—' }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.offreCreatedAt' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ commande.offreCreatedAt }}</dd>
+ </div>
+ <div>
+ <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.offreUpdatedAt' | translate }}</dt>
+ <dd class="mt-1 text-sm text-gray-900">{{ commande.offreUpdatedAt }}</dd>
  </div>
  </dl>
  </section>
 
  <section class="mb-6 border-t border-verga-border pt-6">
- <h3 class="text-xs font-bold uppercase tracking-wide text-verga-muted">{{ 'backoffice.commandes.sectionPayment' | translate }}</h3>
+ <h3 class="bo-modal__section-title">{{ 'backoffice.commandes.sectionPayment' | translate }}</h3>
  <dl class="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
  <div>
  <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.colAmount' | translate }}</dt>
@@ -305,15 +376,15 @@
  </div>
  <div>
  <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.colStatus' | translate }}</dt>
- <dd class="mt-1 text-sm text-gray-900">{{ commande.paiementStatut || '—' }}</dd>
- </div>
- <div>
- <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.paymentMethod' | translate }}</dt>
- <dd class="mt-1 text-sm text-gray-900">{{ commande.paiementMethode || '—' }}</dd>
- </div>
- <div>
- <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.paymentReference' | translate }}</dt>
- <dd class="mt-1 text-sm text-gray-900">{{ commande.paiementReference || '—' }}</dd>
+ <dd class="mt-1">
+ @if (commande.statut) {
+ <span class="inline-block px-2.5 py-1 text-xs font-semibold uppercase" [class]="statusClass(commande.statut)">
+ {{ statusKey(commande.statut) | translate }}
+ </span>
+ } @else {
+ —
+ }
+ </dd>
  </div>
  <div>
  <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.colDate' | translate }}</dt>
@@ -323,7 +394,7 @@
  </section>
 
  <section class="border-t border-verga-border pt-6">
- <h3 class="text-xs font-bold uppercase tracking-wide text-verga-muted">{{ 'backoffice.commandes.sectionParcels' | translate }}</h3>
+ <h3 class="bo-modal__section-title">{{ 'backoffice.commandes.sectionParcels' | translate }}</h3>
  @if (commande.colis.length > 0) {
  <ul class="mt-3 divide-y divide-verga-border border border-verga-border">
  @for (colis of commande.colis; track colis.id) {
@@ -337,12 +408,103 @@
  <p class="mt-3 text-sm text-verga-muted">{{ 'backoffice.commandes.emptyParcels' | translate }}</p>
  }
  </section>
+
+ <div class="border-t border-verga-border pt-6">
+ <div class="flex flex-col gap-2 sm:flex-row sm:justify-between">
+ <button
+ type="button"
+ (click)="openCreateReclamation(commande)"
+ class="verga-btn !w-auto bg-white !text-verga-primary border border-verga-border px-6"
+ >
+ {{ 'backoffice.commandes.actionCreateReclamation' | translate }}
+ </button>
+ <button type="button" (click)="closeDetail()" class="verga-btn !w-auto px-6">{{ 'backoffice.commandes.close' | translate }}</button>
+ </div>
+ </div>
  </div>
  }
 
- <div class="border-t border-verga-border px-5 py-4 sm:px-6">
+ <div class="bo-modal__footer">
+ @if (!selectedCommande()) {
  <button type="button" (click)="closeDetail()" class="verga-btn !w-auto px-6">{{ 'backoffice.commandes.close' | translate }}</button>
+ }
  </div>
+ </div>
+</div>
+}
+
+@if (createOpen()) {
+<div
+ class="bo-modal-backdrop commandes-modal-backdrop fixed inset-0 z-[60] flex items-start justify-center px-4 py-8 sm:items-center"
+ role="dialog"
+ aria-modal="true"
+ (click)="onCreateBackdropClick($event)"
+>
+ <div class="bo-modal w-full max-w-2xl" (click)="$event.stopPropagation()">
+ <div class="bo-modal__header flex items-center justify-between">
+ <h2 class="text-lg font-bold text-gray-900">{{ 'backoffice.reclamations.createModalTitle' | translate }}</h2>
+ <button type="button" (click)="closeCreateReclamation()" [disabled]="createLoading()" class="bo-modal__close text-verga-muted transition hover:text-gray-900 disabled:opacity-40" [attr.aria-label]="'aria.close' | translate">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
+ </button>
+ </div>
+
+ <form class="bo-modal__body max-h-[70vh] overflow-y-auto" (ngSubmit)="submitCreateReclamation($event)">
+ <div class="mb-4 border border-verga-border bg-verga-surface px-4 py-3">
+ <p class="text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.commandes.colCode' | translate }}</p>
+ <p class="mt-1 font-mono text-sm font-semibold text-verga-primary">{{ createCommandeCode }}</p>
+ </div>
+
+ <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+ <div>
+ <label for="create-reclamation-nom" class="block text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.reclamations.createNom' | translate }} *</label>
+ <input id="create-reclamation-nom" name="nom" type="text" required [(ngModel)]="createNom" [disabled]="createLoading()" class="verga-field mt-1.5" />
+ </div>
+ <div>
+ <label for="create-reclamation-prenom" class="block text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.reclamations.createPrenom' | translate }} *</label>
+ <input id="create-reclamation-prenom" name="prenom" type="text" required [(ngModel)]="createPrenom" [disabled]="createLoading()" class="verga-field mt-1.5" />
+ </div>
+ <div>
+ <label for="create-reclamation-telephone" class="block text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.reclamations.colPhone' | translate }} *</label>
+ <input id="create-reclamation-telephone" name="telephone" type="tel" required [(ngModel)]="createTelephone" [disabled]="createLoading()" class="verga-field mt-1.5" />
+ </div>
+ <div>
+ <label for="create-reclamation-email" class="block text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.reclamations.colEmail' | translate }}</label>
+ <input id="create-reclamation-email" name="email" type="email" [(ngModel)]="createEmail" [disabled]="createLoading()" class="verga-field mt-1.5" />
+ <p class="mt-1 text-xs text-verga-muted">{{ 'backoffice.reclamations.createEmailHint' | translate }}</p>
+ </div>
+ <div class="sm:col-span-2">
+ <label for="create-reclamation-objet" class="block text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.reclamations.colObjet' | translate }} *</label>
+ <input id="create-reclamation-objet" name="objet" type="text" required [(ngModel)]="createObjet" [disabled]="createLoading()" class="verga-field mt-1.5" />
+ </div>
+ <div class="sm:col-span-2">
+ <label for="create-reclamation-description" class="block text-xs font-semibold uppercase text-verga-muted">{{ 'backoffice.reclamations.colDescription' | translate }} *</label>
+ <textarea id="create-reclamation-description" name="description" rows="4" required [(ngModel)]="createDescription" [disabled]="createLoading()" class="verga-field mt-1.5 min-h-[6rem] resize-y"></textarea>
+ </div>
+ </div>
+
+ @if (createError()) {
+ <div class="mt-4 text-sm text-red-600" role="alert">
+ @if (createError().startsWith('backoffice.')) {
+ {{ createError() | translate }}
+ } @else {
+ {{ createError() }}
+ }
+ </div>
+ }
+
+ <div class="mt-6 flex flex-col-reverse gap-2 border-t border-verga-border pt-4 sm:flex-row sm:justify-end">
+ <button type="button" (click)="closeCreateReclamation()" [disabled]="createLoading()" class="verga-btn !w-auto bg-white !text-verga-primary border border-verga-border px-6 disabled:opacity-40">
+ {{ 'backoffice.reclamations.createCancel' | translate }}
+ </button>
+ <button type="submit" [disabled]="createLoading()" class="verga-btn !w-auto px-6 disabled:opacity-40">
+ @if (createLoading()) {
+ {{ 'backoffice.reclamations.createSubmitting' | translate }}
+ } @else {
+ {{ 'backoffice.reclamations.createSubmit' | translate }}
+ }
+ </button>
+ </div>
+ </form>
  </div>
 </div>
 }

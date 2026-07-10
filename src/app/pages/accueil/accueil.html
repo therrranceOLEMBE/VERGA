@@ -1,148 +1,263 @@
-<div class="flex min-h-screen flex-col bg-verga-surface font-sans">
- <app-header />
+<div class="home-page flex min-h-screen flex-col font-sans">
+  <app-header [showActionIcons]="false" />
 
- <main class="main-with-header flex-1">
- <div class="mx-auto max-w-[1400px] px-4 py-8 sm:px-6 lg:px-8">
+  <main class="main-with-header flex-1">
+    <!-- Hero -->
+    <section class="home-hero" aria-labelledby="home-hero-title">
+      <div class="home-hero__bg" aria-hidden="true">
+        <div class="home-hero__orb home-hero__orb--1"></div>
+        <div class="home-hero__orb home-hero__orb--2"></div>
+        <div class="home-hero__grid"></div>
+      </div>
 
- <!-- Filtre destinations -->
- <section class="mb-8" aria-label="{{ 'home.destination.title' | translate }}">
- <div class="destination-filter-bar relative">
- <div
- #destinationScroll
- class="destination-filter-scroll flex gap-3 overflow-x-auto scroll-smooth px-12 pb-1"
- >
- @for (dest of destinationFilters; track dest.value) {
- <button
- type="button"
- (click)="selectDestination(dest.value)"
- class="destination-filter-card group flex shrink-0 flex-col items-center justify-center gap-2.5 border bg-white px-2 py-4 transition"
- [class.destination-filter-card--active]="selectedDestination() === dest.value"
- [attr.aria-pressed]="selectedDestination() === dest.value"
- >
- <span
- class="destination-filter-icon flex h-9 w-9 items-center justify-center text-verga-primary transition"
- [class.text-verga-primary]="selectedDestination() !== dest.value"
- [class.text-verga-primary-dark]="selectedDestination() === dest.value"
- aria-hidden="true"
- >
- @switch (dest.icon) {
- @case ('all') {
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-7 w-7">
- <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" />
- </svg>
- }
- @case ('route') {
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-7 w-7">
- <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 12m0 0-4.5 4.5M21 12H7.5" />
- </svg>
- }
- }
- </span>
- <span class="destination-filter-label text-center text-xs font-medium leading-tight text-gray-900">
- {{ dest.labelKey | translate }}
- </span>
- </button>
- }
- </div>
+      <div class="home-hero__inner mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <div class="home-hero__content">
+          <p class="home-hero__eyebrow">{{ 'home.hero.eyebrow' | translate }}</p>
+          <h1 id="home-hero-title" class="home-hero__title">{{ 'home.hero.title' | translate }}</h1>
+          <p class="home-hero__subtitle">{{ 'home.hero.subtitle' | translate }}</p>
 
- <button
- type="button"
- (click)="scrollDestinations('left')"
- class="destination-filter-nav absolute left-0 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-verga-border bg-white text-verga-primary shadow-sm transition hover:border-verga-primary hover:bg-verga-primary-muted"
- [attr.aria-label]="'home.destination.scrollPrevious' | translate"
- >
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
- <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
- </svg>
- </button>
+          <div class="home-hero__actions">
+            <a href="#home-destinations" class="home-hero__cta home-hero__cta--primary">
+              {{ 'home.hero.ctaBrowse' | translate }}
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
+              </svg>
+            </a>
+            <a routerLink="/tarifs" class="home-hero__cta home-hero__cta--ghost">
+              {{ 'home.hero.ctaPricing' | translate }}
+            </a>
+          </div>
+        </div>
 
- <button
- type="button"
- (click)="scrollDestinations('right')"
- class="destination-filter-nav absolute right-0 top-1/2 z-10 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-verga-border bg-white text-verga-primary shadow-sm transition hover:border-verga-primary hover:bg-verga-primary-muted"
- [attr.aria-label]="'home.destination.scrollNext' | translate"
- >
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
- <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
- </svg>
- </button>
- </div>
- </section>
+        <div class="home-hero__stats" [attr.aria-label]="'home.hero.statsLabel' | translate">
+          <article class="home-hero__stat">
+            <span class="home-hero__stat-value">
+              @if (!loading() && totalItems() > 0) {
+                {{ totalItems() }}
+              } @else {
+                —
+              }
+            </span>
+            <span class="home-hero__stat-label">{{ 'home.hero.statOffers' | translate }}</span>
+          </article>
+          <article class="home-hero__stat">
+            <span class="home-hero__stat-value">24/7</span>
+            <span class="home-hero__stat-label">{{ 'home.hero.statAvailability' | translate }}</span>
+          </article>
+          <article class="home-hero__stat">
+            <span class="home-hero__stat-value">100%</span>
+            <span class="home-hero__stat-label">{{ 'home.hero.statSecure' | translate }}</span>
+          </article>
+        </div>
+      </div>
+    </section>
 
- <div class="grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-4">
- @for (offer of displayedOffers(); track offer.id) {
- <app-offer-card [offer]="offer" />
- } @empty {
- <p class="col-span-full py-16 text-center text-sm text-verga-muted">{{ 'home.noResults' | translate }}</p>
- }
- </div>
+    <!-- Trust strip -->
+    <section class="home-trust" [attr.aria-label]="'home.trust.label' | translate">
+      <div class="home-trust__inner mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <div class="home-trust__grid">
+          <div class="home-trust__item">
+            <span class="home-trust__icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177A48.78 48.78 0 0 0 12 6.75c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52 2.62 10.726c.122.499-.106 1.028-.589 1.202a18.16 18.16 0 0 1-3.44.48m12.5-.48a18.16 18.16 0 0 0-3.44-.48c-.328 0-.659.032-.988.096m0 0a18.16 18.16 0 0 1-3.44.48m12.5-.48c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125H3.375c-.621 0-1.125-.504-1.125-1.125v-1.5c0-.621.504-1.125 1.125-1.125h17.25Z" /></svg>
+            </span>
+            <div>
+              <p class="home-trust__title">{{ 'home.trust.logisticsTitle' | translate }}</p>
+              <p class="home-trust__text">{{ 'home.trust.logisticsText' | translate }}</p>
+            </div>
+          </div>
+          <div class="home-trust__item">
+            <span class="home-trust__icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
+            </span>
+            <div>
+              <p class="home-trust__title">{{ 'home.trust.secureTitle' | translate }}</p>
+              <p class="home-trust__text">{{ 'home.trust.secureText' | translate }}</p>
+            </div>
+          </div>
+          <div class="home-trust__item">
+            <span class="home-trust__icon" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" /></svg>
+            </span>
+            <div>
+              <p class="home-trust__title">{{ 'home.trust.networkTitle' | translate }}</p>
+              <p class="home-trust__text">{{ 'home.trust.networkText' | translate }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
- <!-- Pagination -->
- @if (filteredOffers().length > 0) {
- <div class="mt-10 flex flex-col items-center gap-4">
- <nav class="flex flex-wrap items-center justify-center gap-1" aria-label="Pagination">
- <button
- type="button"
- (click)="previousPage()"
- [disabled]="activePage() === 1"
- class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
- [attr.aria-label]="'aria.prevPage' | translate"
- >
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
- <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
- </svg>
- </button>
+    <div class="home-body mx-auto max-w-[1400px] px-4 pb-12 pt-8 sm:px-6 lg:px-8">
+      <!-- Destinations -->
+      <section id="home-destinations" class="home-destinations" [attr.aria-label]="'home.destination.title' | translate">
+        <div class="home-section-head">
+          <div>
+            <p class="home-section-eyebrow">{{ 'home.destination.title' | translate }}</p>
+            <h2 class="home-section-title">{{ 'home.offers.filterHint' | translate }}</h2>
+          </div>
+          <p class="home-section-badge">{{ selectedDestinationLabelKey() | translate }}</p>
+        </div>
 
- @for (page of pageNumbers(); track page) {
- <button
- type="button"
- (click)="goToPage(page)"
- class="flex h-9 min-w-9 items-center justify-center px-2 text-sm font-medium transition"
- [class.bg-verga-primary]="activePage() === page"
- [class.text-white]="activePage() === page"
- [class.border]="activePage() !== page"
- [class.border-verga-border]="activePage() !== page"
- [class.bg-white]="activePage() !== page"
- [class.text-verga-primary]="activePage() !== page"
- [class.hover:bg-verga-primary/10]="activePage() !== page"
- [attr.aria-current]="activePage() === page ? 'page' : null"
- >
- {{ page }}
- </button>
- }
+        <div class="home-destinations__bar">
+          <button
+            type="button"
+            (click)="scrollDestinations('left')"
+            class="home-destinations__nav"
+            [attr.aria-label]="'home.destination.scrollPrevious' | translate"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            </svg>
+          </button>
 
- <button
- type="button"
- (click)="nextPage()"
- [disabled]="activePage() === totalPages()"
- class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40"
- [attr.aria-label]="'aria.nextPage' | translate"
- >
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
- <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
- </svg>
- </button>
- </nav>
+          <div #destinationScroll class="home-destinations__scroll">
+            @for (dest of destinationFilters; track dest.value) {
+              <button
+                type="button"
+                (click)="selectDestination(dest.value)"
+                class="home-dest-card"
+                [class.home-dest-card--active]="selectedDestination() === dest.value"
+                [attr.aria-pressed]="selectedDestination() === dest.value"
+              >
+                <span class="home-dest-card__icon" aria-hidden="true">
+                  @switch (dest.icon) {
+                    @case ('all') {
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25ZM13.5 6a2.25 2.25 0 0 1 2.25-2.25H18A2.25 2.25 0 0 1 20.25 6v2.25A2.25 2.25 0 0 1 18 10.5h-2.25a2.25 2.25 0 0 1-2.25-2.25V6ZM13.5 15.75a2.25 2.25 0 0 1 2.25-2.25H18a2.25 2.25 0 0 1 2.25 2.25V18A2.25 2.25 0 0 1 18 20.25h-2.25A2.25 2.25 0 0 1 13.5 18v-2.25Z" /></svg>
+                    }
+                    @case ('route') {
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 12m0 0-4.5 4.5M21 12H7.5" /></svg>
+                    }
+                  }
+                </span>
+                <span class="home-dest-card__label">{{ dest.labelKey | translate }}</span>
+              </button>
+            }
+          </div>
 
- <p class="text-center text-sm text-gray-600">{{ resultsLabel() }}</p>
- </div>
- }
+          <button
+            type="button"
+            (click)="scrollDestinations('right')"
+            class="home-destinations__nav"
+            [attr.aria-label]="'home.destination.scrollNext' | translate"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
+            </svg>
+          </button>
+        </div>
+      </section>
 
- </div>
- </main>
+      <!-- Catalogue -->
+      <section class="home-catalog" aria-labelledby="home-catalog-title">
+        <div class="home-section-head home-section-head--catalog">
+          <div>
+            <p class="home-section-eyebrow">{{ 'home.offers.eyebrow' | translate }}</p>
+            <h2 id="home-catalog-title" class="home-section-title">{{ 'home.offers.title' | translate }}</h2>
+          </div>
+          @if (!loading() && totalItems() > 0) {
+            <p class="home-catalog__count">{{ resultsLabel() }}</p>
+          }
+        </div>
 
- @if (showScrollTop()) {
- <button
- type="button"
- (click)="scrollToTop()"
- class="fixed bottom-6 right-6 z-40 flex h-11 w-11 items-center justify-center bg-verga-primary text-white transition hover:-translate-y-0.5 hover:bg-verga-primary-dark sm:bottom-8 sm:right-8"
- [attr.aria-label]="'aria.backToTopPage' | translate"
- >
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
- <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
- </svg>
- </button>
- }
+        @if (loading()) {
+          <div class="home-skeleton-grid" aria-hidden="true">
+            @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+              <div class="home-skeleton-card">
+                <div class="home-skeleton-card__media"></div>
+                <div class="home-skeleton-card__body">
+                  <div class="home-skeleton-line home-skeleton-line--lg"></div>
+                  <div class="home-skeleton-line"></div>
+                  <div class="home-skeleton-line home-skeleton-line--sm"></div>
+                </div>
+              </div>
+            }
+          </div>
+          <p class="home-loading-text">{{ 'home.loading' | translate }}</p>
+        } @else if (errorMessage()) {
+          <div class="home-alert home-alert--error" role="alert">
+            @if (errorMessage().startsWith('home.')) {
+              {{ errorMessage() | translate }}
+            } @else {
+              {{ errorMessage() }}
+            }
+          </div>
+        } @else {
+          <div class="home-offers-grid">
+            @for (offer of offers(); track offer.id) {
+              <app-offer-card [offer]="offer" />
+            } @empty {
+              <div class="home-empty">
+                <div class="home-empty__icon" aria-hidden="true">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 7.5-9-5.25L3 7.5m18 0-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" /></svg>
+                </div>
+                <h3 class="home-empty__title">{{ 'home.noResults' | translate }}</h3>
+                <p class="home-empty__text">{{ 'home.offers.emptyHint' | translate }}</p>
+                <button type="button" (click)="selectDestination('')" class="home-empty__btn">
+                  {{ 'home.destination.all' | translate }}
+                </button>
+              </div>
+            }
+          </div>
 
- <app-footer [showBackToTop]="false" />
+          @if (totalItems() > 0) {
+            <div class="home-pagination">
+              <nav class="home-pagination__nav" [attr.aria-label]="'aria.navigation' | translate">
+                <button
+                  type="button"
+                  (click)="previousPage()"
+                  [disabled]="currentPage() === 1"
+                  class="home-pagination__btn home-pagination__btn--icon"
+                  [attr.aria-label]="'aria.prevPage' | translate"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+                  </svg>
+                </button>
+
+                @for (page of pageNumbers(); track page) {
+                  <button
+                    type="button"
+                    (click)="goToPage(page)"
+                    class="home-pagination__btn"
+                    [class.home-pagination__btn--active]="currentPage() === page"
+                    [attr.aria-current]="currentPage() === page ? 'page' : null"
+                  >
+                    {{ page }}
+                  </button>
+                }
+
+                <button
+                  type="button"
+                  (click)="nextPage()"
+                  [disabled]="currentPage() === totalPages()"
+                  class="home-pagination__btn home-pagination__btn--icon"
+                  [attr.aria-label]="'aria.nextPage' | translate"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
+                  </svg>
+                </button>
+              </nav>
+              <p class="home-pagination__label">{{ resultsLabel() }}</p>
+            </div>
+          }
+        }
+      </section>
+    </div>
+  </main>
+
+  @if (showScrollTop()) {
+    <button
+      type="button"
+      (click)="scrollToTop()"
+      class="home-scroll-top"
+      [attr.aria-label]="'aria.backToTopPage' | translate"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+      </svg>
+    </button>
+  }
+
+  <app-footer [showBackToTop]="false" />
 </div>

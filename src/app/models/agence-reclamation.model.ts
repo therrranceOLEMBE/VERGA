@@ -111,13 +111,13 @@ export interface AgenceReclamationStatutUpdateResponse {
 }
 
 export interface AgenceReclamationCreateRequest {
+  commande_id: string;
   nom: string;
   prenom: string;
   telephone: string;
-  email: string;
+  email?: string;
   objet: string;
   description: string;
-  commande_id?: string | null;
 }
 
 export interface AgenceReclamationCreateResponse {

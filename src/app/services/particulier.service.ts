@@ -1,13 +1,15 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, catchError, map, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ClientLoginRequest, ClientLoginResponse, ClientLogoutResponse } from '../models/client-auth.model';
 import {
   ClientCommandesListResponse,
   ClientCommandesQueryParams,
+  ClientCommandeCreateResponse,
 } from '../models/client-commande.model';
 import {
+  ClientColisDetailResponse,
   ClientColisListResponse,
   ClientColisQueryParams,
 } from '../models/client-colis.model';
@@ -25,6 +27,20 @@ import {
   ClientReclamationsQueryParams,
 } from '../models/client-reclamation.model';
 import { ClientRegisterRequest, ClientRegisterResponse } from '../models/client-register.model';
+import {
+  ClientDashboardPeriode,
+  ClientDashboardResponse,
+} from '../models/client-dashboard.model';
+import {
+  ClientOffreDetailResponse,
+  ClientOffresListResponse,
+  ClientOffresQueryParams,
+} from '../models/client-offre.model';
+import {
+  ClientOffreEstimationResponse,
+} from '../models/client-offre-estimation.model';
+import { TypeOffre, TypeOffreListResponse } from '../models/type-offre.model';
+import { parseTypeOffreListResponse } from '../utils/type-offre.util';
 
 @Injectable({ providedIn: 'root' })
 export class ParticulierService {
@@ -42,6 +58,14 @@ export class ParticulierService {
   getMe(token: string): Observable<ClientMeResponse> {
     return this.http.get<ClientMeResponse>(`${this.baseUrl}/me`, {
       headers: this.authHeaders(token),
+    });
+  }
+
+  getDashboard(token: string, periode: ClientDashboardPeriode = 'mois'): Observable<ClientDashboardResponse> {
+    const params = new HttpParams().set('periode', periode);
+    return this.http.get<ClientDashboardResponse>(`${this.baseUrl}/dashboard`, {
+      headers: this.authHeaders(token),
+      params,
     });
   }
 
@@ -79,6 +103,14 @@ export class ParticulierService {
     });
   }
 
+  createCommande(token: string | null, formData: FormData): Observable<ClientCommandeCreateResponse> {
+    const options = token
+      ? { headers: this.authHeaders(token) }
+      : {};
+
+    return this.http.post<ClientCommandeCreateResponse>(`${this.baseUrl}/commandes`, formData, options);
+  }
+
   getColis(token: string, params: ClientColisQueryParams = {}): Observable<ClientColisListResponse> {
     let httpParams = new HttpParams();
 
@@ -101,6 +133,12 @@ export class ParticulierService {
     });
   }
 
+  getColisDetail(token: string, colisId: string): Observable<ClientColisDetailResponse> {
+    return this.http.get<ClientColisDetailResponse>(`${this.baseUrl}/colis/${colisId}`, {
+      headers: this.authHeaders(token),
+    });
+  }
+
   getReclamations(
     token: string,
     params: ClientReclamationsQueryParams = {},
@@ -120,6 +158,64 @@ export class ParticulierService {
     return this.http.get<ClientReclamationsListResponse>(`${this.baseUrl}/reclamations`, {
       headers: this.authHeaders(token),
       params: httpParams,
+    });
+  }
+
+  getOffres(params: ClientOffresQueryParams = {}): Observable<ClientOffresListResponse> {
+    let httpParams = new HttpParams();
+
+    if (params.search?.trim()) {
+      httpParams = httpParams.set('search', params.search.trim());
+    }
+    if (params.destination?.trim()) {
+      httpParams = httpParams.set('destination', params.destination.trim());
+    }
+    if (params.type) {
+      httpParams = httpParams.set('type', params.type);
+    }
+    if (params.type_offre_id?.trim()) {
+      httpParams = httpParams.set('type_offre_id', params.type_offre_id.trim());
+    }
+    if (params.date_debut) {
+      httpParams = httpParams.set('date_debut', params.date_debut);
+    }
+    if (params.date_fin) {
+      httpParams = httpParams.set('date_fin', params.date_fin);
+    }
+    if (params.page) {
+      httpParams = httpParams.set('page', String(params.page));
+    }
+    if (params.per_page) {
+      httpParams = httpParams.set('per_page', String(params.per_page));
+    }
+
+    return this.http.get<ClientOffresListResponse>(`${this.baseUrl}/offres`, {
+      params: httpParams,
+    });
+  }
+
+  getOffre(offreId: string): Observable<ClientOffreDetailResponse> {
+    return this.http.get<ClientOffreDetailResponse>(`${this.baseUrl}/offres/${offreId}`);
+  }
+
+  getTypeOffres(): Observable<TypeOffre[]> {
+    return this.http
+      .get<TypeOffreListResponse>(`${environment.apiUrl}/types-offres`)
+      .pipe(
+        map((response) => parseTypeOffreListResponse(response)),
+        catchError(() =>
+          this.http.get<TypeOffreListResponse>(`${this.baseUrl}/types-offres`).pipe(
+            map((response) => parseTypeOffreListResponse(response)),
+            catchError(() => of([])),
+          ),
+        ),
+      );
+  }
+
+  estimateOffre(offreId: string, quantite: number): Observable<ClientOffreEstimationResponse> {
+    const params = new HttpParams().set('quantite', String(quantite));
+    return this.http.get<ClientOffreEstimationResponse>(`${this.baseUrl}/offres/${offreId}/estimation`, {
+      params,
     });
   }
 

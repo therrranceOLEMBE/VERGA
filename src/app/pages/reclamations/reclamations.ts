@@ -55,19 +55,6 @@ export class Reclamations implements OnInit {
   } | null>(null);
   protected readonly updatingReclamationId = signal('');
 
-  protected readonly createOpen = signal(false);
-  protected readonly createLoading = signal(false);
-  protected readonly createError = signal('');
-  protected readonly createSuccess = signal('');
-
-  protected createNom = '';
-  protected createPrenom = '';
-  protected createTelephone = '';
-  protected createEmail = '';
-  protected createObjet = '';
-  protected createDescription = '';
-  protected createCommandeId = '';
-
   protected readonly pageNumbers = computed(() =>
     Array.from({ length: this.totalPages() }, (_, index) => index + 1),
   );
@@ -293,74 +280,6 @@ export class Reclamations implements OnInit {
     });
   }
 
-  protected openCreate(): void {
-    this.resetCreateForm();
-    this.createError.set('');
-    this.createSuccess.set('');
-    this.createOpen.set(true);
-  }
-
-  protected closeCreate(): void {
-    if (this.createLoading()) {
-      return;
-    }
-    this.createOpen.set(false);
-    this.createError.set('');
-  }
-
-  protected onCreateBackdropClick(event: MouseEvent): void {
-    if (event.target === event.currentTarget && !this.createLoading()) {
-      this.closeCreate();
-    }
-  }
-
-  protected submitCreate(event: Event): void {
-    event.preventDefault();
-    this.createError.set('');
-
-    if (!this.agenceSession.isAuthenticated()) {
-      this.createError.set('backoffice.reclamations.authRequired');
-      return;
-    }
-
-    if (!this.isCreateFormValid()) {
-      this.createError.set('backoffice.reclamations.createValidationError');
-      return;
-    }
-
-    const commandeId = this.createCommandeId.trim();
-    const payload = {
-      nom: this.createNom.trim(),
-      prenom: this.createPrenom.trim(),
-      telephone: this.createTelephone.trim(),
-      email: this.createEmail.trim(),
-      objet: this.createObjet.trim(),
-      description: this.createDescription.trim(),
-      ...(commandeId ? { commande_id: commandeId } : {}),
-    };
-
-    this.createLoading.set(true);
-
-    this.agenceSession.createReclamation(payload).subscribe({
-      next: () => {
-        this.createLoading.set(false);
-        this.createOpen.set(false);
-        this.resetCreateForm();
-        this.createSuccess.set('backoffice.reclamations.createSuccess');
-        this.currentPage.set(1);
-        this.loadReclamations();
-      },
-      error: (error: HttpErrorResponse | Error) => {
-        if (error instanceof Error && error.message === 'No agence token') {
-          this.createError.set('backoffice.reclamations.authRequired');
-        } else {
-          this.createError.set(this.resolveCreateError(error as HttpErrorResponse));
-        }
-        this.createLoading.set(false);
-      },
-    });
-  }
-
   private loadReclamations(): void {
     if (!this.agenceSession.isAuthenticated()) {
       this.loading.set(false);
@@ -458,37 +377,5 @@ export class Reclamations implements OnInit {
     }
     const apiMessage = extractApiErrorMessage(error);
     return apiMessage ?? 'backoffice.reclamations.statusUpdateError';
-  }
-
-  private resetCreateForm(): void {
-    this.createNom = '';
-    this.createPrenom = '';
-    this.createTelephone = '';
-    this.createEmail = '';
-    this.createObjet = '';
-    this.createDescription = '';
-    this.createCommandeId = '';
-  }
-
-  private isCreateFormValid(): boolean {
-    return (
-      this.createNom.trim().length > 0 &&
-      this.createPrenom.trim().length > 0 &&
-      this.createTelephone.trim().length > 0 &&
-      this.createEmail.trim().length > 0 &&
-      this.createObjet.trim().length > 0 &&
-      this.createDescription.trim().length > 0
-    );
-  }
-
-  private resolveCreateError(error: HttpErrorResponse): string {
-    if (error.status === 401) {
-      return 'backoffice.reclamations.authRequired';
-    }
-    if (error.status === 422) {
-      return 'backoffice.reclamations.createValidationError';
-    }
-    const apiMessage = extractApiErrorMessage(error);
-    return apiMessage ?? 'backoffice.reclamations.createError';
   }
 }

@@ -2,12 +2,13 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ClientColis, ClientColisStatut } from '../../models/client-colis.model';
+import { ClientColis, ClientColisDetail, ClientColisStatut } from '../../models/client-colis.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LanguageService } from '../../services/language.service';
 import { ClientSessionService } from '../../services/client-session.service';
 import { ParticulierService } from '../../services/particulier.service';
-import { parseColisListResponse } from '../../utils/client-colis.util';
+import { extractApiErrorMessage } from '../../utils/api-error.util';
+import { parseColisDetailResponse, parseColisListResponse } from '../../utils/client-colis.util';
 
 @Component({
   selector: 'app-colis-client',
@@ -35,6 +36,11 @@ export class ColisClient implements OnInit {
   protected readonly resultsFrom = signal(0);
   protected readonly resultsTo = signal(0);
 
+  protected readonly detailOpen = signal(false);
+  protected readonly detailLoading = signal(false);
+  protected readonly detailError = signal('');
+  protected readonly selectedColis = signal<ClientColisDetail | null>(null);
+
   protected readonly pageNumbers = computed(() =>
     Array.from({ length: this.totalPages() }, (_, index) => index + 1),
   );
@@ -54,6 +60,7 @@ export class ColisClient implements OnInit {
 
   protected readonly statutOptions: Array<{ value: ClientColisStatut | ''; labelKey: string }> = [
     { value: '', labelKey: 'clientBackoffice.colis.filterStatusAll' },
+    { value: 'chez_client', labelKey: 'clientBackoffice.colis.status.chez_client' },
     { value: 'déposé', labelKey: 'clientBackoffice.colis.status.depose' },
     { value: 'en_transit', labelKey: 'clientBackoffice.colis.status.en_transit' },
     { value: 'arrivé', labelKey: 'clientBackoffice.colis.status.arrive' },
@@ -96,6 +103,9 @@ export class ColisClient implements OnInit {
   }
 
   protected statusKey(statut: string): string {
+    if (statut === 'chez_client') {
+      return 'clientBackoffice.colis.status.chez_client';
+    }
     if (statut === 'déposé') {
       return 'clientBackoffice.colis.status.depose';
     }
@@ -121,6 +131,9 @@ export class ColisClient implements OnInit {
     if (statut === 'en_transit') {
       return 'bg-amber-50 text-amber-700';
     }
+    if (statut === 'chez_client') {
+      return 'bg-sky-50 text-sky-700';
+    }
     return 'bg-verga-surface text-verga-muted';
   }
 
@@ -135,6 +148,50 @@ export class ColisClient implements OnInit {
     void this.router.navigate(['/espace-client/commandes'], {
       queryParams: { search: item.commande },
     });
+  }
+
+  protected openDetail(item: ClientColis): void {
+    this.detailOpen.set(true);
+    this.selectedColis.set({ ...item, historique: [] });
+    this.detailLoading.set(true);
+    this.detailError.set('');
+
+    const token = this.clientSession.getToken();
+    if (!token) {
+      this.detailLoading.set(false);
+      this.detailError.set('clientBackoffice.colis.loadError');
+      return;
+    }
+
+    this.particulierService.getColisDetail(token, item.id).subscribe({
+      next: (response) => {
+        this.selectedColis.set(parseColisDetailResponse(response));
+        this.detailLoading.set(false);
+      },
+      error: (error: HttpErrorResponse) => {
+        console.error('[ColisClient] openDetail — erreur:', error);
+        if (error.status === 404) {
+          this.selectedColis.set({ ...item, historique: [] });
+          this.detailLoading.set(false);
+          return;
+        }
+        this.detailError.set(this.resolveDetailError(error));
+        this.detailLoading.set(false);
+      },
+    });
+  }
+
+  protected closeDetail(): void {
+    this.detailOpen.set(false);
+    this.selectedColis.set(null);
+    this.detailLoading.set(false);
+    this.detailError.set('');
+  }
+
+  protected onModalBackdropClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) {
+      this.closeDetail();
+    }
   }
 
   private loadColis(): void {
@@ -174,5 +231,10 @@ export class ColisClient implements OnInit {
           this.loading.set(false);
         },
       });
+  }
+
+  private resolveDetailError(error: HttpErrorResponse): string {
+    const apiMessage = extractApiErrorMessage(error);
+    return apiMessage ?? 'clientBackoffice.colis.detailLoadError';
   }
 }

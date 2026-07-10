@@ -3,6 +3,30 @@
   height: 100dvh;
   scrollbar-width: thin;
   transition: transform 0.25s ease;
+  box-shadow: 4px 0 24px rgba(15, 23, 42, 0.04);
+}
+
+.backoffice-sidebar__brand {
+  line-height: 0;
+}
+
+ .backoffice-sidebar__logo {
+   display: block;
+   width: 100%;
+   max-width: 15rem;
+   height: auto;
+   max-height: 5rem;
+   object-fit: contain;
+   object-position: left center;
+ }
+
+.backoffice-sidebar a[class*='border-l-4'] {
+  border-radius: 0 10px 10px 0;
+  margin-right: 0.5rem;
+}
+
+.backoffice-sidebar a[class*='border-l-4']:hover {
+  transform: translateX(2px);
 }
 
 @media (max-width: 1023px) {

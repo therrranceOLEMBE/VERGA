@@ -1,8 +1,10 @@
-<div class="mx-auto max-w-[1400px]">
- <div class="mb-8">
- <h1 class="text-2xl font-bold text-gray-900">{{ 'backoffice.offerHistory.title' | translate }}</h1>
- <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.offerHistory.subtitle' | translate }}</p>
+<div class="bo-page mx-auto max-w-[1400px]">
+ <header class="bo-page-header">
+ <div class="bo-page-header__copy">
+ <h1 class="bo-page-title">{{ 'backoffice.offerHistory.title' | translate }}</h1>
+ <p class="bo-page-subtitle">{{ 'backoffice.offerHistory.subtitle' | translate }}</p>
  </div>
+ </header>
 
  <section class="mb-6 border border-verga-border bg-white p-4 sm:p-6">
  <h2 class="text-sm font-bold uppercase tracking-wide text-gray-900">{{ 'backoffice.offerHistory.filters' | translate }}</h2>
@@ -189,21 +191,21 @@
 
 @if (detailOpen()) {
 <div
- class="offer-modal-backdrop fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 py-8 sm:items-center"
+ class="bo-modal-backdrop offer-modal-backdrop fixed inset-0 z-50 flex items-start justify-center px-4 py-8 sm:items-center"
  role="dialog"
  aria-modal="true"
  (click)="onModalBackdropClick($event)"
 >
- <div class="w-full max-w-lg border border-verga-border bg-white shadow-lg" (click)="$event.stopPropagation()">
- <div class="flex items-center justify-between border-b border-verga-border px-5 py-4 sm:px-6">
+ <div class="bo-modal w-full max-w-lg" (click)="$event.stopPropagation()">
+ <div class="bo-modal__header flex items-center justify-between">
  <h2 class="text-lg font-bold text-gray-900">{{ 'backoffice.offerHistory.modalDetailTitle' | translate }}</h2>
- <button type="button" (click)="closeDetail()" class="text-verga-muted transition hover:text-gray-900" [attr.aria-label]="'aria.close' | translate">
+ <button type="button" (click)="closeDetail()" class="bo-modal__close text-verga-muted transition hover:text-gray-900" [attr.aria-label]="'aria.close' | translate">
  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
  </button>
  </div>
 
  @if (detailLoading()) {
- <p class="px-5 py-8 text-sm text-verga-muted sm:px-6">{{ 'backoffice.offerHistory.detailLoading' | translate }}</p>
+ <p class="bo-modal__body text-sm text-verga-muted">{{ 'backoffice.offerHistory.detailLoading' | translate }}</p>
  } @else if (detailError()) {
  <div class="px-5 py-6 text-sm text-red-600 sm:px-6" role="alert">
  @if (detailError().startsWith('backoffice.')) {
@@ -268,7 +270,7 @@
  }
 
  @if (selectedOffer()) {
- <div class="border-t border-verga-border px-5 py-4 sm:px-6">
+ <div class="bo-modal__footer">
  <div class="flex flex-wrap gap-3">
  <button type="button" (click)="openEditFromDetail()" class="verga-btn !w-auto px-6">{{ 'backoffice.offerHistory.actionEdit' | translate }}</button>
  <button type="button" (click)="openDeleteFromDetail()" class="verga-btn !w-auto bg-white !text-red-600 border border-red-200 px-6">{{ 'backoffice.offerHistory.actionDelete' | translate }}</button>
@@ -276,7 +278,7 @@
  </div>
  </div>
  } @else {
- <div class="border-t border-verga-border px-5 py-4 sm:px-6">
+ <div class="bo-modal__footer">
  <button type="button" (click)="closeDetail()" class="verga-btn !w-auto px-6">{{ 'backoffice.offerHistory.close' | translate }}</button>
  </div>
  }
@@ -286,21 +288,21 @@
 
 @if (editOpen()) {
 <div
- class="offer-modal-backdrop fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 py-8 sm:items-center"
+ class="bo-modal-backdrop offer-modal-backdrop fixed inset-0 z-50 flex items-start justify-center px-4 py-8 sm:items-center"
  role="dialog"
  aria-modal="true"
  (click)="onEditModalBackdropClick($event)"
 >
- <div class="w-full max-w-2xl border border-verga-border bg-white shadow-lg" (click)="$event.stopPropagation()">
- <div class="flex items-center justify-between border-b border-verga-border px-5 py-4 sm:px-6">
+ <div class="bo-modal w-full max-w-2xl" (click)="$event.stopPropagation()">
+ <div class="bo-modal__header flex items-center justify-between">
  <h2 class="text-lg font-bold text-gray-900">{{ 'backoffice.offerHistory.modalEditTitle' | translate }}</h2>
- <button type="button" (click)="closeEdit()" class="text-verga-muted transition hover:text-gray-900" [attr.aria-label]="'aria.close' | translate">
+ <button type="button" (click)="closeEdit()" class="bo-modal__close text-verga-muted transition hover:text-gray-900" [attr.aria-label]="'aria.close' | translate">
  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
  </button>
  </div>
 
  @if (editLoading()) {
- <p class="px-5 py-8 text-sm text-verga-muted sm:px-6">{{ 'backoffice.offerHistory.detailLoading' | translate }}</p>
+ <p class="bo-modal__body text-sm text-verga-muted">{{ 'backoffice.offerHistory.detailLoading' | translate }}</p>
  } @else {
  @if (editError()) {
  <div class="mx-5 mt-5 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 sm:mx-6" role="alert">
@@ -400,15 +402,15 @@
 @if (deleteOpen()) {
 @if (deletingOffer(); as offer) {
 <div
- class="offer-modal-backdrop fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 py-8 sm:items-center"
+ class="bo-modal-backdrop offer-modal-backdrop fixed inset-0 z-50 flex items-start justify-center px-4 py-8 sm:items-center"
  role="dialog"
  aria-modal="true"
  (click)="onDeleteModalBackdropClick($event)"
 >
- <div class="w-full max-w-md border border-verga-border bg-white shadow-lg" (click)="$event.stopPropagation()">
- <div class="flex items-center justify-between border-b border-verga-border px-5 py-4 sm:px-6">
+ <div class="bo-modal w-full max-w-md" (click)="$event.stopPropagation()">
+ <div class="bo-modal__header flex items-center justify-between">
  <h2 class="text-lg font-bold text-gray-900">{{ 'backoffice.offerHistory.modalDeleteTitle' | translate }}</h2>
- <button type="button" (click)="closeDelete()" class="text-verga-muted transition hover:text-gray-900" [attr.aria-label]="'aria.close' | translate" [disabled]="deleteSubmitting()">
+ <button type="button" (click)="closeDelete()" class="bo-modal__close text-verga-muted transition hover:text-gray-900" [attr.aria-label]="'aria.close' | translate" [disabled]="deleteSubmitting()">
  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
  </button>
  </div>

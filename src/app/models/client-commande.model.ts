@@ -72,3 +72,20 @@ export interface ClientCommandesPage {
   from: number;
   to: number;
 }
+
+export interface ClientCommandeCreateResponse {
+  commande_id?: string;
+  code?: string;
+  commande_statut?: string;
+  quantite_reservee?: number;
+  quantite_payee?: number;
+  quantite_a_payer?: number;
+  quantite_restante?: number;
+  montant_sous_total?: number;
+  montant_commission_client?: number;
+  montant_total?: number;
+  paiement_code?: string;
+  redirect_url?: string;
+  verification_url?: string;
+  mode?: string;
+}

@@ -92,7 +92,13 @@ function formatDate(value: string | null | undefined): string {
   if (Number.isNaN(parsed.getTime())) {
     return value;
   }
-  return parsed.toLocaleDateString('fr-FR');
+  return parsed.toLocaleString('fr-FR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 }
 
 function formatMontant(value: number | string | null | undefined): string {
@@ -113,13 +119,38 @@ function formatQuantite(value: number | string | null | undefined): string {
   return String(value);
 }
 
+function resolveQuantiteLabel(raw: AgenceCommandeRaw): string {
+  if (raw.quantite_label?.trim()) {
+    return raw.quantite_label.trim();
+  }
+  return formatQuantite(raw.quantite);
+}
+
+function resolveQuantitePayeeLabel(raw: AgenceCommandeRaw): string {
+  if (raw.quantite_payee_label?.trim()) {
+    return raw.quantite_payee_label.trim();
+  }
+  return formatQuantite(raw.quantite_payee);
+}
+
+function resolveQuantiteRestanteLabel(raw: AgenceCommandeRaw): string {
+  if (raw.quantite_restante_label?.trim()) {
+    return raw.quantite_restante_label.trim();
+  }
+  return formatQuantite(raw.quantite_restante);
+}
+
+function resolveMontantSousTotal(raw: AgenceCommandeRaw): string {
+  return formatMontant(raw.montant_sous_total ?? raw.montant);
+}
+
 export function mapAgenceCommandeToRow(raw: AgenceCommandeRaw): AgenceCommande {
   return {
     id: String(raw.id ?? raw.code ?? ''),
     code: raw.code?.trim() ?? '—',
     client: resolveLabel(raw.client),
-    quantite: formatQuantite(raw.quantite),
-    montant: formatMontant(raw.montant),
+    quantite: resolveQuantiteLabel(raw),
+    montant: resolveMontantSousTotal(raw),
     statut: raw.statut?.trim() ?? '',
     date: formatDate(raw.date ?? raw.created_at),
   };
@@ -132,8 +163,8 @@ function mapColisItems(items: AgenceCommandeRaw['colis']): AgenceCommandeColisIt
 
   return items
     .map((item) => ({
-      id: String(item.id ?? item.code ?? ''),
-      code: item.code?.trim() ?? '—',
+      id: String(item.id ?? item.code ?? item.reference ?? ''),
+      code: (item.code ?? item.reference)?.trim() ?? '—',
       statut: item.statut?.trim() ?? item.tracking?.trim() ?? '',
     }))
     .filter((item) => item.id || item.code !== '—');
@@ -143,22 +174,36 @@ export function parseAgenceCommandeDetailResponse(response: AgenceCommandeDetail
   const source = unwrapCommandeRaw(response);
   const client = asRecord(source.client);
   const offre = asRecord(source.offre);
+  const typeOffre = offre ? asRecord(offre['type_offre']) : null;
   const paiement = asRecord(source.paiement);
 
   return {
     id: String(source.id ?? source.code ?? ''),
     code: source.code?.trim() ?? '—',
     statut: source.statut?.trim() ?? '',
-    quantite: formatQuantite(source.quantite),
-    montant: formatMontant(source.montant),
+    quantite: resolveQuantiteLabel(source),
+    quantitePayee: resolveQuantitePayeeLabel(source),
+    quantiteRestante: resolveQuantiteRestanteLabel(source),
+    montantSousTotal: resolveMontantSousTotal(source),
     date: formatDate(source.date ?? source.created_at),
     clientName: client ? resolveLabel(client) : resolveLabel(source.client),
+    clientNom: client ? readString(client, ['nom']) : '',
+    clientPrenom: client ? readString(client, ['prenom']) : '',
     clientEmail: client ? readString(client, ['email']) : '',
     clientPhone: client ? readString(client, ['telephone', 'phone']) : '',
     offreTitre: offre ? readString(offre, ['titre', 'title']) : resolveLabel(source.offre),
+    offreDescription: offre ? readString(offre, ['description']) : '',
+    offreType: offre ? readString(offre, ['type']) : '',
+    offreTypeNom: typeOffre ? readString(typeOffre, ['nom']) : '',
+    offreTypeUnite: typeOffre ? readString(typeOffre, ['unite_label', 'unite']) : '',
     offreOrigine: offre ? readString(offre, ['origine']) : '',
     offreDestination: offre ? readString(offre, ['destination']) : '',
     offrePrix: offre ? formatMontant(offre['prix'] as number | string | null) : '—',
+    offreCapaciteTotale: offre ? formatQuantite(offre['capacite_totale'] as number | string | null) : '—',
+    offreCapaciteDisponible: offre ? formatQuantite(offre['capacite_disponible'] as number | string | null) : '—',
+    offreStatut: offre ? readString(offre, ['statut']) : '',
+    offreCreatedAt: offre ? formatDate(readString(offre, ['created_at']) || null) : '—',
+    offreUpdatedAt: offre ? formatDate(readString(offre, ['updated_at']) || null) : '—',
     paiementMontant: paiement ? formatMontant(paiement['montant'] as number | string | null) : '—',
     paiementStatut: paiement ? readString(paiement, ['statut']) : '',
     paiementMethode: paiement ? readString(paiement, ['methode', 'method']) : '',

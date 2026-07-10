@@ -137,7 +137,7 @@ export function mapAgenceReclamationToRow(raw: AgenceReclamationRaw): AgenceRecl
 
   return {
     id: String(raw.id ?? ''),
-    client: resolveLabel(raw.client) || '—',
+    client: resolveClientName(raw) || '—',
     objet: raw.objet?.trim() ?? '—',
     commande: commande || '—',
     statut: raw.statut?.trim() ?? '',

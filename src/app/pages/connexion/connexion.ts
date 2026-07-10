@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -17,7 +17,7 @@ export type LoginFormType = 'entreprise' | 'particulier';
   templateUrl: './connexion.html',
   styleUrl: './connexion.css',
 })
-export class Connexion {
+export class Connexion implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly clientSession = inject(ClientSessionService);
@@ -32,6 +32,15 @@ export class Connexion {
 
   protected email = '';
   protected password = '';
+
+  ngOnInit(): void {
+    const scope = this.route.snapshot.queryParamMap.get('scope');
+    if (scope === 'client') {
+      this.formType.set('particulier');
+    } else if (scope === 'agence') {
+      this.formType.set('entreprise');
+    }
+  }
 
   protected setFormType(type: LoginFormType): void {
     this.formType.set(type);
@@ -112,14 +121,19 @@ export class Connexion {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
     const target =
       returnUrl && returnUrl.startsWith('/backoffice') ? returnUrl : '/backoffice/tableau-de-bord';
-    void this.router.navigateByUrl(target);
+    void this.router.navigateByUrl(target, { replaceUrl: true });
   }
 
   private navigateAfterClientLogin(): void {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-    const target =
-      returnUrl && returnUrl.startsWith('/espace-client') ? returnUrl : '/espace-client/dashboard';
-    void this.router.navigateByUrl(target);
+    const isPublicReturn =
+      !!returnUrl &&
+      !returnUrl.startsWith('/espace-client') &&
+      !returnUrl.startsWith('/backoffice') &&
+      !returnUrl.startsWith('/connexion');
+
+    const target = isPublicReturn ? returnUrl : '/accueil';
+    void this.router.navigateByUrl(target, { replaceUrl: true });
   }
 
   private resolveLoginError(error: HttpErrorResponse): string {

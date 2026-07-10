@@ -11,61 +11,182 @@
  <h2 id="offer-booking-title" class="text-lg font-semibold text-gray-900">{{ titleKey() | translate }}</h2>
  <p class="mt-1 text-sm text-verga-muted">{{ offer().title }}</p>
  </div>
- <button type="button" class="text-verga-muted transition hover:text-verga-ink" [attr.aria-label]="'aria.close' | translate" (click)="close()">
+ <button type="button" class="text-verga-muted transition hover:text-verga-ink" [attr.aria-label]="'aria.close' | translate" (click)="close()" [disabled]="submitting()">
  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-6 w-6">
  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
  </svg>
  </button>
  </div>
 
- @if (submittedSuccess()) {
- <div class="px-6 py-10 text-center">
- <p class="text-sm font-semibold text-verga-success">{{ 'offerBooking.success' | translate }}</p>
+ <form class="max-h-[75vh] space-y-4 overflow-y-auto px-6 py-6" novalidate (ngSubmit)="onSubmit($event)">
+ @if (errorMessage()) {
+ <div class="border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+ @if (errorMessage().startsWith('offerBooking.')) {
+ {{ errorMessage() | translate }}
+ } @else {
+ {{ errorMessage() }}
+ }
+ </div>
+ }
+
+ @if (isAuthenticated()) {
+ <p class="border border-verga-border bg-verga-surface px-4 py-3 text-sm text-verga-muted">{{ 'offerBooking.authenticatedHint' | translate }}</p>
+ } @else {
+ <p class="border border-verga-primary/20 bg-verga-primary-muted px-4 py-3 text-sm text-verga-ink">{{ 'offerBooking.guestHint' | translate }}</p>
+ <p class="text-sm text-verga-muted">
+ {{ 'offerBooking.loginOptional' | translate }}
+ <a routerLink="/connexion" class="font-semibold text-verga-primary hover:underline" (click)="close()">{{ 'offerBooking.loginLink' | translate }}</a>
+ </p>
+ }
+
+ @if (!isAuthenticated()) {
+ <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+ <div>
+ <label for="booking-prenom" class="block text-sm text-gray-700">{{ 'offerBooking.prenom' | translate }} <span class="text-verga-primary">*</span></label>
+ <input id="booking-prenom" name="prenom" type="text" autocomplete="given-name" [(ngModel)]="prenom" [disabled]="submitting()" class="verga-field mt-2" />
+ </div>
+ <div>
+ <label for="booking-nom" class="block text-sm text-gray-700">{{ 'offerBooking.nom' | translate }} <span class="text-verga-primary">*</span></label>
+ <input id="booking-nom" name="nom" type="text" autocomplete="family-name" [(ngModel)]="nom" [disabled]="submitting()" class="verga-field mt-2" />
+ </div>
+ </div>
+ }
+
+ @if (isReserve()) {
+ <p class="border border-verga-border bg-verga-surface px-4 py-3 text-sm text-verga-muted">{{ 'offerBooking.reserveHint' | translate }}</p>
+ <div>
+ <label for="booking-quantite-reservee" class="block text-sm text-gray-700">{{ 'offerBooking.quantiteReservee' | translate }} <span class="text-verga-primary">*</span></label>
+ <input
+ id="booking-quantite-reservee"
+ name="quantiteReservee"
+ type="number"
+ [min]="quantityMin()"
+ [step]="quantityStep()"
+ [(ngModel)]="quantiteReservee"
+ (ngModelChange)="onQuantityChanged()"
+ [disabled]="submitting() || isContainerOffer()"
+ class="verga-field mt-2"
+ />
+ </div>
+ <div>
+ <label for="booking-quantite-pay" class="block text-sm text-gray-700">{{ 'offerBooking.quantitePayNow' | translate }} <span class="text-verga-primary">*</span></label>
+ <input
+ id="booking-quantite-pay"
+ name="quantitePayNow"
+ type="number"
+ [min]="quantityMin()"
+ [step]="quantityStep()"
+ [(ngModel)]="quantite"
+ (ngModelChange)="onQuantityChanged()"
+ [disabled]="submitting() || isContainerOffer()"
+ class="verga-field mt-2"
+ />
+ </div>
+ } @else if (!isContainerOffer()) {
+ <div>
+ <label for="booking-quantite" class="block text-sm text-gray-700">{{ quantityLabelKey() | translate }} <span class="text-verga-primary">*</span></label>
+ <input
+ id="booking-quantite"
+ name="quantiteAchete"
+ type="number"
+ [min]="quantityMin()"
+ [step]="quantityStep()"
+ [(ngModel)]="quantite"
+ (ngModelChange)="onQuantityChanged()"
+ [disabled]="submitting()"
+ class="verga-field mt-2"
+ />
  </div>
  } @else {
- <form class="space-y-4 px-6 py-6" (ngSubmit)="onSubmit($event)">
- <div>
- <label for="booking-full-name" class="block text-sm text-gray-700">{{ 'offerBooking.fullName' | translate }} <span class="text-verga-primary">*</span></label>
- <input id="booking-full-name" name="fullName" type="text" autocomplete="name" required [(ngModel)]="fullName" class="verga-field mt-2" />
- </div>
-
- @if (isKiloOffer()) {
- <div>
- <label for="booking-kilos" class="block text-sm text-gray-700">{{ 'offerBooking.kilos' | translate }} <span class="text-verga-primary">*</span></label>
- <input id="booking-kilos" name="kilos" type="number" min="1" step="1" required [(ngModel)]="kilos" class="verga-field mt-2" placeholder="Ex. 25" />
- </div>
- }
-
- @if (isCubicMeterOffer()) {
- <div>
- <label for="booking-cubic-meters" class="block text-sm text-gray-700">{{ 'offerBooking.cubicMeters' | translate }} <span class="text-verga-primary">*</span></label>
- <input id="booking-cubic-meters" name="cubicMeters" type="number" min="0.1" step="0.1" required [(ngModel)]="cubicMeters" class="verga-field mt-2" placeholder="Ex. 2.5" />
- </div>
- }
-
- @if (isContainerOffer()) {
  <p class="border border-verga-border bg-verga-surface px-4 py-3 text-sm text-verga-muted">{{ 'offerBooking.containerHint' | translate }}</p>
  }
 
+ <section class="border border-verga-border bg-verga-surface px-4 py-4" aria-live="polite">
+ <h3 class="text-sm font-semibold text-gray-900">{{ 'offerBooking.estimationTitle' | translate }}</h3>
+ <p class="mt-1 text-xs text-verga-muted">{{ 'offerBooking.estimationHint' | translate }}</p>
+
+ @if (estimationLoading()) {
+ <p class="mt-3 text-sm text-verga-muted">{{ 'offerBooking.estimationLoading' | translate }}</p>
+ } @else if (estimation()) {
+ <dl class="mt-3 space-y-2 text-sm">
+ <div class="flex items-center justify-between gap-3">
+ <dt class="text-verga-muted">{{ 'offerBooking.estimationUnitPrice' | translate }}</dt>
+ <dd class="font-medium text-gray-900">{{ estimation()!.unitPrice }}</dd>
+ </div>
+ <div class="flex items-center justify-between gap-3">
+ <dt class="text-verga-muted">{{ 'offerBooking.estimationSubtotal' | translate }}</dt>
+ <dd class="font-medium text-gray-900">{{ estimation()!.subtotal }}</dd>
+ </div>
+ <div class="flex items-center justify-between gap-3">
+ <dt class="text-verga-muted">
+ {{ estimation()!.commissionLabel || ('offerBooking.estimationCommissionDefault' | translate) }}
+ @if (estimation()!.commissionRate) {
+ <span class="text-xs">({{ estimation()!.commissionRate }})</span>
+ }
+ </dt>
+ <dd class="font-medium text-gray-900">{{ estimation()!.commission }}</dd>
+ </div>
+ <div class="flex items-center justify-between gap-3 border-t border-verga-border pt-2">
+ <dt class="font-semibold text-gray-900">{{ 'offerBooking.estimationTotal' | translate }}</dt>
+ <dd class="text-base font-bold text-verga-primary">{{ estimation()!.total }}</dd>
+ </div>
+ </dl>
+ @if (!estimation()!.stockSufficient) {
+ <p class="mt-3 text-sm font-medium text-red-600">{{ 'offerBooking.insufficientStock' | translate }}</p>
+ }
+ } @else if (estimationError()) {
+ <p class="mt-3 text-sm text-red-600">
+ @if (estimationError().startsWith('offerBooking.')) {
+ {{ estimationError() | translate }}
+ } @else {
+ {{ estimationError() }}
+ }
+ </p>
+ } @else {
+ <p class="mt-3 text-sm text-verga-muted">{{ 'offerBooking.estimationUnavailable' | translate }}</p>
+ }
+ </section>
+
  <div>
- <label for="booking-email" class="block text-sm text-gray-700">{{ 'auth.email' | translate }} <span class="text-verga-primary">*</span></label>
- <input id="booking-email" name="email" type="email" autocomplete="email" required [(ngModel)]="email" class="verga-field mt-2" />
+ <label for="booking-description" class="block text-sm text-gray-700">{{ 'offerBooking.description' | translate }} <span class="text-verga-primary">*</span></label>
+ <textarea id="booking-description" name="description" rows="3" [(ngModel)]="description" [disabled]="submitting()" class="verga-field mt-2 min-h-[5rem] resize-y" [placeholder]="'offerBooking.descriptionPh' | translate"></textarea>
+ </div>
+
+ <div>
+ <label for="booking-photos" class="block text-sm text-gray-700">{{ 'offerBooking.photos' | translate }}</label>
+ <input id="booking-photos" type="file" accept="image/*" multiple [disabled]="submitting()" class="mt-2 block w-full text-sm text-gray-600 file:mr-3 file:border-0 file:bg-verga-primary-muted file:px-3 file:py-2 file:text-sm file:font-semibold file:text-verga-primary" (change)="onPhotosSelected($event)" />
+ <p class="mt-1 text-xs text-verga-muted">{{ 'offerBooking.photosHint' | translate }}</p>
+ @if (photos().length > 0) {
+ <ul class="mt-2 space-y-1 rounded border border-verga-border bg-verga-surface p-2">
+ @for (photo of photos(); track photoKey(photo); let i = $index) {
+ <li class="flex items-center justify-between gap-2 text-xs text-gray-700">
+ <span class="truncate" [title]="photo.name">{{ photo.name }}</span>
+ <button type="button" class="shrink-0 text-verga-primary hover:underline disabled:opacity-40" [disabled]="submitting()" (click)="removePhoto(i)">
+ {{ 'offerBooking.photosRemove' | translate }}
+ </button>
+ </li>
+ }
+ </ul>
+ }
  </div>
 
  <div>
  <label for="booking-phone" class="block text-sm text-gray-700">{{ 'auth.signup.phone' | translate }} <span class="text-verga-primary">*</span></label>
- <input id="booking-phone" name="phone" type="tel" autocomplete="tel" required [(ngModel)]="phone" class="verga-field mt-2" />
+ <input id="booking-phone" name="phone" type="tel" autocomplete="tel" [(ngModel)]="phone" [disabled]="submitting()" class="verga-field mt-2" />
  </div>
 
  <div class="flex flex-wrap justify-end gap-3 border-t border-verga-border pt-4">
- <button type="button" class="border border-verga-border px-5 py-2.5 text-sm font-semibold text-verga-ink transition hover:bg-verga-surface" (click)="close()">
+ <button type="button" class="border border-verga-border px-5 py-2.5 text-sm font-semibold text-verga-ink transition hover:bg-verga-surface disabled:opacity-40" (click)="close()" [disabled]="submitting()">
  {{ 'offerBooking.cancel' | translate }}
  </button>
- <button type="submit" class="verga-btn !w-auto px-6 py-2.5 text-sm">
+ <button type="submit" class="verga-btn !w-auto px-6 py-2.5 text-sm disabled:opacity-40" [disabled]="submitDisabled()">
+ @if (submitting()) {
+ {{ 'offerBooking.submitting' | translate }}
+ } @else {
  {{ submitKey() | translate }}
+ }
  </button>
  </div>
  </form>
- }
  </div>
 </div>

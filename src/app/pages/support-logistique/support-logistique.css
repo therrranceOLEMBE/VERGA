@@ -40,23 +40,20 @@
 }
 
 .colis-col-description {
-  width: 26%;
-}
-
-.colis-col-agence {
-  width: 18%;
+  width: 32%;
 }
 
 .colis-col-poids {
-  width: 12%;
+  width: 14%;
 }
 
 .colis-col-status {
-  width: 14%;
+  width: 16%;
 }
 
 .colis-col-actions {
-  width: 14%;
+  width: 18%;
+  min-width: 11rem;
 }
 
 .colis-cell-truncate {
@@ -91,6 +88,15 @@
 .colis-modal-backdrop {
   -webkit-overflow-scrolling: touch;
   overflow-y: auto;
+}
+
+.colis-photo-link {
+  aspect-ratio: 1;
+}
+
+.colis-photo-link img {
+  height: 100%;
+  min-height: 7rem;
 }
 
 @media (max-width: 1023px) {

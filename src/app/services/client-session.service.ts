@@ -1,5 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
+import { ClientCommandeCreateResponse } from '../models/client-commande.model';
+import { ClientDashboardPeriode, ClientDashboardResponse } from '../models/client-dashboard.model';
 import { mapClientMeToProfile, mapProfileToApiPayload } from '../utils/client-me.util';
 import { ParticulierService } from './particulier.service';
 
@@ -31,11 +33,13 @@ const EMPTY_PROFILE: ClientProfile = {
 export class ClientSessionService {
   private readonly particulierService = inject(ParticulierService);
   private readonly profile = signal<ClientProfile>({ ...EMPTY_PROFILE });
+  private readonly authenticated = signal(!!localStorage.getItem(CLIENT_TOKEN_KEY));
 
   readonly client = this.profile.asReadonly();
+  readonly isLoggedIn = this.authenticated.asReadonly();
 
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    return this.authenticated();
   }
 
   getToken(): string | null {
@@ -44,6 +48,7 @@ export class ClientSessionService {
 
   setSession(token: string, profile?: Partial<ClientProfile>): void {
     localStorage.setItem(CLIENT_TOKEN_KEY, token);
+    this.authenticated.set(true);
     if (profile) {
       this.updateProfile(profile);
     }
@@ -51,6 +56,7 @@ export class ClientSessionService {
 
   clearSession(): void {
     localStorage.removeItem(CLIENT_TOKEN_KEY);
+    this.authenticated.set(false);
     this.profile.set({ ...EMPTY_PROFILE });
   }
 
@@ -107,5 +113,17 @@ export class ClientSessionService {
   get fullName(): string {
     const { firstName, lastName } = this.profile();
     return `${firstName} ${lastName}`.trim();
+  }
+
+  createCommande(formData: FormData): Observable<ClientCommandeCreateResponse> {
+    return this.particulierService.createCommande(this.getToken(), formData);
+  }
+
+  loadDashboard(periode: ClientDashboardPeriode = 'mois'): Observable<ClientDashboardResponse> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No client token'));
+    }
+    return this.particulierService.getDashboard(token, periode);
   }
 }
