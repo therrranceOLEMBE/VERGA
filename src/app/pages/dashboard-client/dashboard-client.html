@@ -1,194 +1,224 @@
-<div class="dashboard-page mx-auto max-w-[1200px]">
- <header class="dashboard-header">
- <div class="dashboard-header-main">
- <a routerLink="/accueil" class="dashboard-back-home">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4 shrink-0" aria-hidden="true">
- <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
- </svg>
- {{ 'clientBackoffice.dashboard.backHome' | translate }}
- </a>
- <p class="dashboard-eyebrow">{{ 'clientBackoffice.dashboard.title' | translate }}</p>
- @if (dashboard()?.profilName) {
- <h1 class="dashboard-title">{{ displayName() }}</h1>
- <div class="dashboard-meta">
- @if (dashboard()!.profilTypeKey) {
- <span class="dashboard-badge">{{ dashboard()!.profilTypeKey | translate }}</span>
- } @else if (dashboard()!.profilType) {
- <span class="dashboard-badge">{{ dashboard()!.profilType }}</span>
- }
- @if (dashboard()?.debut && dashboard()?.fin) {
- <span class="dashboard-period-range">
- {{ 'clientBackoffice.dashboard.periodRange' | translate }} : {{ dashboard()!.debut }} – {{ dashboard()!.fin }}
- </span>
- }
- </div>
- } @else {
- <h1 class="dashboard-title">{{ 'clientBackoffice.dashboard.title' | translate }}</h1>
- <p class="dashboard-subtitle">{{ 'clientBackoffice.dashboard.welcome' | translate:{ name: displayName() } }}</p>
- }
- </div>
+<div class="cdash-page">
+  <header class="cdash-hero">
+    <div class="cdash-hero-bg" aria-hidden="true"></div>
+    <div class="cdash-hero-inner">
+      <div class="cdash-hero-top">
+        <div class="cdash-hero-copy">
+          <a routerLink="/accueil" class="cdash-back">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+            </svg>
+            {{ 'clientBackoffice.dashboard.backHome' | translate }}
+          </a>
+          <p class="cdash-eyebrow">{{ 'clientBackoffice.dashboard.title' | translate }}</p>
+          <h1 class="cdash-title">{{ 'clientBackoffice.dashboard.welcome' | translate:{ name: displayName() } }}</h1>
+          <div class="cdash-meta">
+            @if (dashboard()?.profilTypeKey) {
+              <span class="cdash-pill">{{ dashboard()!.profilTypeKey | translate }}</span>
+            } @else if (dashboard()?.profilType) {
+              <span class="cdash-pill">{{ dashboard()!.profilType }}</span>
+            }
+            @if (dashboard()?.debut && dashboard()?.fin) {
+              <span class="cdash-period-inline">
+                {{ 'clientBackoffice.dashboard.periodRange' | translate }} · {{ dashboard()!.debut }} – {{ dashboard()!.fin }}
+              </span>
+            }
+          </div>
+        </div>
 
- <div class="dashboard-period-filter" role="group" [attr.aria-label]="'clientBackoffice.dashboard.periodFilter' | translate">
- @for (option of periodOptions; track option.value) {
- <button
- type="button"
- class="dashboard-period-btn"
- [class.is-active]="selectedPeriode() === option.value"
- [disabled]="loading()"
- (click)="selectPeriode(option.value)"
- >
- {{ option.labelKey | translate }}
- </button>
- }
- </div>
- </header>
+        <div class="cdash-period-card">
+          <p class="cdash-period-label">{{ 'clientBackoffice.dashboard.periodFilter' | translate }}</p>
+          <p class="cdash-period-value">{{ selectedPeriodLabel() | translate }}</p>
+          <div class="cdash-period-bar" role="group" [attr.aria-label]="'clientBackoffice.dashboard.periodFilter' | translate">
+            @for (option of periodOptions; track option.value) {
+              <button
+                type="button"
+                class="cdash-period-btn"
+                [class.is-active]="selectedPeriode() === option.value"
+                [disabled]="loading()"
+                (click)="selectPeriode(option.value)"
+              >
+                {{ option.labelKey | translate }}
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
 
- @if (loading()) {
- <div class="dashboard-skeleton" aria-hidden="true">
- <div class="dashboard-skeleton-highlights">
- <div class="dashboard-skeleton-card"></div>
- <div class="dashboard-skeleton-card"></div>
- <div class="dashboard-skeleton-card"></div>
- </div>
- <div class="dashboard-skeleton-grid">
- @for (i of [1, 2, 3, 4, 5, 6]; track i) {
- <div class="dashboard-skeleton-metric"></div>
- }
- </div>
- </div>
- <p class="dashboard-loading-text">{{ 'clientBackoffice.dashboard.loading' | translate }}</p>
- } @else {
- @if (errorMessage()) {
- <div class="dashboard-alert" role="alert">
- <p>
- @if (errorMessage().startsWith('clientBackoffice.')) {
- {{ errorMessage() | translate }}
- } @else {
- {{ errorMessage() }}
- }
- </p>
- @if (unauthenticated()) {
- <a routerLink="/connexion" class="dashboard-alert-link">{{ 'clientBackoffice.dashboard.goToLogin' | translate }}</a>
- }
- </div>
- }
+  @if (loading()) {
+    <div class="cdash-skeleton" aria-hidden="true">
+      <div class="cdash-skeleton-actions"></div>
+      <div class="cdash-skeleton-grid">
+        @for (i of [1, 2]; track i) {
+          <div class="cdash-skeleton-block cdash-skeleton-panel"></div>
+        }
+      </div>
+      <div class="cdash-skeleton-block cdash-skeleton-table"></div>
+    </div>
+    <p class="cdash-loading-text">{{ 'clientBackoffice.dashboard.loading' | translate }}</p>
+  } @else {
+    @if (errorMessage()) {
+      <div class="cdash-alert" role="alert">
+        <p>
+          @if (errorMessage().startsWith('clientBackoffice.')) {
+            {{ errorMessage() | translate }}
+          } @else {
+            {{ errorMessage() }}
+          }
+        </p>
+        @if (unauthenticated()) {
+          <a routerLink="/connexion" class="cdash-alert-link">{{ 'clientBackoffice.dashboard.goToLogin' | translate }}</a>
+        }
+      </div>
+    }
 
- @if (dashboard()) {
- <section class="dashboard-highlights" [attr.aria-label]="'clientBackoffice.dashboard.highlights' | translate">
- @for (item of highlights(); track item.labelKey) {
- <article class="dashboard-highlight" [class]="'dashboard-highlight--' + item.accent">
- <p class="dashboard-highlight-label">{{ item.labelKey | translate }}</p>
- <p class="dashboard-highlight-value">{{ item.value }}</p>
- </article>
- }
- </section>
+    @if (dashboard()) {
+      <section class="cdash-quick" [attr.aria-label]="'clientBackoffice.dashboard.quickActions' | translate">
+        <div class="cdash-section-head">
+          <h2 class="cdash-section-title">{{ 'clientBackoffice.dashboard.quickActions' | translate }}</h2>
+          <p class="cdash-section-subtitle">{{ 'clientBackoffice.dashboard.quickActionsSubtitle' | translate }}</p>
+        </div>
+        <div class="cdash-quick-grid">
+          @for (link of quickLinks; track link.path) {
+            <a [routerLink]="link.path" class="cdash-quick-card">
+              <span class="cdash-quick-icon" aria-hidden="true">
+                @switch (link.icon) {
+                  @case ('orders') {
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z" /></svg>
+                  }
+                  @case ('payments') {
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" /></svg>
+                  }
+                  @case ('parcels') {
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177A48.78 48.78 0 0 0 12 6.75c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52" /></svg>
+                  }
+                  @case ('claims') {
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" /></svg>
+                  }
+                  @case ('home') {
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+                  }
+                  @default {
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg>
+                  }
+                }
+              </span>
+              <span class="cdash-quick-copy">
+                <span class="cdash-quick-label">{{ link.labelKey | translate }}</span>
+                <span class="cdash-quick-hint">{{ link.hintKey | translate }}</span>
+              </span>
+              <span class="cdash-quick-arrow" aria-hidden="true">→</span>
+            </a>
+          }
+        </div>
+      </section>
 
- @for (group of metricGroups(); track group.titleKey) {
- <section class="dashboard-section">
- <div class="dashboard-section-head">
- <h2 class="dashboard-section-title">{{ group.titleKey | translate }}</h2>
- </div>
- <div class="dashboard-metric-grid">
- @for (metric of group.metrics; track metric.labelKey) {
- <article class="dashboard-metric">
- <p class="dashboard-metric-label">{{ metric.labelKey | translate }}</p>
- <p class="dashboard-metric-value">{{ metric.value }}</p>
- </article>
- }
- </div>
- </section>
- }
+      <div class="cdash-panels">
+        <section class="cdash-panel">
+          <div class="cdash-panel-head">
+            <h2 class="cdash-panel-title">{{ 'clientBackoffice.dashboard.ordersByStatus' | translate }}</h2>
+          </div>
+          @if (commandesStatusBars().length > 0) {
+            <ul class="cdash-status-list">
+              @for (item of commandesStatusBars(); track item.key) {
+                <li class="cdash-status-item">
+                  <div class="cdash-status-row">
+                    <span class="cdash-status-label">{{ item.labelKey | translate }}</span>
+                    <span class="cdash-status-meta">
+                      <strong>{{ item.count }}</strong>
+                      <span>{{ item.percent }}%</span>
+                    </span>
+                  </div>
+                  <div class="cdash-status-track">
+                    <span class="cdash-status-fill" [style.width.%]="item.percent"></span>
+                  </div>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="cdash-empty">{{ 'clientBackoffice.dashboard.emptyStatus' | translate }}</p>
+          }
+        </section>
 
- <div class="dashboard-panels">
- <section class="dashboard-panel">
- <h2 class="dashboard-panel-title">{{ 'clientBackoffice.dashboard.ordersByStatus' | translate }}</h2>
- @if (commandesStatusBars().length > 0) {
- <ul class="dashboard-status-list">
- @for (item of commandesStatusBars(); track item.key) {
- <li class="dashboard-status-item">
- <div class="dashboard-status-row">
- <span class="dashboard-status-label">{{ item.labelKey | translate }}</span>
- <span class="dashboard-status-count">{{ item.count }}</span>
- </div>
- <div class="dashboard-status-track">
- <span class="dashboard-status-fill" [style.width.%]="item.percent"></span>
- </div>
- </li>
- }
- </ul>
- } @else {
- <p class="dashboard-empty">{{ 'clientBackoffice.dashboard.emptyStatus' | translate }}</p>
- }
- </section>
+        <section class="cdash-panel">
+          <div class="cdash-panel-head">
+            <h2 class="cdash-panel-title">{{ 'clientBackoffice.dashboard.parcelsByStatus' | translate }}</h2>
+          </div>
+          @if (colisStatusBars().length > 0) {
+            <ul class="cdash-status-list">
+              @for (item of colisStatusBars(); track item.key) {
+                <li class="cdash-status-item">
+                  <div class="cdash-status-row">
+                    <span class="cdash-status-label">{{ item.labelKey | translate }}</span>
+                    <span class="cdash-status-meta">
+                      <strong>{{ item.count }}</strong>
+                      <span>{{ item.percent }}%</span>
+                    </span>
+                  </div>
+                  <div class="cdash-status-track">
+                    <span class="cdash-status-fill cdash-status-fill--alt" [style.width.%]="item.percent"></span>
+                  </div>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="cdash-empty">{{ 'clientBackoffice.dashboard.emptyStatus' | translate }}</p>
+          }
+        </section>
+      </div>
 
- <section class="dashboard-panel">
- <h2 class="dashboard-panel-title">{{ 'clientBackoffice.dashboard.parcelsByStatus' | translate }}</h2>
- @if (colisStatusBars().length > 0) {
- <ul class="dashboard-status-list">
- @for (item of colisStatusBars(); track item.key) {
- <li class="dashboard-status-item">
- <div class="dashboard-status-row">
- <span class="dashboard-status-label">{{ item.labelKey | translate }}</span>
- <span class="dashboard-status-count">{{ item.count }}</span>
- </div>
- <div class="dashboard-status-track">
- <span class="dashboard-status-fill dashboard-status-fill--muted" [style.width.%]="item.percent"></span>
- </div>
- </li>
- }
- </ul>
- } @else {
- <p class="dashboard-empty">{{ 'clientBackoffice.dashboard.emptyStatus' | translate }}</p>
- }
- </section>
- </div>
-
- <section class="dashboard-panel dashboard-panel--table">
- <div class="dashboard-section-head flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
- <h2 class="dashboard-panel-title !mb-0">{{ 'clientBackoffice.dashboard.recentOrders' | translate }}</h2>
- <a routerLink="/espace-client/commandes" class="text-sm font-semibold text-verga-primary hover:underline">
- {{ 'clientBackoffice.dashboard.viewAll' | translate }}
- </a>
- </div>
- @if (dashboard()!.dernieresCommandes.length > 0) {
- <div class="dashboard-table-wrap">
- <table class="dashboard-table">
- <thead>
- <tr>
- <th>{{ 'clientBackoffice.commandes.colCode' | translate }}</th>
- <th>{{ 'clientBackoffice.commandes.colAgence' | translate }}</th>
- <th class="text-right">{{ 'clientBackoffice.commandes.colQuantity' | translate }}</th>
- <th class="text-right">{{ 'clientBackoffice.commandes.colAmount' | translate }}</th>
- <th>{{ 'clientBackoffice.commandes.colStatus' | translate }}</th>
- <th>{{ 'clientBackoffice.commandes.colDate' | translate }}</th>
- </tr>
- </thead>
- <tbody>
- @for (commande of dashboard()!.dernieresCommandes; track commande.id) {
- <tr>
- <td class="dashboard-table-code">{{ commande.code }}</td>
- <td>{{ commande.agence }}</td>
- <td class="text-right tabular-nums">{{ commande.quantite }}</td>
- <td class="text-right tabular-nums font-medium">{{ commande.montant }}</td>
- <td>
- @if (commande.statut) {
- <span class="inline-block px-2.5 py-1 text-xs font-semibold uppercase" [class]="statusClass(commande.statut)">
- {{ commande.statutKey | translate }}
- </span>
- } @else {
- —
- }
- </td>
- <td class="dashboard-table-date">{{ commande.date || '—' }}</td>
- </tr>
- }
- </tbody>
- </table>
- </div>
- } @else {
- <p class="dashboard-empty">{{ 'clientBackoffice.dashboard.noOrders' | translate }}</p>
- }
- </section>
- }
- }
+      <section class="cdash-panel cdash-panel--table">
+        <div class="cdash-panel-head cdash-panel-head--row">
+          <div>
+            <h2 class="cdash-panel-title">{{ 'clientBackoffice.dashboard.recentOrders' | translate }}</h2>
+            <p class="cdash-panel-subtitle">{{ 'clientBackoffice.dashboard.recentOrdersSubtitle' | translate }}</p>
+          </div>
+          <a routerLink="/espace-client/commandes" class="cdash-link">
+            {{ 'clientBackoffice.dashboard.viewAll' | translate }}
+          </a>
+        </div>
+        @if (dashboard()!.dernieresCommandes.length > 0) {
+          <div class="cdash-table-wrap">
+            <table class="cdash-table">
+              <thead>
+                <tr>
+                  <th>{{ 'clientBackoffice.commandes.colCode' | translate }}</th>
+                  <th>{{ 'clientBackoffice.commandes.colAgence' | translate }}</th>
+                  <th class="text-right">{{ 'clientBackoffice.commandes.colQuantity' | translate }}</th>
+                  <th class="text-right cdash-table-col-amount">{{ 'clientBackoffice.commandes.colAmount' | translate }}</th>
+                  <th class="cdash-table-col-status">{{ 'clientBackoffice.commandes.colStatus' | translate }}</th>
+                  <th>{{ 'clientBackoffice.commandes.colDate' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (commande of dashboard()!.dernieresCommandes; track commande.id) {
+                  <tr>
+                    <td class="cdash-table-code">{{ commande.code }}</td>
+                    <td>{{ commande.agence }}</td>
+                    <td class="text-right tabular-nums">{{ commande.quantite }}</td>
+                    <td class="text-right tabular-nums font-semibold cdash-table-col-amount">{{ commande.montant }}</td>
+                    <td class="cdash-table-col-status">
+                      @if (commande.statut) {
+                        <span [class]="statusClass(commande.statut)">{{ commande.statutKey | translate }}</span>
+                      } @else {
+                        —
+                      }
+                    </td>
+                    <td class="cdash-table-date">{{ commande.date || '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="cdash-empty-state">
+            <p class="cdash-empty">{{ 'clientBackoffice.dashboard.noOrders' | translate }}</p>
+            <a routerLink="/accueil" class="cdash-empty-cta">{{ 'clientBackoffice.dashboard.browseOffers' | translate }}</a>
+          </div>
+        }
+      </section>
+    }
+  }
 </div>

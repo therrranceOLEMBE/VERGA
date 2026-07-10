@@ -1,85 +1,94 @@
-<div class="mx-auto max-w-3xl">
- <div class="mb-8">
- <h1 class="text-2xl font-bold text-gray-900">{{ 'clientBackoffice.profile.title' | translate }}</h1>
- <p class="mt-2 text-sm text-verga-muted">{{ 'clientBackoffice.profile.subtitle' | translate }}</p>
- </div>
+<div class="cespace-page cespace-page--medium">
+  <header class="cespace-hero">
+    <div class="cespace-hero-bg" aria-hidden="true"></div>
+    <div class="cespace-hero-inner">
+      <p class="cespace-eyebrow">{{ 'clientBackoffice.space' | translate }}</p>
+      <h1 class="cespace-title">{{ 'clientBackoffice.profile.title' | translate }}</h1>
+      <p class="cespace-subtitle">{{ 'clientBackoffice.profile.subtitle' | translate }}</p>
+    </div>
+  </header>
 
- @if (loading()) {
- <p class="text-sm text-verga-muted">{{ 'clientBackoffice.profile.loading' | translate }}</p>
- } @else {
- @if (errorMessage()) {
- <p class="mb-4 text-sm font-medium text-red-600" role="alert">
- @if (errorMessage().startsWith('clientBackoffice.')) {
- {{ errorMessage() | translate }}
- } @else {
- {{ errorMessage() }}
- }
- </p>
- }
- @if (successMessage()) {
- <p class="mb-4 text-sm font-medium text-green-700" role="status">{{ successMessage() | translate }}</p>
- }
+  @if (loading()) {
+    <div class="cespace-loading">
+      <span class="cespace-loading-dot" aria-hidden="true"></span>
+      {{ 'clientBackoffice.profile.loading' | translate }}
+    </div>
+  } @else {
+    @if (errorMessage()) {
+      <div class="cespace-alert" role="alert">
+        @if (errorMessage().startsWith('clientBackoffice.')) {
+          {{ errorMessage() | translate }}
+        } @else {
+          {{ errorMessage() }}
+        }
+      </div>
+    }
+    @if (successMessage()) {
+      <div class="cespace-alert cespace-alert--success" role="status">{{ successMessage() | translate }}</div>
+    }
 
- <form class="space-y-6 border border-verga-border bg-white p-4 sm:p-8" (ngSubmit)="onSubmit($event)">
- <div class="flex flex-col items-start gap-4 border-b border-verga-border pb-6 sm:flex-row sm:items-center">
- <span class="flex h-16 w-16 items-center justify-center bg-verga-primary text-xl font-bold text-white">{{ initials }}</span>
- <div>
- <p class="font-bold text-gray-900">{{ displayName }}</p>
- <p class="text-sm text-verga-muted">
- @if (displayAccountType) {
- {{ displayAccountType }}
- } @else {
- {{ 'clientBackoffice.profile.accountType' | translate }}
- }
- </p>
- </div>
- </div>
+    <form class="cespace-form" (ngSubmit)="onSubmit($event)">
+      <div class="cespace-form-body">
+        <div class="cespace-profile-banner">
+          <span class="cespace-avatar">{{ initials }}</span>
+          <div>
+            <p class="cespace-profile-name">{{ displayName }}</p>
+            <p class="cespace-profile-meta">
+              @if (displayAccountType) {
+                {{ displayAccountType }}
+              } @else {
+                {{ 'clientBackoffice.profile.accountType' | translate }}
+              }
+            </p>
+          </div>
+        </div>
 
- <div class="grid gap-5 sm:grid-cols-2">
- <div>
- <label for="client-first-name" class="block text-sm font-medium text-gray-700">{{ 'auth.signup.firstName' | translate }}</label>
- <input id="client-first-name" name="firstName" type="text" [(ngModel)]="firstName" class="verga-field mt-2" />
- </div>
- <div>
- <label for="client-last-name" class="block text-sm font-medium text-gray-700">{{ 'auth.signup.lastName' | translate }}</label>
- <input id="client-last-name" name="lastName" type="text" [(ngModel)]="lastName" class="verga-field mt-2" />
- </div>
- </div>
+        <div class="cespace-form-grid">
+          <div>
+            <label for="client-first-name" class="cespace-form-label">{{ 'auth.signup.firstName' | translate }}</label>
+            <input id="client-first-name" name="firstName" type="text" [(ngModel)]="firstName" class="verga-field" />
+          </div>
+          <div>
+            <label for="client-last-name" class="cespace-form-label">{{ 'auth.signup.lastName' | translate }}</label>
+            <input id="client-last-name" name="lastName" type="text" [(ngModel)]="lastName" class="verga-field" />
+          </div>
+        </div>
 
- <div class="grid gap-5 sm:grid-cols-2">
- <div>
- <label for="client-email" class="block text-sm font-medium text-gray-700">{{ 'backoffice.profile.email' | translate }}</label>
- <input id="client-email" name="email" type="email" [(ngModel)]="email" class="verga-field mt-2" />
- </div>
- <div>
- <label for="client-phone" class="block text-sm font-medium text-gray-700">{{ 'backoffice.profile.phone' | translate }}</label>
- <input id="client-phone" name="phone" type="tel" [(ngModel)]="phone" class="verga-field mt-2" />
- </div>
- </div>
+        <div class="cespace-form-grid">
+          <div>
+            <label for="client-email" class="cespace-form-label">{{ 'backoffice.profile.email' | translate }}</label>
+            <input id="client-email" name="email" type="email" [(ngModel)]="email" class="verga-field" />
+          </div>
+          <div>
+            <label for="client-phone" class="cespace-form-label">{{ 'backoffice.profile.phone' | translate }}</label>
+            <input id="client-phone" name="phone" type="tel" [(ngModel)]="phone" class="verga-field" />
+          </div>
+        </div>
 
- <div>
- <label for="client-address" class="block text-sm font-medium text-gray-700">{{ 'auth.signup.address' | translate }}</label>
- <input id="client-address" name="address" type="text" [(ngModel)]="address" class="verga-field mt-2" />
- </div>
+        <div>
+          <label for="client-address" class="cespace-form-label">{{ 'auth.signup.address' | translate }}</label>
+          <input id="client-address" name="address" type="text" [(ngModel)]="address" class="verga-field" />
+        </div>
 
- <div class="grid gap-5 sm:grid-cols-2">
- <div>
- <label for="client-city" class="block text-sm font-medium text-gray-700">{{ 'auth.signup.city' | translate }}</label>
- <input id="client-city" name="city" type="text" [(ngModel)]="city" class="verga-field mt-2" />
- </div>
- <div>
- <label for="client-country" class="block text-sm font-medium text-gray-700">{{ 'auth.signup.country' | translate }}</label>
- <input id="client-country" name="country" type="text" [(ngModel)]="country" class="verga-field mt-2" />
- </div>
- </div>
+        <div class="cespace-form-grid">
+          <div>
+            <label for="client-city" class="cespace-form-label">{{ 'auth.signup.city' | translate }}</label>
+            <input id="client-city" name="city" type="text" [(ngModel)]="city" class="verga-field" />
+          </div>
+          <div>
+            <label for="client-country" class="cespace-form-label">{{ 'auth.signup.country' | translate }}</label>
+            <input id="client-country" name="country" type="text" [(ngModel)]="country" class="verga-field" />
+          </div>
+        </div>
 
- <button type="submit" class="verga-btn !w-auto px-8" [disabled]="submitting()">
- @if (submitting()) {
- {{ 'clientBackoffice.profile.saving' | translate }}
- } @else {
- {{ 'clientBackoffice.profile.save' | translate }}
- }
- </button>
- </form>
- }
+        <button type="submit" class="verga-btn cespace-submit" [disabled]="submitting()">
+          @if (submitting()) {
+            {{ 'clientBackoffice.profile.saving' | translate }}
+          } @else {
+            {{ 'clientBackoffice.profile.save' | translate }}
+          }
+        </button>
+      </div>
+    </form>
+  }
 </div>

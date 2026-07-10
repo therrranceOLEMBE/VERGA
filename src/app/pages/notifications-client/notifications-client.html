@@ -1,55 +1,63 @@
-<div class="mx-auto max-w-3xl">
- <div class="mb-8">
- <h1 class="text-2xl font-bold text-gray-900">{{ 'clientBackoffice.notifications.title' | translate }}</h1>
- <p class="mt-2 text-sm text-verga-muted">{{ 'clientBackoffice.notifications.subtitle' | translate }}</p>
- </div>
+<div class="cespace-page cespace-page--medium">
+  <header class="cespace-hero">
+    <div class="cespace-hero-bg" aria-hidden="true"></div>
+    <div class="cespace-hero-inner">
+      <p class="cespace-eyebrow">{{ 'clientBackoffice.space' | translate }}</p>
+      <h1 class="cespace-title">{{ 'clientBackoffice.notifications.title' | translate }}</h1>
+      <p class="cespace-subtitle">{{ 'clientBackoffice.notifications.subtitle' | translate }}</p>
+    </div>
+  </header>
 
- <section class="mb-8 border border-verga-border bg-white p-4 sm:p-6">
- <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
- <h2 class="text-lg font-bold text-gray-900">{{ 'clientBackoffice.notifications.inbox' | translate }}</h2>
- <button type="button" (click)="markAllRead()" class="self-start text-sm font-semibold text-verga-primary hover:underline sm:self-auto">
- {{ 'clientBackoffice.notifications.markAllRead' | translate }}
- </button>
- </div>
- <ul class="mt-6 divide-y divide-verga-border">
- @for (notif of notifications(); track notif.id) {
- <li class="flex gap-4 py-4 first:pt-0 last:pb-0" [class.opacity-70]="notif.read">
- <span class="mt-1 flex h-9 w-9 shrink-0 items-center justify-center" [class.bg-verga-primary-muted]="!notif.read" [class.text-verga-primary]="!notif.read" [class.bg-verga-surface]="notif.read" [class.text-verga-muted]="notif.read">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
- <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
- </svg>
- </span>
- <div class="min-w-0 flex-1">
- <p class="font-semibold text-gray-900">{{ notif.titleKey | translate }}</p>
- <p class="mt-1 text-sm text-gray-600">{{ notif.descKey | translate }}</p>
- <p class="mt-2 text-xs text-verga-muted">{{ notif.date }}</p>
- </div>
- @if (!notif.read) {
- <span class="mt-2 h-2 w-2 shrink-0 bg-verga-primary"></span>
- }
- </li>
- }
- </ul>
- </section>
+  <section class="cespace-panel">
+    <div class="cespace-panel-head">
+      <h2 class="cespace-panel-title">{{ 'clientBackoffice.notifications.inbox' | translate }}</h2>
+      <button type="button" (click)="markAllRead()" class="cespace-link-btn">
+        {{ 'clientBackoffice.notifications.markAllRead' | translate }}
+      </button>
+    </div>
+    <ul class="cespace-notif-list">
+      @for (notif of notifications(); track notif.id) {
+        <li class="cespace-notif-item" [class.is-read]="notif.read">
+          <span class="cespace-notif-icon" [class.is-unread]="!notif.read" [class.is-read]="notif.read">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+            </svg>
+          </span>
+          <div class="min-w-0 flex-1">
+            <p class="cespace-notif-title">{{ notif.titleKey | translate }}</p>
+            <p class="cespace-notif-desc">{{ notif.descKey | translate }}</p>
+            <p class="cespace-notif-date">{{ notif.date }}</p>
+          </div>
+          @if (!notif.read) {
+            <span class="cespace-notif-dot" aria-hidden="true"></span>
+          }
+        </li>
+      }
+    </ul>
+  </section>
 
- <form class="space-y-5 border border-verga-border bg-white p-4 sm:p-6" (ngSubmit)="onSavePreferences($event)">
- <h2 class="text-lg font-bold text-gray-900">{{ 'clientBackoffice.notifications.preferences' | translate }}</h2>
- <label class="flex cursor-pointer items-center justify-between gap-4 border border-verga-border px-4 py-3">
- <span class="text-sm text-gray-700">{{ 'clientBackoffice.notifications.emailNotif' | translate }}</span>
- <input type="checkbox" [(ngModel)]="emailNotif" name="emailNotif" class="h-4 w-4 text-verga-primary focus:ring-verga-primary/40" />
- </label>
- <label class="flex cursor-pointer items-center justify-between gap-4 border border-verga-border px-4 py-3">
- <span class="text-sm text-gray-700">{{ 'clientBackoffice.notifications.smsNotif' | translate }}</span>
- <input type="checkbox" [(ngModel)]="smsNotif" name="smsNotif" class="h-4 w-4 text-verga-primary focus:ring-verga-primary/40" />
- </label>
- <label class="flex cursor-pointer items-center justify-between gap-4 border border-verga-border px-4 py-3">
- <span class="text-sm text-gray-700">{{ 'clientBackoffice.notifications.shipmentNotif' | translate }}</span>
- <input type="checkbox" [(ngModel)]="shipmentNotif" name="shipmentNotif" class="h-4 w-4 text-verga-primary focus:ring-verga-primary/40" />
- </label>
- <label class="flex cursor-pointer items-center justify-between gap-4 border border-verga-border px-4 py-3">
- <span class="text-sm text-gray-700">{{ 'clientBackoffice.notifications.promoNotif' | translate }}</span>
- <input type="checkbox" [(ngModel)]="promoNotif" name="promoNotif" class="h-4 w-4 text-verga-primary focus:ring-verga-primary/40" />
- </label>
- <button type="submit" class="verga-btn !w-auto px-8">{{ 'clientBackoffice.notifications.save' | translate }}</button>
- </form>
+  <form class="cespace-form" (ngSubmit)="onSavePreferences($event)">
+    <div class="cespace-panel-head">
+      <h2 class="cespace-panel-title">{{ 'clientBackoffice.notifications.preferences' | translate }}</h2>
+    </div>
+    <div class="cespace-form-body">
+      <label class="cespace-pref-row">
+        <span>{{ 'clientBackoffice.notifications.emailNotif' | translate }}</span>
+        <input type="checkbox" [(ngModel)]="emailNotif" name="emailNotif" class="h-4 w-4 text-verga-primary focus:ring-verga-primary/40" />
+      </label>
+      <label class="cespace-pref-row">
+        <span>{{ 'clientBackoffice.notifications.smsNotif' | translate }}</span>
+        <input type="checkbox" [(ngModel)]="smsNotif" name="smsNotif" class="h-4 w-4 text-verga-primary focus:ring-verga-primary/40" />
+      </label>
+      <label class="cespace-pref-row">
+        <span>{{ 'clientBackoffice.notifications.shipmentNotif' | translate }}</span>
+        <input type="checkbox" [(ngModel)]="shipmentNotif" name="shipmentNotif" class="h-4 w-4 text-verga-primary focus:ring-verga-primary/40" />
+      </label>
+      <label class="cespace-pref-row">
+        <span>{{ 'clientBackoffice.notifications.promoNotif' | translate }}</span>
+        <input type="checkbox" [(ngModel)]="promoNotif" name="promoNotif" class="h-4 w-4 text-verga-primary focus:ring-verga-primary/40" />
+      </label>
+      <button type="submit" class="verga-btn cespace-submit">{{ 'clientBackoffice.notifications.save' | translate }}</button>
+    </div>
+  </form>
 </div>

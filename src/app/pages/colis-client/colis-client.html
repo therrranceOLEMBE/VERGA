@@ -1,253 +1,293 @@
-<div class="mx-auto max-w-[1200px]">
- <div class="mb-8">
- <h1 class="text-2xl font-bold text-gray-900">{{ 'clientBackoffice.colis.title' | translate }}</h1>
- <p class="mt-2 text-sm text-verga-muted">{{ 'clientBackoffice.colis.subtitle' | translate }}</p>
- </div>
+<div class="cespace-page">
+  <header class="cespace-hero">
+    <div class="cespace-hero-bg" aria-hidden="true"></div>
+    <div class="cespace-hero-inner">
+      <p class="cespace-eyebrow">{{ 'clientBackoffice.space' | translate }}</p>
+      <h1 class="cespace-title">{{ 'clientBackoffice.colis.title' | translate }}</h1>
+      <p class="cespace-subtitle">{{ 'clientBackoffice.colis.subtitle' | translate }}</p>
+    </div>
+  </header>
 
- <section class="mb-6 border border-verga-border bg-white p-4 sm:p-6">
- <h2 class="text-sm font-bold uppercase tracking-wide text-gray-900">{{ 'backoffice.transactions.filters' | translate }}</h2>
- <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
- <div>
- <label for="filter-colis-search" class="block text-xs font-medium text-verga-muted">{{ 'clientBackoffice.colis.filterSearch' | translate }}</label>
- <input
- id="filter-colis-search"
- type="text"
- [ngModel]="filterSearch()"
- (ngModelChange)="filterSearch.set($event)"
- (keyup.enter)="onFilterChange()"
- class="verga-field mt-1.5"
- placeholder="REF-..."
- />
- </div>
- <div>
- <label for="filter-colis-statut" class="block text-xs font-medium text-verga-muted">{{ 'clientBackoffice.colis.filterStatus' | translate }}</label>
- <select
- id="filter-colis-statut"
- [ngModel]="filterStatut()"
- (ngModelChange)="filterStatut.set($event); onFilterChange()"
- class="verga-field mt-1.5"
- >
- @for (option of statutOptions; track option.value) {
- <option [ngValue]="option.value">{{ option.labelKey | translate }}</option>
- }
- </select>
- </div>
- </div>
- <div class="mt-4">
- <button type="button" (click)="resetFilters()" class="text-sm font-semibold text-verga-primary hover:underline">
- {{ 'backoffice.transactions.reset' | translate }}
- </button>
- </div>
- </section>
+  <section class="cespace-panel">
+    <div class="cespace-panel-head">
+      <h2 class="cespace-panel-title">{{ 'backoffice.transactions.filters' | translate }}</h2>
+    </div>
+    <div class="cespace-panel-body">
+      <div class="cespace-filters-grid">
+        <div>
+          <label for="filter-colis-search" class="cespace-field-label">{{ 'clientBackoffice.colis.filterSearch' | translate }}</label>
+          <input
+            id="filter-colis-search"
+            type="text"
+            [ngModel]="filterSearch()"
+            (ngModelChange)="filterSearch.set($event)"
+            (keyup.enter)="onFilterChange()"
+            class="verga-field"
+            placeholder="REF-..."
+          />
+        </div>
+        <div>
+          <label for="filter-colis-statut" class="cespace-field-label">{{ 'clientBackoffice.colis.filterStatus' | translate }}</label>
+          <select
+            id="filter-colis-statut"
+            [ngModel]="filterStatut()"
+            (ngModelChange)="filterStatut.set($event); onFilterChange()"
+            class="verga-field"
+          >
+            @for (option of statutOptions; track option.value) {
+              <option [ngValue]="option.value">{{ option.labelKey | translate }}</option>
+            }
+          </select>
+        </div>
+      </div>
+      <div class="cespace-filters-actions">
+        <button type="button" (click)="resetFilters()" class="cespace-link-btn">
+          {{ 'backoffice.transactions.reset' | translate }}
+        </button>
+      </div>
+    </div>
+  </section>
 
- @if (errorMessage()) {
- <p class="mb-4 text-sm font-medium text-red-600" role="alert">{{ errorMessage() | translate }}</p>
- }
+  @if (errorMessage()) {
+    <div class="cespace-alert" role="alert">{{ errorMessage() | translate }}</div>
+  }
 
- @if (loading()) {
- <p class="text-sm text-verga-muted">{{ 'clientBackoffice.colis.loading' | translate }}</p>
- } @else {
- <div class="client-colis-table-wrap overflow-x-auto border border-verga-border bg-white">
- <table class="client-colis-table w-full text-left text-sm">
- <thead class="border-b border-verga-border bg-verga-surface text-xs font-semibold uppercase tracking-wide text-verga-muted">
- <tr>
- <th class="client-col-reference px-4 py-3.5">{{ 'clientBackoffice.colis.colReference' | translate }}</th>
- <th class="client-col-commande px-4 py-3.5">{{ 'clientBackoffice.colis.colCommande' | translate }}</th>
- <th class="client-col-description px-4 py-3.5">{{ 'clientBackoffice.colis.colDescription' | translate }}</th>
- <th class="client-col-poids px-4 py-3.5 text-right">{{ 'clientBackoffice.colis.colPoids' | translate }}</th>
- <th class="client-col-status px-4 py-3.5">{{ 'clientBackoffice.colis.colStatus' | translate }}</th>
- <th class="client-col-actions px-4 py-3.5">{{ 'clientBackoffice.colis.colActions' | translate }}</th>
- </tr>
- </thead>
- <tbody class="divide-y divide-verga-border">
- @for (item of colis(); track item.id) {
- <tr class="transition hover:bg-verga-primary-muted/30">
- <td class="client-col-reference whitespace-nowrap px-4 py-3.5 font-mono text-xs font-semibold text-verga-primary">{{ item.reference }}</td>
- <td class="client-col-commande px-4 py-3.5 text-gray-900">
- <span class="client-cell-truncate" [attr.title]="item.commande">{{ item.commande }}</span>
- </td>
- <td class="client-col-description px-4 py-3.5 text-gray-600">
- <span class="client-cell-truncate" [attr.title]="item.description">{{ item.description }}</span>
- </td>
- <td class="client-col-poids whitespace-nowrap px-4 py-3.5 text-right font-medium text-gray-900">{{ item.poids }}</td>
- <td class="client-col-status whitespace-nowrap px-4 py-3.5">
- @if (item.statut) {
- <span class="inline-block px-2.5 py-1 text-xs font-semibold uppercase" [class]="statusClass(item.statut)">
- {{ statusKey(item.statut) | translate }}
- </span>
- } @else {
- —
- }
- </td>
- <td class="client-col-actions whitespace-nowrap px-4 py-3.5">
- <button type="button" class="client-colis-action-btn" (click)="openDetail(item)">
- {{ 'clientBackoffice.colis.actionDetail' | translate }}
- </button>
- </td>
- </tr>
- } @empty {
- <tr>
- <td colspan="6" class="px-4 py-12 text-center text-sm text-verga-muted">{{ 'clientBackoffice.colis.empty' | translate }}</td>
- </tr>
- }
- </tbody>
- </table>
- </div>
+  @if (loading()) {
+    <div class="cespace-loading">
+      <span class="cespace-loading-dot" aria-hidden="true"></span>
+      {{ 'clientBackoffice.colis.loading' | translate }}
+    </div>
+  } @else {
+    <div class="cespace-table-wrap">
+      <table class="cespace-table client-colis-table">
+        <thead>
+          <tr>
+            <th class="client-col-reference">{{ 'clientBackoffice.colis.colReference' | translate }}</th>
+            <th class="client-col-commande">{{ 'clientBackoffice.colis.colCommande' | translate }}</th>
+            <th class="client-col-description">{{ 'clientBackoffice.colis.colDescription' | translate }}</th>
+            <th class="client-col-poids text-right">{{ 'clientBackoffice.colis.colPoids' | translate }}</th>
+            <th class="client-col-status">{{ 'clientBackoffice.colis.colStatus' | translate }}</th>
+            <th class="client-col-actions">{{ 'clientBackoffice.colis.colActions' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (item of colis(); track item.id) {
+            <tr>
+              <td class="client-col-reference cespace-table-code">{{ item.reference }}</td>
+              <td class="client-col-commande cespace-ink">
+                <span class="cespace-cell-truncate" [attr.title]="item.commande">{{ item.commande }}</span>
+              </td>
+              <td class="client-col-description">
+                <span class="cespace-cell-truncate" [attr.title]="item.description">{{ item.description }}</span>
+              </td>
+              <td class="client-col-poids text-right cespace-tabular cespace-ink">{{ item.poids }}</td>
+              <td class="client-col-status">
+                @if (item.statut) {
+                  <span [class]="statusClass(item.statut)">
+                    {{ statusKey(item.statut) | translate }}
+                  </span>
+                } @else {
+                  —
+                }
+              </td>
+              <td class="client-col-actions">
+                <button type="button" class="cespace-action-btn" (click)="openDetail(item)">
+                  {{ 'clientBackoffice.colis.actionDetail' | translate }}
+                </button>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="cespace-empty">{{ 'clientBackoffice.colis.empty' | translate }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
 
- @if (totalItems() > 0) {
- <div class="mt-6 flex flex-col items-center gap-4">
- <nav class="flex flex-wrap items-center justify-center gap-1" [attr.aria-label]="'aria.navigation' | translate">
- <button type="button" (click)="previousPage()" [disabled]="currentPage() === 1" class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40" [attr.aria-label]="'aria.prevPage' | translate">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
- </button>
- @for (page of pageNumbers(); track page) {
- <button type="button" (click)="goToPage(page)" class="flex h-9 min-w-9 items-center justify-center px-2 text-sm font-medium transition" [class.bg-verga-primary]="currentPage() === page" [class.text-white]="currentPage() === page" [class.border]="currentPage() !== page" [class.border-verga-border]="currentPage() !== page" [class.bg-white]="currentPage() !== page" [class.text-verga-primary]="currentPage() !== page" [class.hover:bg-verga-primary/10]="currentPage() !== page" [attr.aria-current]="currentPage() === page ? 'page' : null">{{ page }}</button>
- }
- <button type="button" (click)="nextPage()" [disabled]="currentPage() === totalPages()" class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40" [attr.aria-label]="'aria.nextPage' | translate">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" /></svg>
- </button>
- </nav>
- <p class="text-center text-sm text-gray-600">{{ resultsLabel() }}</p>
- </div>
- }
- }
+    @if (totalItems() > 0) {
+      <div class="cespace-pagination">
+        <nav class="cespace-pagination-nav" [attr.aria-label]="'aria.navigation' | translate">
+          <button
+            type="button"
+            (click)="previousPage()"
+            [disabled]="currentPage() === 1"
+            class="cespace-page-btn"
+            [attr.aria-label]="'aria.prevPage' | translate"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+          @for (page of pageNumbers(); track page) {
+            <button
+              type="button"
+              (click)="goToPage(page)"
+              class="cespace-page-btn"
+              [class.is-active]="currentPage() === page"
+              [attr.aria-current]="currentPage() === page ? 'page' : null"
+            >
+              {{ page }}
+            </button>
+          }
+          <button
+            type="button"
+            (click)="nextPage()"
+            [disabled]="currentPage() === totalPages()"
+            class="cespace-page-btn"
+            [attr.aria-label]="'aria.nextPage' | translate"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
+            </svg>
+          </button>
+        </nav>
+        <p class="cespace-results">{{ resultsLabel() }}</p>
+      </div>
+    }
+  }
 </div>
 
 @if (detailOpen()) {
-<div
- class="client-colis-modal-backdrop fixed inset-0 z-50 flex items-start justify-center bg-black/40 px-4 py-8 sm:items-center"
- role="dialog"
- aria-modal="true"
- (click)="onModalBackdropClick($event)"
->
- <div class="w-full max-w-2xl border border-verga-border bg-white shadow-lg" (click)="$event.stopPropagation()">
- <div class="flex items-center justify-between border-b border-verga-border px-5 py-4 sm:px-6">
- <h2 class="text-lg font-bold text-gray-900">{{ 'clientBackoffice.colis.modalDetailTitle' | translate }}</h2>
- <button type="button" (click)="closeDetail()" class="text-verga-muted transition hover:text-gray-900" [attr.aria-label]="'aria.close' | translate">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
- </button>
- </div>
+  <div
+    class="cespace-modal-backdrop"
+    role="dialog"
+    aria-modal="true"
+    (click)="onModalBackdropClick($event)"
+  >
+    <div class="cespace-modal" (click)="$event.stopPropagation()">
+      <div class="cespace-modal-head">
+        <h2 class="cespace-modal-title">{{ 'clientBackoffice.colis.modalDetailTitle' | translate }}</h2>
+        <button type="button" (click)="closeDetail()" class="cespace-modal-close" [attr.aria-label]="'aria.close' | translate">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
 
- @if (detailLoading()) {
- <p class="px-5 py-8 text-sm text-verga-muted sm:px-6">{{ 'clientBackoffice.colis.detailLoading' | translate }}</p>
- } @else if (detailError()) {
- <div class="px-5 py-6 text-sm text-red-600 sm:px-6" role="alert">
- @if (detailError().startsWith('clientBackoffice.')) {
- {{ detailError() | translate }}
- } @else {
- {{ detailError() }}
- }
- </div>
- } @else if (selectedColis(); as colis) {
- <div class="max-h-[70vh] overflow-y-auto px-5 py-6 sm:px-6">
- <section class="mb-6">
- <h3 class="text-xs font-bold uppercase tracking-wide text-verga-muted">{{ 'clientBackoffice.colis.sectionParcel' | translate }}</h3>
- <dl class="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
- <div>
- <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'clientBackoffice.colis.colReference' | translate }}</dt>
- <dd class="mt-1 font-mono text-sm font-semibold text-verga-primary">{{ colis.reference }}</dd>
- </div>
- <div>
- <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'clientBackoffice.colis.colStatus' | translate }}</dt>
- <dd class="mt-1">
- @if (colis.statut) {
- <span class="inline-block px-2.5 py-1 text-xs font-semibold uppercase" [class]="statusClass(colis.statut)">
- {{ statusKey(colis.statut) | translate }}
- </span>
- } @else {
- —
- }
- </dd>
- </div>
- <div>
- <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'clientBackoffice.colis.colCommande' | translate }}</dt>
- <dd class="mt-1 text-sm text-gray-900">{{ colis.commande }}</dd>
- </div>
- <div>
- <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'clientBackoffice.colis.colQuantite' | translate }}</dt>
- <dd class="mt-1 text-sm font-semibold text-gray-900">{{ colis.commandeQuantite }}</dd>
- </div>
- <div>
- <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'clientBackoffice.colis.colPoids' | translate }}</dt>
- <dd class="mt-1 text-sm font-semibold text-gray-900">{{ colis.poids }}</dd>
- </div>
- <div>
- <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'clientBackoffice.colis.colVolume' | translate }}</dt>
- <dd class="mt-1 text-sm text-gray-900">{{ colis.volume }}</dd>
- </div>
- <div>
- <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'clientBackoffice.colis.colCreatedAt' | translate }}</dt>
- <dd class="mt-1 text-sm text-gray-900">{{ colis.createdAt }}</dd>
- </div>
- @if (colis.agence !== '—') {
- <div>
- <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'clientBackoffice.colis.colAgence' | translate }}</dt>
- <dd class="mt-1 text-sm text-gray-900">{{ colis.agence }}</dd>
- </div>
- }
- <div class="sm:col-span-2">
- <dt class="text-xs font-semibold uppercase text-verga-muted">{{ 'clientBackoffice.colis.colDescription' | translate }}</dt>
- <dd class="mt-1 text-sm text-gray-900">{{ colis.description }}</dd>
- </div>
- </dl>
- </section>
+      @if (detailLoading()) {
+        <div class="cespace-loading" style="margin: 1rem; border: none">
+          <span class="cespace-loading-dot" aria-hidden="true"></span>
+          {{ 'clientBackoffice.colis.detailLoading' | translate }}
+        </div>
+      } @else if (detailError()) {
+        <div class="cespace-alert" style="margin: 1rem" role="alert">
+          @if (detailError().startsWith('clientBackoffice.')) {
+            {{ detailError() | translate }}
+          } @else {
+            {{ detailError() }}
+          }
+        </div>
+      } @else if (selectedColis(); as colis) {
+        <div class="cespace-modal-body">
+          <section class="cespace-detail-section">
+            <h3 class="cespace-detail-label">{{ 'clientBackoffice.colis.sectionParcel' | translate }}</h3>
+            <dl class="cespace-detail-grid">
+              <div>
+                <dt class="cespace-detail-dt">{{ 'clientBackoffice.colis.colReference' | translate }}</dt>
+                <dd class="cespace-detail-dd cespace-table-code">{{ colis.reference }}</dd>
+              </div>
+              <div>
+                <dt class="cespace-detail-dt">{{ 'clientBackoffice.colis.colStatus' | translate }}</dt>
+                <dd class="cespace-detail-dd">
+                  @if (colis.statut) {
+                    <span [class]="statusClass(colis.statut)">
+                      {{ statusKey(colis.statut) | translate }}
+                    </span>
+                  } @else {
+                    —
+                  }
+                </dd>
+              </div>
+              <div>
+                <dt class="cespace-detail-dt">{{ 'clientBackoffice.colis.colCommande' | translate }}</dt>
+                <dd class="cespace-detail-dd">{{ colis.commande }}</dd>
+              </div>
+              <div>
+                <dt class="cespace-detail-dt">{{ 'clientBackoffice.colis.colQuantite' | translate }}</dt>
+                <dd class="cespace-detail-dd cespace-strong">{{ colis.commandeQuantite }}</dd>
+              </div>
+              <div>
+                <dt class="cespace-detail-dt">{{ 'clientBackoffice.colis.colPoids' | translate }}</dt>
+                <dd class="cespace-detail-dd cespace-strong">{{ colis.poids }}</dd>
+              </div>
+              <div>
+                <dt class="cespace-detail-dt">{{ 'clientBackoffice.colis.colVolume' | translate }}</dt>
+                <dd class="cespace-detail-dd">{{ colis.volume }}</dd>
+              </div>
+              <div>
+                <dt class="cespace-detail-dt">{{ 'clientBackoffice.colis.colCreatedAt' | translate }}</dt>
+                <dd class="cespace-detail-dd">{{ colis.createdAt }}</dd>
+              </div>
+              @if (colis.agence !== '—') {
+                <div>
+                  <dt class="cespace-detail-dt">{{ 'clientBackoffice.colis.colAgence' | translate }}</dt>
+                  <dd class="cespace-detail-dd">{{ colis.agence }}</dd>
+                </div>
+              }
+              <div class="span-2">
+                <dt class="cespace-detail-dt">{{ 'clientBackoffice.colis.colDescription' | translate }}</dt>
+                <dd class="cespace-detail-dd">{{ colis.description }}</dd>
+              </div>
+            </dl>
+          </section>
 
- <section class="mb-6 border-t border-verga-border pt-6">
- <h3 class="text-xs font-bold uppercase tracking-wide text-verga-muted">{{ 'clientBackoffice.colis.sectionPhotos' | translate }}</h3>
- @if (colis.photos.length > 0) {
- <div class="client-colis-photos mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
- @for (photo of colis.photos; track photo.id) {
- <a [href]="photo.url" target="_blank" rel="noopener noreferrer" class="client-colis-photo-link group block overflow-hidden border border-verga-border bg-verga-surface">
- <img [src]="photo.url" [alt]="colis.description" class="h-28 w-full object-cover transition group-hover:scale-105" loading="lazy" />
- </a>
- }
- </div>
- } @else {
- <p class="mt-3 text-sm text-verga-muted">{{ 'clientBackoffice.colis.emptyPhotos' | translate }}</p>
- }
- </section>
+          <section class="cespace-detail-section">
+            <h3 class="cespace-detail-label">{{ 'clientBackoffice.colis.sectionPhotos' | translate }}</h3>
+            @if (colis.photos.length > 0) {
+              <div class="cespace-photos">
+                @for (photo of colis.photos; track photo.id) {
+                  <a [href]="photo.url" target="_blank" rel="noopener noreferrer" class="cespace-photo">
+                    <img [src]="photo.url" [alt]="colis.description" loading="lazy" />
+                  </a>
+                }
+              </div>
+            } @else {
+              <p class="cespace-form-hint">{{ 'clientBackoffice.colis.emptyPhotos' | translate }}</p>
+            }
+          </section>
 
- <section class="border-t border-verga-border pt-6">
- <h3 class="text-xs font-bold uppercase tracking-wide text-verga-muted">{{ 'clientBackoffice.colis.sectionHistory' | translate }}</h3>
- @if (colis.historique.length > 0) {
- <ul class="mt-3 divide-y divide-verga-border border border-verga-border">
- @for (entry of colis.historique; track entry.id) {
- <li class="px-4 py-3 text-sm">
- <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
- <div class="flex items-center gap-3">
- @if (entry.statut) {
- <span class="inline-block px-2.5 py-1 text-xs font-semibold uppercase" [class]="statusClass(entry.statut)">
- {{ statusKey(entry.statut) | translate }}
- </span>
- }
- <span class="text-xs text-verga-muted">{{ entry.date }}</span>
- </div>
- </div>
- @if (entry.commentaire !== '—') {
- <p class="mt-2 text-gray-600">{{ entry.commentaire }}</p>
- }
- </li>
- }
- </ul>
- } @else {
- <p class="mt-3 text-sm text-verga-muted">{{ 'clientBackoffice.colis.emptyHistory' | translate }}</p>
- }
- </section>
- </div>
- }
+          <section class="cespace-detail-section">
+            <h3 class="cespace-detail-label">{{ 'clientBackoffice.colis.sectionHistory' | translate }}</h3>
+            @if (colis.historique.length > 0) {
+              <ul class="cespace-history">
+                @for (entry of colis.historique; track entry.id) {
+                  <li class="cespace-history-item">
+                    <div class="cespace-history-meta">
+                      @if (entry.statut) {
+                        <span [class]="statusClass(entry.statut)">
+                          {{ statusKey(entry.statut) | translate }}
+                        </span>
+                      }
+                      <span class="cespace-notif-date" style="margin-top: 0">{{ entry.date }}</span>
+                    </div>
+                    @if (entry.commentaire !== '—') {
+                      <p class="cespace-history-comment">{{ entry.commentaire }}</p>
+                    }
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="cespace-form-hint">{{ 'clientBackoffice.colis.emptyHistory' | translate }}</p>
+            }
+          </section>
+        </div>
+      }
 
- <div class="flex flex-wrap items-center justify-between gap-3 border-t border-verga-border px-5 py-4 sm:px-6">
- @if (selectedColis(); as colis) {
- @if (canViewCommande(colis)) {
- <button type="button" (click)="viewCommande(colis)" class="text-sm font-semibold text-verga-primary hover:underline">
- {{ 'clientBackoffice.colis.actionViewCommande' | translate }}
- </button>
- } @else {
- <span></span>
- }
- }
- <button type="button" (click)="closeDetail()" class="verga-btn !w-auto px-6">{{ 'clientBackoffice.colis.close' | translate }}</button>
- </div>
- </div>
-</div>
+      <div class="cespace-modal-foot">
+        @if (selectedColis(); as colis) {
+          @if (canViewCommande(colis)) {
+            <button type="button" (click)="viewCommande(colis)" class="cespace-link-btn">
+              {{ 'clientBackoffice.colis.actionViewCommande' | translate }}
+            </button>
+          } @else {
+            <span></span>
+          }
+        }
+        <button type="button" (click)="closeDetail()" class="verga-btn cespace-submit">
+          {{ 'clientBackoffice.colis.close' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
 }

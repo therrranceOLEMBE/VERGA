@@ -1,10 +1,14 @@
-/* Design system — espace agence (backoffice) */
+/* Design system — espace agence (backoffice)
+ * Chargé globalement (styles.css) pour que les modales des pages
+ * enfants (router-outlet) reçoivent bien fond / overlay / couleurs.
+ */
 
+:root,
 .backoffice-shell {
-  --bo-primary: var(--color-verga-primary, #0f766e);
+  --bo-primary: var(--color-verga-primary, #5eadd6);
   --bo-primary-soft: color-mix(in srgb, var(--bo-primary) 10%, white);
   --bo-primary-muted: color-mix(in srgb, var(--bo-primary) 16%, white);
-  --bo-success: var(--color-verga-success, #15803d);
+  --bo-success: var(--color-verga-success, #2e8b72);
   --bo-warning: #d97706;
   --bo-danger: #dc2626;
   --bo-border: var(--color-verga-border, #e2e8f0);
@@ -285,108 +289,94 @@
   padding: 1.5rem 1rem !important;
 }
 
+.bo-modal,
 .bo-modal-backdrop > .bo-modal,
 .commandes-modal-backdrop > .bo-modal,
-.commandes-modal-backdrop > div,
 .colis-modal-backdrop > .bo-modal,
-.colis-modal-backdrop > div,
 .reclamations-modal-backdrop > .bo-modal,
-.reclamations-modal-backdrop > div,
-.offer-modal-backdrop > .bo-modal,
-.offer-modal-backdrop > div {
-  border: 1px solid var(--bo-border) !important;
-  border-radius: calc(var(--bo-radius) + 2px) !important;
-  background: #fff !important;
+.offer-modal-backdrop > .bo-modal {
+  border: 1px solid var(--bo-border, #e2e8f0) !important;
+  border-radius: 16px !important;
+  background: #ffffff !important;
   box-shadow: 0 24px 48px rgba(15, 23, 42, 0.18), 0 8px 16px rgba(15, 23, 42, 0.08) !important;
   overflow: hidden;
+  color: #0f172a;
 }
 
-.bo-modal__header,
-.bo-modal-backdrop > div > .flex.items-center.justify-between.border-b,
-.commandes-modal-backdrop > div > .flex.items-center.justify-between.border-b,
-.colis-modal-backdrop > div > .flex.items-center.justify-between.border-b,
-.reclamations-modal-backdrop > div > .flex.items-center.justify-between.border-b,
-.offer-modal-backdrop > div > .flex.items-center.justify-between.border-b {
-  border-bottom: 1px solid var(--bo-border) !important;
-  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+.bo-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--bo-border, #e2e8f0) !important;
+  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%) !important;
   padding: 1.125rem 1.5rem !important;
 }
 
-.bo-modal__header h2,
-.bo-modal-backdrop > div > .flex.items-center.justify-between h2 {
+.bo-modal__header h2 {
   font-size: 1.0625rem;
   font-weight: 700;
   letter-spacing: -0.01em;
   color: #0f172a;
 }
 
-.bo-modal__close,
-.bo-modal-backdrop button[aria-label] {
+.bo-modal__close {
   display: flex;
   align-items: center;
   justify-content: center;
   width: 2.25rem;
   height: 2.25rem;
-  border-radius: 10px;
-  color: var(--bo-muted);
+  border-radius: 10px !important;
+  color: var(--bo-muted, #64748b);
   transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.bo-modal__close:hover:not(:disabled),
-.bo-modal-backdrop button[aria-label]:hover:not(:disabled) {
+.bo-modal__close:hover:not(:disabled) {
   background: #f1f5f9;
   color: #0f172a;
 }
 
-.bo-modal__body,
-.bo-modal-backdrop .max-h-\[70vh\].overflow-y-auto,
-.bo-modal-backdrop form.max-h-\[70vh\].overflow-y-auto,
-.bo-modal-backdrop > div > dl.grid {
+.bo-modal__body {
   padding: 1.25rem 1.5rem !important;
+  background: #ffffff;
 }
 
-.bo-modal__body section,
-.bo-modal-backdrop section {
+.bo-modal__body section {
   margin-bottom: 1.5rem;
 }
 
-.bo-modal__body section:last-child,
-.bo-modal-backdrop section:last-child {
+.bo-modal__body section:last-child {
   margin-bottom: 0;
 }
 
-.bo-modal__section-title,
-.bo-modal-backdrop h3.text-xs.font-bold.uppercase {
+.bo-modal__section-title {
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--bo-primary);
+  color: var(--bo-primary, #5eadd6);
 }
 
-.bo-modal-backdrop dl {
+.bo-modal dl {
   gap: 1rem;
 }
 
-.bo-modal-backdrop dt {
+.bo-modal dt {
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: var(--bo-muted);
+  color: var(--bo-muted, #64748b);
 }
 
-.bo-modal-backdrop dd {
+.bo-modal dd {
   margin-top: 0.35rem;
   font-size: 0.875rem;
   color: #334155;
 }
 
-.bo-modal__footer,
-.bo-modal-backdrop > div > .border-t.border-verga-border.px-5,
-.bo-modal-backdrop > div > .border-t.border-verga-border.pt-6 {
-  border-top: 1px solid var(--bo-border) !important;
-  background: #fafbfc;
+.bo-modal__footer {
+  border-top: 1px solid var(--bo-border, #e2e8f0) !important;
+  background: #fafbfc !important;
   padding: 1rem 1.5rem !important;
 }
 

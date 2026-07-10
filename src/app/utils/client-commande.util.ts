@@ -9,11 +9,34 @@ import {
 } from '../models/client-commande.model';
 
 function unwrapListPayload(response: ClientCommandesListResponse): ClientCommandesListPayload {
-  const root = response.data ?? response;
-  if (Array.isArray(root)) {
-    return { data: root };
+  if (Array.isArray(response.data)) {
+    return {
+      data: response.data,
+      meta: response.meta ?? {
+        current_page: response.current_page,
+        last_page: response.last_page,
+        per_page: response.per_page,
+        total: response.total,
+        from: response.from,
+        to: response.to,
+      },
+    };
   }
-  return root as ClientCommandesListPayload;
+
+  if (response.data && typeof response.data === 'object') {
+    return response.data as ClientCommandesListPayload;
+  }
+
+  return {
+    data: [],
+    meta: response.meta,
+    current_page: response.current_page,
+    last_page: response.last_page,
+    per_page: response.per_page,
+    total: response.total,
+    from: response.from,
+    to: response.to,
+  };
 }
 
 function resolveMeta(payload: ClientCommandesListPayload): ClientCommandesPaginationMeta {
@@ -59,26 +82,44 @@ function formatMontant(value: number | string | null | undefined): string {
   }
   const numeric = typeof value === 'number' ? value : Number(String(value).replace(/\s/g, '').replace(',', '.'));
   if (!Number.isNaN(numeric) && Number.isFinite(numeric)) {
-    return new Intl.NumberFormat('fr-FR').format(numeric);
+    return `${new Intl.NumberFormat('fr-FR').format(numeric)} FCFA`;
   }
   return String(value);
 }
 
-function formatQuantite(value: number | string | null | undefined): string {
+function parseNumeric(value: number | string | null | undefined): number {
   if (value == null || value === '') {
-    return '—';
+    return 0;
   }
-  return String(value);
+  const numeric = typeof value === 'number' ? value : Number(String(value).replace(/\s/g, '').replace(',', '.'));
+  return !Number.isNaN(numeric) && Number.isFinite(numeric) ? numeric : 0;
+}
+
+function resolveAgenceId(raw: ClientCommandeRaw): string {
+  if (raw.agence_id != null && String(raw.agence_id).trim()) {
+    return String(raw.agence_id).trim();
+  }
+  if (raw.agence && typeof raw.agence === 'object' && raw.agence.id != null) {
+    return String(raw.agence.id).trim();
+  }
+  return '';
 }
 
 export function mapCommandeToRow(raw: ClientCommandeRaw): ClientCommande {
+  const quantiteLabel = raw.quantite_label?.trim() || '';
+  const quantiteRestante = parseNumeric(raw.quantite_restante);
+
   return {
     id: String(raw.id ?? raw.code ?? ''),
     code: raw.code?.trim() ?? '—',
     client: resolveLabel(raw.client),
     agence: resolveLabel(raw.agence),
-    quantite: formatQuantite(raw.quantite),
-    montant: formatMontant(raw.montant),
+    agenceId: resolveAgenceId(raw),
+    quantite: quantiteLabel || String(raw.quantite ?? '—'),
+    quantiteRestante,
+    quantiteRestanteLabel: raw.quantite_restante_label?.trim() || (quantiteRestante > 0 ? String(quantiteRestante) : '—'),
+    quantitePayeeLabel: raw.quantite_payee_label?.trim() || '—',
+    montant: formatMontant(raw.montant_total ?? raw.montant),
     statut: raw.statut?.trim() ?? '',
     date: formatDate(raw.date ?? raw.created_at),
   };
@@ -126,4 +167,9 @@ export function resolvePaymentRedirectUrl(response: ClientCommandeCreateResponse
   }
 
   return '';
+}
+
+export function isCommandeReservee(statut: string): boolean {
+  const normalized = statut.trim().toLowerCase();
+  return normalized === 'réservée' || normalized === 'reservee';
 }

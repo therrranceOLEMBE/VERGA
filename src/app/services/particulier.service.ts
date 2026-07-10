@@ -25,7 +25,13 @@ import {
 import {
   ClientReclamationsListResponse,
   ClientReclamationsQueryParams,
+  ClientReclamationCreateRequest,
+  ClientReclamationCreateResponse,
 } from '../models/client-reclamation.model';
+import {
+  ClientPaiementsListResponse,
+  ClientPaiementsQueryParams,
+} from '../models/client-paiement.model';
 import { ClientRegisterRequest, ClientRegisterResponse } from '../models/client-register.model';
 import {
   ClientDashboardPeriode,
@@ -111,6 +117,18 @@ export class ParticulierService {
     return this.http.post<ClientCommandeCreateResponse>(`${this.baseUrl}/commandes`, formData, options);
   }
 
+  payCommandeSolde(
+    token: string,
+    commandeId: string,
+    quantite: number,
+  ): Observable<ClientCommandeCreateResponse> {
+    return this.http.post<ClientCommandeCreateResponse>(
+      `${this.baseUrl}/commandes/${commandeId}/paiements`,
+      { quantite },
+      { headers: this.authHeaders(token) },
+    );
+  }
+
   getColis(token: string, params: ClientColisQueryParams = {}): Observable<ClientColisListResponse> {
     let httpParams = new HttpParams();
 
@@ -156,6 +174,37 @@ export class ParticulierService {
     }
 
     return this.http.get<ClientReclamationsListResponse>(`${this.baseUrl}/reclamations`, {
+      headers: this.authHeaders(token),
+      params: httpParams,
+    });
+  }
+
+  createReclamation(
+    token: string,
+    body: ClientReclamationCreateRequest,
+  ): Observable<ClientReclamationCreateResponse> {
+    return this.http.post<ClientReclamationCreateResponse>(`${this.baseUrl}/reclamations`, body, {
+      headers: this.authHeaders(token),
+    });
+  }
+
+  getPaiements(token: string, params: ClientPaiementsQueryParams = {}): Observable<ClientPaiementsListResponse> {
+    let httpParams = new HttpParams();
+
+    if (params.search?.trim()) {
+      httpParams = httpParams.set('search', params.search.trim());
+    }
+    if (params.statut) {
+      httpParams = httpParams.set('statut', params.statut);
+    }
+    if (params.page) {
+      httpParams = httpParams.set('page', String(params.page));
+    }
+    if (params.per_page) {
+      httpParams = httpParams.set('per_page', String(params.per_page));
+    }
+
+    return this.http.get<ClientPaiementsListResponse>(`${this.baseUrl}/paiements`, {
       headers: this.authHeaders(token),
       params: httpParams,
     });

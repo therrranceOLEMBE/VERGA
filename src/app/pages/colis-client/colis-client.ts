@@ -123,18 +123,18 @@ export class ColisClient implements OnInit {
 
   protected statusClass(statut: string): string {
     if (statut === 'récupéré') {
-      return 'bg-verga-success-muted text-verga-success';
+      return 'cespace-badge cespace-badge--success';
     }
     if (statut === 'arrivé') {
-      return 'bg-verga-primary-muted text-verga-primary';
+      return 'cespace-badge cespace-badge--primary';
     }
     if (statut === 'en_transit') {
-      return 'bg-amber-50 text-amber-700';
+      return 'cespace-badge cespace-badge--warn';
     }
     if (statut === 'chez_client') {
-      return 'bg-sky-50 text-sky-700';
+      return 'cespace-badge cespace-badge--primary';
     }
-    return 'bg-verga-surface text-verga-muted';
+    return 'cespace-badge cespace-badge--muted';
   }
 
   protected canViewCommande(item: ClientColis): boolean {

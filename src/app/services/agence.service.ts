@@ -60,7 +60,21 @@ import {
   AgenceReclamationCreateResponse,
 } from '../models/agence-reclamation.model';
 import { TypeAgence, TypeAgenceListResponse } from '../models/type-agence.model';
-import { TypeOffre, TypeOffreListResponse } from '../models/type-offre.model';
+import {
+  TypeOffre,
+  TypeOffreCreateRequest,
+  TypeOffreCreateResponse,
+  TypeOffreDeleteResponse,
+  TypeOffreDetailResponse,
+  TypeOffreListResponse,
+  TypeOffreUpdateRequest,
+  TypeOffreUpdateResponse,
+} from '../models/type-offre.model';
+import {
+  parseTypeOffreCreateResponse,
+  parseTypeOffreDetailResponse,
+  parseTypeOffreListResponse,
+} from '../utils/type-offre.util';
 
 @Injectable({ providedIn: 'root' })
 export class AgenceService {
@@ -339,10 +353,70 @@ export class AgenceService {
     );
   }
 
-  getTypeOffres(): Observable<TypeOffre[]> {
-    return this.http.get<TypeOffreListResponse>(`${this.baseUrl}/types-offres`).pipe(
-      map((response) => this.mapTypeOffres(response)),
-    );
+  getTypeOffres(token: string): Observable<TypeOffre[]> {
+    return this.http
+      .get<TypeOffreListResponse>(`${this.baseUrl}/types-offres`, {
+        headers: this.authHeaders(token),
+      })
+      .pipe(map((response) => parseTypeOffreListResponse(response)));
+  }
+
+  getTypeOffre(token: string, typeOffreId: string): Observable<TypeOffre> {
+    return this.http
+      .get<TypeOffreDetailResponse>(`${this.baseUrl}/types-offres/${typeOffreId}`, {
+        headers: this.authHeaders(token),
+      })
+      .pipe(
+        map((response) => {
+          const item = parseTypeOffreDetailResponse(response);
+          if (!item) {
+            throw new Error('Type offre introuvable');
+          }
+          return item;
+        }),
+      );
+  }
+
+  createTypeOffre(token: string, payload: TypeOffreCreateRequest): Observable<TypeOffre> {
+    return this.http
+      .post<TypeOffreCreateResponse>(`${this.baseUrl}/types-offres`, payload, {
+        headers: this.authHeaders(token),
+      })
+      .pipe(
+        map((response) => {
+          const item = parseTypeOffreCreateResponse(response);
+          if (!item) {
+            throw new Error('Réponse type offre invalide');
+          }
+          return item;
+        }),
+      );
+  }
+
+  updateTypeOffre(
+    token: string,
+    typeOffreId: string,
+    payload: TypeOffreUpdateRequest,
+  ): Observable<TypeOffre> {
+    return this.http
+      .patch<TypeOffreUpdateResponse>(`${this.baseUrl}/types-offres/${typeOffreId}`, payload, {
+        headers: this.authHeaders(token),
+      })
+      .pipe(
+        map((response) => {
+          const item = parseTypeOffreDetailResponse(response);
+          if (!item) {
+            throw new Error('Réponse type offre invalide');
+          }
+          return item;
+        }),
+      );
+  }
+
+  deleteTypeOffre(token: string, typeOffreId: string): Observable<TypeOffreDeleteResponse> {
+    return this.http.delete<TypeOffreDeleteResponse>(`${this.baseUrl}/types-offres/${typeOffreId}`, {
+      headers: this.authHeaders(token),
+    });
   }
 
   getTypeAgences(): Observable<TypeAgence[]> {
@@ -350,31 +424,6 @@ export class AgenceService {
       map((response) => this.mapTypeAgences(response)),
       catchError(() => of(this.getConfiguredTypeAgences())),
     );
-  }
-
-  private mapTypeOffres(response: TypeOffreListResponse): TypeOffre[] {
-    const items = response.data ?? [];
-    return items
-      .map((item) => {
-        const label = (item.nom ?? item.name ?? item.label ?? '').trim();
-        const code = (item.code ?? item.slug ?? item.type ?? this.slugify(label)).trim();
-        return {
-          id: item.id?.trim() ?? '',
-          label,
-          code,
-          description: item.description?.trim() ?? '',
-        };
-      })
-      .filter((item) => item.id && item.label);
-  }
-
-  private slugify(value: string): string {
-    return value
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '')
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '_')
-      .replace(/^_+|_+$/g, '');
   }
 
   private mapTypeAgences(response: TypeAgenceListResponse): TypeAgence[] {

@@ -1,0 +1,144 @@
+<div class="bo-page mx-auto max-w-3xl">
+  <header class="bo-page-header">
+    <div class="bo-page-header__copy">
+      <h1 class="bo-page-title">{{ 'backoffice.createTypeOffre.title' | translate }}</h1>
+      <p class="bo-page-subtitle">{{ 'backoffice.createTypeOffre.subtitle' | translate }}</p>
+    </div>
+  </header>
+
+  @if (unauthenticated()) {
+    <div class="mb-6 border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+      {{ 'backoffice.createTypeOffre.authRequired' | translate }}
+      <a routerLink="/connexion" class="ml-1 font-semibold text-verga-primary underline">{{ 'auth.login.title' | translate }}</a>
+    </div>
+  }
+
+  @if (errorMessage()) {
+    <div class="mb-6 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      @if (errorMessage().startsWith('backoffice.')) {
+        {{ errorMessage() | translate }}
+      } @else {
+        {{ errorMessage() }}
+      }
+    </div>
+  }
+
+  @if (successMessage()) {
+    <div class="mb-6 border border-verga-success/30 bg-verga-success-muted px-4 py-3 text-sm text-verga-success">
+      {{ successMessage() | translate }}
+    </div>
+  }
+
+  <form class="space-y-6 border border-verga-border bg-white p-4 sm:p-8" (ngSubmit)="onSubmit($event)">
+    <div>
+      <label for="type-offre-nom" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createTypeOffre.nom' | translate }} *</label>
+      <input
+        id="type-offre-nom"
+        name="nom"
+        type="text"
+        required
+        [ngModel]="nom"
+        (ngModelChange)="onNomChange($event)"
+        class="verga-field mt-2"
+        [placeholder]="'backoffice.createTypeOffre.nomPh' | translate"
+      />
+    </div>
+
+    <div>
+      <label for="type-offre-slug" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createTypeOffre.slug' | translate }} *</label>
+      <input
+        id="type-offre-slug"
+        name="slug"
+        type="text"
+        required
+        [ngModel]="slug"
+        (ngModelChange)="onSlugChange($event)"
+        class="verga-field mt-2 font-mono text-sm"
+        [placeholder]="'backoffice.createTypeOffre.slugPh' | translate"
+      />
+      <p class="mt-1.5 text-xs text-verga-muted">{{ 'backoffice.createTypeOffre.slugHint' | translate }}</p>
+    </div>
+
+    <div>
+      <label for="type-offre-description" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createTypeOffre.description' | translate }}</label>
+      <textarea
+        id="type-offre-description"
+        name="description"
+        rows="4"
+        [(ngModel)]="description"
+        class="verga-field mt-2 min-h-[100px] resize-y"
+        [placeholder]="'backoffice.createTypeOffre.descriptionPh' | translate"
+      ></textarea>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="type-offre-unite" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createTypeOffre.unite' | translate }} *</label>
+        <input
+          id="type-offre-unite"
+          name="unite"
+          type="text"
+          required
+          [(ngModel)]="unite"
+          class="verga-field mt-2"
+          [placeholder]="'backoffice.createTypeOffre.unitePh' | translate"
+        />
+      </div>
+      <div>
+        <label for="type-offre-unite-label" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createTypeOffre.uniteLabel' | translate }} *</label>
+        <input
+          id="type-offre-unite-label"
+          name="uniteLabel"
+          type="text"
+          required
+          [(ngModel)]="uniteLabel"
+          class="verga-field mt-2"
+          [placeholder]="'backoffice.createTypeOffre.uniteLabelPh' | translate"
+        />
+      </div>
+    </div>
+
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="type-offre-quantite-min" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createTypeOffre.quantiteMin' | translate }} *</label>
+        <input
+          id="type-offre-quantite-min"
+          name="quantiteMin"
+          type="number"
+          min="0.001"
+          step="any"
+          required
+          [(ngModel)]="quantiteMin"
+          class="verga-field mt-2"
+          [placeholder]="'backoffice.createTypeOffre.quantiteMinPh' | translate"
+        />
+      </div>
+      <div class="flex flex-col justify-end gap-3 pb-1">
+        <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" name="quantiteEntier" [(ngModel)]="quantiteEntier" class="h-4 w-4 accent-[var(--color-verga-primary,#5eadd6)]" />
+          {{ 'backoffice.createTypeOffre.quantiteEntier' | translate }}
+        </label>
+        <label class="inline-flex items-center gap-2 text-sm text-gray-700">
+          <input type="checkbox" name="actif" [(ngModel)]="actif" class="h-4 w-4 accent-[var(--color-verga-primary,#5eadd6)]" />
+          {{ 'backoffice.createTypeOffre.actif' | translate }}
+        </label>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <button type="submit" class="verga-btn !w-auto px-8" [disabled]="submitting()">
+        @if (submitting()) {
+          {{ 'backoffice.createTypeOffre.submitting' | translate }}
+        } @else {
+          {{ 'backoffice.createTypeOffre.submit' | translate }}
+        }
+      </button>
+      <a
+        routerLink="/backoffice/historique-types-offres"
+        class="verga-btn !w-auto border border-verga-border bg-white px-6 !text-verga-primary"
+      >
+        {{ 'backoffice.createTypeOffre.cancel' | translate }}
+      </a>
+    </div>
+  </form>
+</div>

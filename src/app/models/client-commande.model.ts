@@ -1,11 +1,19 @@
-export type ClientCommandeStatut = 'en_attente' | 'confirmée' | 'annulée';
+export type ClientCommandeStatut = 'en_attente' | 'confirmée' | 'annulée' | 'réservée';
 
 export interface ClientCommandeRaw {
   id?: string | number;
   code?: string;
   statut?: ClientCommandeStatut | string;
   quantite?: number | string | null;
+  quantite_label?: string | null;
+  quantite_payee?: number | string | null;
+  quantite_payee_label?: string | null;
+  quantite_restante?: number | string | null;
+  quantite_restante_label?: string | null;
   montant?: number | string | null;
+  montant_sous_total?: number | string | null;
+  montant_commission_client?: number | string | null;
+  montant_total?: number | string | null;
   date?: string | null;
   created_at?: string | null;
   client?: {
@@ -20,6 +28,7 @@ export interface ClientCommandeRaw {
     nom?: string;
     name?: string;
   } | string | null;
+  agence_id?: string | number | null;
 }
 
 export interface ClientCommandesPaginationMeta {
@@ -44,6 +53,14 @@ export interface ClientCommandesListPayload {
 
 export interface ClientCommandesListResponse {
   data?: ClientCommandesListPayload | ClientCommandeRaw[];
+  meta?: ClientCommandesPaginationMeta;
+  links?: unknown;
+  current_page?: number;
+  last_page?: number;
+  per_page?: number;
+  total?: number;
+  from?: number;
+  to?: number;
 }
 
 export interface ClientCommandesQueryParams {
@@ -58,7 +75,11 @@ export interface ClientCommande {
   code: string;
   client: string;
   agence: string;
+  agenceId: string;
   quantite: string;
+  quantiteRestante: number;
+  quantiteRestanteLabel: string;
+  quantitePayeeLabel: string;
   montant: string;
   statut: string;
   date: string;
@@ -78,14 +99,23 @@ export interface ClientCommandeCreateResponse {
   code?: string;
   commande_statut?: string;
   quantite_reservee?: number;
+  quantite_reservee_label?: string;
   quantite_payee?: number;
+  quantite_payee_label?: string;
   quantite_a_payer?: number;
+  quantite_a_payer_label?: string;
   quantite_restante?: number;
+  quantite_restante_label?: string;
   montant_sous_total?: number;
   montant_commission_client?: number;
   montant_total?: number;
   paiement_code?: string;
+  retour_url?: string;
   redirect_url?: string;
   verification_url?: string;
   mode?: string;
+}
+
+export interface ClientCommandeSoldePaiementRequest {
+  quantite: number;
 }

@@ -3,6 +3,60 @@
   height: 100dvh;
   scrollbar-width: thin;
   transition: transform 0.25s ease;
+  background:
+    linear-gradient(180deg, color-mix(in srgb, var(--color-verga-primary, #5eadd6) 6%, white) 0%, #fff 12rem),
+    #fff;
+}
+
+.client-sidebar-brand {
+  background: linear-gradient(
+    120deg,
+    color-mix(in srgb, var(--color-verga-primary, #5eadd6) 8%, white) 0%,
+    transparent 70%
+  );
+}
+
+.client-nav-link {
+  border: 1px solid transparent;
+  color: #334155;
+}
+
+.client-nav-link:hover {
+  border-color: color-mix(in srgb, var(--color-verga-primary, #5eadd6) 18%, white);
+  background: color-mix(in srgb, var(--color-verga-primary, #5eadd6) 8%, white);
+  color: var(--color-verga-primary-dark, #3d94c4);
+}
+
+.client-nav-active {
+  border-color: color-mix(in srgb, var(--color-verga-primary, #5eadd6) 28%, white) !important;
+  background: color-mix(in srgb, var(--color-verga-primary, #5eadd6) 12%, white) !important;
+  color: var(--color-verga-primary-dark, #3d94c4) !important;
+  font-weight: 700;
+}
+
+.client-logout-btn {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border: 1px solid #fecaca;
+  background: #fff;
+  padding: 0.8rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #b91c1c;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.client-logout-btn:hover {
+  border-color: #f87171;
+  background: #fef2f2;
+  color: #991b1b;
 }
 
 @media (max-width: 1023px) {

@@ -1,4 +1,6 @@
 @import 'tailwindcss';
+@import './app/styles/backoffice-ui.css';
+@import './app/styles/client-espace-ui.css';
 
 /*
  * Palette Verga (web + mobile)
@@ -36,6 +38,36 @@
   *::before,
   *::after {
     border-radius: 0 !important;
+  }
+
+  .bo-modal,
+  .bo-modal *,
+  .bo-modal *::before,
+  .bo-modal *::after,
+  .filters-modal,
+  .filters-modal *,
+  .filters-modal *::before,
+  .filters-modal *::after {
+    border-radius: revert-layer !important;
+  }
+
+  .bo-modal {
+    border-radius: 16px !important;
+  }
+
+  .bo-modal__close,
+  .filters-modal__close,
+  .filters-modal__route,
+  .filters-modal__btn {
+    border-radius: 10px !important;
+  }
+
+  .filters-modal__route {
+    border-radius: 9999px !important;
+  }
+
+  .filters-modal {
+    border-radius: 16px !important;
   }
 }
 

@@ -1,0 +1,825 @@
+/* Design system — espace client (particulier) */
+
+.cespace-page {
+  --cespace-primary: var(--color-verga-primary, #5eadd6);
+  --cespace-primary-dark: var(--color-verga-primary-dark, #3d94c4);
+  --cespace-primary-soft: color-mix(in srgb, var(--cespace-primary) 12%, white);
+  --cespace-success: var(--color-verga-success, #2e8b72);
+  --cespace-border: var(--color-verga-border, #e2e8f0);
+  --cespace-muted: var(--color-verga-muted, #64748b);
+  --cespace-ink: #0f172a;
+  --cespace-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px rgba(15, 23, 42, 0.06);
+  max-width: 1280px;
+  margin: 0 auto;
+  padding-bottom: 2rem;
+}
+
+.cespace-page--narrow {
+  max-width: 42rem;
+}
+
+.cespace-page--medium {
+  max-width: 48rem;
+}
+
+/* Hero */
+.cespace-hero {
+  position: relative;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--cespace-primary) 24%, white);
+  background: #fff;
+  box-shadow: var(--cespace-shadow);
+}
+
+.cespace-hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 70% 80% at 100% -10%, color-mix(in srgb, var(--cespace-primary) 32%, white) 0%, transparent 55%),
+    linear-gradient(120deg, color-mix(in srgb, var(--cespace-primary) 7%, white) 0%, #fff 50%);
+  pointer-events: none;
+}
+
+.cespace-hero-inner {
+  position: relative;
+  padding: 1.35rem 1.35rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .cespace-hero-inner {
+    padding: 1.65rem 1.85rem;
+  }
+}
+
+.cespace-eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--cespace-primary);
+}
+
+.cespace-title {
+  margin-top: 0.4rem;
+  max-width: 36rem;
+  font-size: clamp(1.35rem, 2.2vw, 1.85rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  color: var(--cespace-ink);
+}
+
+.cespace-subtitle {
+  margin-top: 0.55rem;
+  max-width: 36rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: var(--cespace-muted);
+}
+
+/* Panels */
+.cespace-panel {
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--cespace-border);
+  background: #fff;
+  box-shadow: var(--cespace-shadow);
+}
+
+.cespace-panel-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--cespace-border);
+  background: linear-gradient(180deg, #fafbfc 0%, #fff 100%);
+}
+
+.cespace-panel-title {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cespace-ink);
+}
+
+.cespace-panel-body {
+  padding: 1.15rem 1.25rem 1.35rem;
+}
+
+/* Filters */
+.cespace-filters-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .cespace-filters-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.cespace-field-label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--cespace-muted);
+}
+
+.cespace-filters-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.cespace-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--cespace-primary);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.cespace-link-btn:hover {
+  color: var(--cespace-primary-dark);
+}
+
+/* Alerts */
+.cespace-alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1.25rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.cespace-alert--success {
+  border-color: color-mix(in srgb, var(--cespace-success) 35%, white);
+  background: var(--color-verga-success-muted, #e6f4f0);
+  color: var(--cespace-success);
+}
+
+/* Loading / empty */
+.cespace-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 2rem 1.25rem;
+  border: 1px dashed var(--cespace-border);
+  background: #fff;
+  color: var(--cespace-muted);
+  font-size: 0.875rem;
+}
+
+.cespace-loading-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  background: var(--cespace-primary);
+  animation: cespace-pulse 1s ease-in-out infinite;
+}
+
+@keyframes cespace-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.cespace-empty {
+  padding: 2.75rem 1.5rem;
+  text-align: center;
+  color: var(--cespace-muted);
+  font-size: 0.875rem;
+}
+
+/* Table */
+.cespace-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  border: 1px solid var(--cespace-border);
+  background: #fff;
+  box-shadow: var(--cespace-shadow);
+}
+
+.cespace-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.cespace-table th {
+  border-bottom: 1px solid var(--cespace-border);
+  padding: 0.85rem 1rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--cespace-muted);
+  background: #f8fafc;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.cespace-table td {
+  border-bottom: 1px solid #f1f5f9;
+  padding: 0.95rem 1rem;
+  vertical-align: middle;
+  color: #475569;
+}
+
+.cespace-table tbody tr {
+  transition: background-color 0.15s ease;
+}
+
+.cespace-table tbody tr:hover td {
+  background: color-mix(in srgb, var(--cespace-primary) 5%, white);
+}
+
+.cespace-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.cespace-table .text-right {
+  text-align: right;
+}
+
+.cespace-table-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--cespace-primary-dark);
+  white-space: nowrap;
+}
+
+.cespace-cell-truncate {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cespace-ink {
+  color: var(--cespace-ink);
+  font-weight: 500;
+}
+
+.cespace-strong {
+  color: var(--cespace-ink);
+  font-weight: 700;
+}
+
+.cespace-tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Status badges */
+.cespace-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.65rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.cespace-badge--success {
+  background: var(--color-verga-success-muted, #e6f4f0);
+  color: var(--cespace-success);
+}
+
+.cespace-badge--muted {
+  background: #f1f5f9;
+  color: var(--cespace-muted);
+}
+
+.cespace-badge--primary {
+  background: var(--cespace-primary-soft);
+  color: var(--cespace-primary-dark);
+}
+
+.cespace-badge--warn {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+/* Action button */
+.cespace-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  border: 1px solid color-mix(in srgb, var(--cespace-primary) 35%, white);
+  background: #fff;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--cespace-primary-dark);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.cespace-action-btn:hover {
+  border-color: var(--cespace-primary);
+  background: var(--cespace-primary-soft);
+  color: var(--cespace-primary-dark);
+}
+
+/* Pagination */
+.cespace-pagination {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  margin-top: 1.35rem;
+}
+
+.cespace-pagination-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.cespace-page-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.25rem;
+  height: 2.25rem;
+  padding: 0 0.5rem;
+  border: 1px solid var(--cespace-border);
+  background: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--cespace-primary-dark);
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.cespace-page-btn:hover:not(:disabled):not(.is-active) {
+  background: var(--cespace-primary-soft);
+  border-color: color-mix(in srgb, var(--cespace-primary) 40%, white);
+}
+
+.cespace-page-btn.is-active {
+  border-color: var(--cespace-primary);
+  background: var(--cespace-primary);
+  color: #fff;
+}
+
+.cespace-page-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
+.cespace-results {
+  font-size: 0.8125rem;
+  color: var(--cespace-muted);
+}
+
+/* Forms */
+.cespace-form {
+  border: 1px solid var(--cespace-border);
+  background: #fff;
+  box-shadow: var(--cespace-shadow);
+}
+
+.cespace-form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1.35rem 1.25rem 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .cespace-form-body {
+    padding: 1.75rem 1.85rem 2rem;
+  }
+}
+
+.cespace-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.15rem;
+}
+
+@media (min-width: 640px) {
+  .cespace-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.cespace-form-label {
+  display: block;
+  margin-bottom: 0.45rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.cespace-form-hint {
+  margin-top: 0.45rem;
+  font-size: 0.8125rem;
+  color: var(--cespace-muted);
+}
+
+.cespace-profile-banner {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-bottom: 1.35rem;
+  margin-bottom: 0.25rem;
+  border-bottom: 1px solid var(--cespace-border);
+}
+
+@media (min-width: 640px) {
+  .cespace-profile-banner {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.cespace-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 4rem;
+  height: 4rem;
+  background: linear-gradient(145deg, var(--cespace-primary) 0%, var(--cespace-primary-dark) 100%);
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #fff;
+  box-shadow: 0 8px 20px color-mix(in srgb, var(--cespace-primary) 35%, transparent);
+}
+
+.cespace-profile-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--cespace-ink);
+}
+
+.cespace-profile-meta {
+  margin-top: 0.2rem;
+  font-size: 0.8125rem;
+  color: var(--cespace-muted);
+}
+
+.cespace-password-wrap {
+  position: relative;
+}
+
+.cespace-password-wrap .verga-field {
+  padding-right: 3rem;
+}
+
+.cespace-password-toggle {
+  position: absolute;
+  inset-block: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  padding-inline: 0.9rem;
+  border: none;
+  background: none;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.cespace-password-toggle:hover {
+  color: #475569;
+}
+
+.cespace-submit {
+  align-self: flex-start;
+  width: auto !important;
+  min-width: 10rem;
+  padding-inline: 1.75rem !important;
+}
+
+/* Notifications */
+.cespace-notif-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cespace-notif-item {
+  display: flex;
+  gap: 1rem;
+  padding: 1.1rem 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s ease;
+}
+
+.cespace-notif-item:last-child {
+  border-bottom: none;
+}
+
+.cespace-notif-item:hover {
+  background: color-mix(in srgb, var(--cespace-primary) 4%, white);
+}
+
+.cespace-notif-item.is-read {
+  opacity: 0.72;
+}
+
+.cespace-notif-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.cespace-notif-icon.is-unread {
+  background: var(--cespace-primary-soft);
+  color: var(--cespace-primary-dark);
+}
+
+.cespace-notif-icon.is-read {
+  background: #f1f5f9;
+  color: var(--cespace-muted);
+}
+
+.cespace-notif-title {
+  font-weight: 700;
+  color: var(--cespace-ink);
+}
+
+.cespace-notif-desc {
+  margin-top: 0.3rem;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.cespace-notif-date {
+  margin-top: 0.45rem;
+  font-size: 0.75rem;
+  color: var(--cespace-muted);
+}
+
+.cespace-notif-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-top: 0.55rem;
+  flex-shrink: 0;
+  background: var(--cespace-primary);
+}
+
+.cespace-pref-row {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid var(--cespace-border);
+  background: #fff;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.cespace-pref-row:hover {
+  border-color: color-mix(in srgb, var(--cespace-primary) 40%, white);
+  background: color-mix(in srgb, var(--cespace-primary) 4%, white);
+}
+
+.cespace-pref-row span {
+  font-size: 0.875rem;
+  color: #334155;
+}
+
+/* Modal */
+.cespace-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+  background: rgba(15, 23, 42, 0.45);
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (min-width: 640px) {
+  .cespace-modal-backdrop {
+    align-items: center;
+  }
+}
+
+.cespace-modal {
+  width: 100%;
+  max-width: 42rem;
+  border: 1px solid var(--cespace-border);
+  background: #fff;
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.18);
+}
+
+.cespace-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.35rem;
+  border-bottom: 1px solid var(--cespace-border);
+  background: linear-gradient(180deg, #fafbfc 0%, #fff 100%);
+}
+
+.cespace-modal-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--cespace-ink);
+}
+
+.cespace-modal-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--cespace-border);
+  background: #fff;
+  color: var(--cespace-muted);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.cespace-modal-close:hover {
+  color: var(--cespace-ink);
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.cespace-modal-body {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 1.35rem;
+}
+
+.cespace-modal-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.35rem;
+  border-top: 1px solid var(--cespace-border);
+  background: #fafbfc;
+}
+
+.cespace-detail-section {
+  margin-bottom: 1.5rem;
+}
+
+.cespace-detail-section:last-child {
+  margin-bottom: 0;
+}
+
+.cespace-detail-section + .cespace-detail-section {
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--cespace-border);
+}
+
+.cespace-detail-label {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--cespace-muted);
+}
+
+.cespace-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 0.85rem;
+}
+
+@media (min-width: 640px) {
+  .cespace-detail-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.cespace-detail-grid .span-2 {
+  grid-column: 1 / -1;
+}
+
+.cespace-detail-dt {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cespace-muted);
+}
+
+.cespace-detail-dd {
+  margin-top: 0.3rem;
+  font-size: 0.875rem;
+  color: var(--cespace-ink);
+}
+
+.cespace-photos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+}
+
+@media (min-width: 640px) {
+  .cespace-photos {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.cespace-photo {
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 1;
+  border: 1px solid var(--cespace-border);
+  background: #f8fafc;
+}
+
+.cespace-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.25s ease;
+}
+
+.cespace-photo:hover img {
+  transform: scale(1.05);
+}
+
+.cespace-history {
+  margin-top: 0.85rem;
+  border: 1px solid var(--cespace-border);
+}
+
+.cespace-history-item {
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.875rem;
+}
+
+.cespace-history-item:last-child {
+  border-bottom: none;
+}
+
+.cespace-history-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.cespace-history-comment {
+  margin-top: 0.5rem;
+  color: #64748b;
+}

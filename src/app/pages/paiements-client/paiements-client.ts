@@ -1,33 +1,34 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { ClientReclamation, ClientReclamationStatut } from '../../models/client-reclamation.model';
+import { ActivatedRoute } from '@angular/router';
+import { ClientPaiement, ClientPaiementStatut } from '../../models/client-paiement.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LanguageService } from '../../services/language.service';
 import { ClientSessionService } from '../../services/client-session.service';
 import { ParticulierService } from '../../services/particulier.service';
-import { parseReclamationsListResponse } from '../../utils/client-reclamation.util';
+import { parseClientPaiementsListResponse } from '../../utils/client-paiement.util';
 
 @Component({
-  selector: 'app-reclamations-client',
+  selector: 'app-paiements-client',
   imports: [FormsModule, TranslatePipe],
-  templateUrl: './reclamations-client.html',
-  styleUrl: './reclamations-client.css',
+  templateUrl: './paiements-client.html',
+  styleUrl: './paiements-client.css',
 })
-export class ReclamationsClient implements OnInit {
-  private readonly router = inject(Router);
+export class PaiementsClient implements OnInit {
+  private readonly route = inject(ActivatedRoute);
   private readonly language = inject(LanguageService);
   private readonly clientSession = inject(ClientSessionService);
   private readonly particulierService = inject(ParticulierService);
 
   protected readonly loading = signal(true);
   protected readonly errorMessage = signal('');
-  protected readonly filterStatut = signal<ClientReclamationStatut | ''>('');
+  protected readonly filterSearch = signal('');
+  protected readonly filterStatut = signal<ClientPaiementStatut | ''>('');
   protected readonly currentPage = signal(1);
   protected readonly pageSize = 10;
 
-  protected readonly reclamations = signal<ClientReclamation[]>([]);
+  protected readonly paiements = signal<ClientPaiement[]>([]);
   protected readonly totalPages = signal(1);
   protected readonly totalItems = signal(0);
   protected readonly resultsFrom = signal(0);
@@ -41,42 +42,47 @@ export class ReclamationsClient implements OnInit {
     this.language.lang();
     const total = this.totalItems();
     if (total === 0) {
-      return this.language.translate('clientBackoffice.reclamations.empty');
+      return this.language.translate('clientBackoffice.paiements.empty');
     }
-    return this.language.translate('clientBackoffice.reclamations.results', {
+    return this.language.translate('clientBackoffice.paiements.results', {
       start: this.resultsFrom(),
       end: this.resultsTo(),
       total,
     });
   });
 
-  protected readonly statutOptions: Array<{ value: ClientReclamationStatut | ''; labelKey: string }> = [
-    { value: '', labelKey: 'clientBackoffice.reclamations.filterStatusAll' },
-    { value: 'ouverte', labelKey: 'clientBackoffice.reclamations.status.ouverte' },
-    { value: 'en_cours', labelKey: 'clientBackoffice.reclamations.status.en_cours' },
-    { value: 'résolue', labelKey: 'clientBackoffice.reclamations.status.resolue' },
-    { value: 'fermée', labelKey: 'clientBackoffice.reclamations.status.fermee' },
+  protected readonly statutOptions: Array<{ value: ClientPaiementStatut | ''; labelKey: string }> = [
+    { value: '', labelKey: 'clientBackoffice.paiements.filterStatusAll' },
+    { value: 'en_attente', labelKey: 'clientBackoffice.paiements.status.en_attente' },
+    { value: 'validé', labelKey: 'clientBackoffice.paiements.status.valide' },
+    { value: 'remboursé', labelKey: 'clientBackoffice.paiements.status.rembourse' },
+    { value: 'échec', labelKey: 'clientBackoffice.paiements.status.echec' },
   ];
 
   ngOnInit(): void {
-    this.loadReclamations();
+    const search = this.route.snapshot.queryParamMap.get('search');
+    if (search) {
+      this.filterSearch.set(search);
+    }
+    this.loadPaiements();
   }
 
   protected resetFilters(): void {
+    this.filterSearch.set('');
     this.filterStatut.set('');
     this.currentPage.set(1);
-    this.loadReclamations();
+    this.loadPaiements();
   }
 
   protected onFilterChange(): void {
     this.currentPage.set(1);
-    this.loadReclamations();
+    this.loadPaiements();
   }
 
   protected goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages()) {
       this.currentPage.set(page);
-      this.loadReclamations();
+      this.loadPaiements();
     }
   }
 
@@ -89,52 +95,39 @@ export class ReclamationsClient implements OnInit {
   }
 
   protected statusKey(statut: string): string {
-    if (statut === 'ouverte') {
-      return 'clientBackoffice.reclamations.status.ouverte';
+    if (statut === 'validé') {
+      return 'clientBackoffice.paiements.status.valide';
     }
-    if (statut === 'en_cours') {
-      return 'clientBackoffice.reclamations.status.en_cours';
+    if (statut === 'remboursé') {
+      return 'clientBackoffice.paiements.status.rembourse';
     }
-    if (statut === 'résolue') {
-      return 'clientBackoffice.reclamations.status.resolue';
+    if (statut === 'échec') {
+      return 'clientBackoffice.paiements.status.echec';
     }
-    if (statut === 'fermée') {
-      return 'clientBackoffice.reclamations.status.fermee';
+    if (statut === 'en_attente') {
+      return 'clientBackoffice.paiements.status.en_attente';
     }
-    return 'clientBackoffice.reclamations.status.unknown';
+    return 'clientBackoffice.paiements.status.unknown';
   }
 
   protected statusClass(statut: string): string {
-    if (statut === 'résolue') {
+    if (statut === 'validé') {
       return 'cespace-badge cespace-badge--success';
     }
-    if (statut === 'fermée') {
+    if (statut === 'remboursé') {
       return 'cespace-badge cespace-badge--muted';
     }
-    if (statut === 'en_cours') {
+    if (statut === 'échec') {
       return 'cespace-badge cespace-badge--warn';
     }
     return 'cespace-badge cespace-badge--primary';
   }
 
-  protected canViewCommande(item: ClientReclamation): boolean {
-    return item.commandeCode.length > 0 && item.commandeCode !== '—';
-  }
-
-  protected viewCommande(item: ClientReclamation): void {
-    if (!this.canViewCommande(item)) {
-      return;
-    }
-    void this.router.navigate(['/espace-client/commandes'], {
-      queryParams: { search: item.commandeCode },
-    });
-  }
-
-  private loadReclamations(): void {
+  private loadPaiements(): void {
     const token = this.clientSession.getToken();
     if (!token) {
       this.loading.set(false);
-      this.errorMessage.set('clientBackoffice.reclamations.loadError');
+      this.errorMessage.set('clientBackoffice.paiements.loadError');
       return;
     }
 
@@ -143,15 +136,16 @@ export class ReclamationsClient implements OnInit {
 
     const statut = this.filterStatut();
     this.particulierService
-      .getReclamations(token, {
+      .getPaiements(token, {
+        search: this.filterSearch().trim() || undefined,
         statut: statut || undefined,
         page: this.currentPage(),
         per_page: this.pageSize,
       })
       .subscribe({
         next: (response) => {
-          const page = parseReclamationsListResponse(response);
-          this.reclamations.set(page.items);
+          const page = parseClientPaiementsListResponse(response);
+          this.paiements.set(page.items);
           this.currentPage.set(page.currentPage);
           this.totalPages.set(page.lastPage);
           this.totalItems.set(page.total);
@@ -160,9 +154,9 @@ export class ReclamationsClient implements OnInit {
           this.loading.set(false);
         },
         error: (error: HttpErrorResponse) => {
-          console.error('[ReclamationsClient] loadReclamations — erreur:', error);
-          this.errorMessage.set('clientBackoffice.reclamations.loadError');
-          this.reclamations.set([]);
+          console.error('[PaiementsClient] loadPaiements — erreur:', error);
+          this.errorMessage.set('clientBackoffice.paiements.loadError');
+          this.paiements.set([]);
           this.loading.set(false);
         },
       });

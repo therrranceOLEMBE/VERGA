@@ -1,36 +1,40 @@
-.client-colis-table {
+.client-paiements-table {
   min-width: 52rem;
   table-layout: fixed;
 }
 
-.client-col-reference {
-  width: 10rem;
+.client-col-code {
+  width: 9.5rem;
 }
 
 .client-col-commande {
   width: 9.5rem;
 }
 
-.client-col-description {
-  width: 14rem;
+.client-col-bamboo {
+  width: 11rem;
 }
 
-.client-col-poids {
+.client-col-quantite {
   width: 7rem;
+}
+
+.client-col-amount {
+  width: 9rem;
   padding-right: 1.25rem !important;
 }
 
 .client-col-status {
-  width: 9rem;
+  width: 8.5rem;
   padding-left: 0.35rem !important;
 }
 
-.client-col-actions {
+.client-col-date {
   width: 7.5rem;
 }
 
 @media (max-width: 639px) {
-  .client-colis-table {
+  .client-paiements-table {
     min-width: 42rem;
   }
 }

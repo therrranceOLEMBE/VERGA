@@ -99,8 +99,14 @@ export class CreerOffre implements OnInit {
       return;
     }
 
+    const token = this.agenceSession.getToken();
+    if (!token) {
+      this.typeOffreOptions.set([]);
+      return;
+    }
+
     this.loadingTypeOffres.set(true);
-    this.agenceService.getTypeOffres().subscribe({
+    this.agenceService.getTypeOffres(token).subscribe({
       next: (options) => {
         this.typeOffreOptions.set(options);
         this.loadingTypeOffres.set(false);

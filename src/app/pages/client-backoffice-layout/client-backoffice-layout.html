@@ -1,4 +1,4 @@
-<div class="client-backoffice-shell min-h-screen bg-verga-surface font-sans">
+<div class="client-backoffice-shell min-h-screen font-sans">
  @if (sidebarOpen()) {
  <button
  type="button"
@@ -11,7 +11,7 @@
  <app-client-backoffice-sidebar [open]="sidebarOpen()" (navigate)="closeSidebar()" />
 
  <div class="client-backoffice-main flex min-h-screen min-h-dvh flex-col">
- <header class="client-backoffice-mobile-bar sticky top-0 z-20 flex items-center gap-3 border-b border-verga-border bg-white px-4 py-3 lg:hidden">
+ <header class="client-backoffice-mobile-bar sticky top-0 z-20 flex items-center gap-3 border-b border-verga-border px-4 py-3 lg:hidden">
  <button
  type="button"
  class="flex h-10 w-10 shrink-0 items-center justify-center border border-verga-border text-verga-primary transition hover:bg-verga-primary-muted"

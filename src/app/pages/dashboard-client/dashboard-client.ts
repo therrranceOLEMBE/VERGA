@@ -5,26 +5,11 @@ import { ClientDashboardPeriode } from '../../models/client-dashboard.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ClientSessionService } from '../../services/client-session.service';
 import { extractApiErrorMessage } from '../../utils/api-error.util';
-import { formatDashboardMoney } from '../../utils/agence-dashboard.util';
 import {
   ClientDashboardStatusCount,
   ClientDashboardView,
   parseClientDashboardResponse,
 } from '../../utils/client-dashboard.util';
-
-interface DashboardMetric {
-  labelKey: string;
-  value: string;
-}
-
-interface DashboardHighlight extends DashboardMetric {
-  accent: 'primary' | 'success' | 'neutral';
-}
-
-interface MetricGroup {
-  titleKey: string;
-  metrics: DashboardMetric[];
-}
 
 interface PeriodOption {
   value: ClientDashboardPeriode;
@@ -33,6 +18,13 @@ interface PeriodOption {
 
 interface StatusBarItem extends ClientDashboardStatusCount {
   percent: number;
+}
+
+interface QuickLink {
+  labelKey: string;
+  path: string;
+  icon: 'orders' | 'payments' | 'parcels' | 'claims' | 'home' | 'profile';
+  hintKey: string;
 }
 
 @Component({
@@ -59,6 +51,45 @@ export class DashboardClient implements OnInit {
     { value: 'tout', labelKey: 'backoffice.dashboard.periodeAll' },
   ];
 
+  protected readonly quickLinks: QuickLink[] = [
+    {
+      labelKey: 'clientBackoffice.nav.commandes',
+      path: '/espace-client/commandes',
+      icon: 'orders',
+      hintKey: 'clientBackoffice.dashboard.quickOrdersHint',
+    },
+    {
+      labelKey: 'clientBackoffice.nav.paiements',
+      path: '/espace-client/paiements',
+      icon: 'payments',
+      hintKey: 'clientBackoffice.dashboard.quickPaymentsHint',
+    },
+    {
+      labelKey: 'clientBackoffice.nav.colis',
+      path: '/espace-client/colis',
+      icon: 'parcels',
+      hintKey: 'clientBackoffice.dashboard.quickParcelsHint',
+    },
+    {
+      labelKey: 'clientBackoffice.nav.reclamations',
+      path: '/espace-client/reclamations',
+      icon: 'claims',
+      hintKey: 'clientBackoffice.dashboard.quickClaimsHint',
+    },
+    {
+      labelKey: 'clientBackoffice.dashboard.browseOffers',
+      path: '/accueil',
+      icon: 'home',
+      hintKey: 'clientBackoffice.dashboard.quickOffersHint',
+    },
+    {
+      labelKey: 'clientBackoffice.nav.profile',
+      path: '/espace-client/profil',
+      icon: 'profile',
+      hintKey: 'clientBackoffice.dashboard.quickProfileHint',
+    },
+  ];
+
   protected readonly displayName = computed(() => {
     const profilName = this.dashboard()?.profilName?.trim();
     if (profilName) {
@@ -67,62 +98,9 @@ export class DashboardClient implements OnInit {
     return this.clientSession.fullName || '—';
   });
 
-  protected readonly highlights = computed<DashboardHighlight[]>(() => {
-    const stats = this.dashboard()?.stats;
-    if (!stats) {
-      return [];
-    }
-
-    return [
-      {
-        labelKey: 'clientBackoffice.dashboard.totalSpent',
-        value: formatDashboardMoney(stats.total_depense),
-        accent: 'primary',
-      },
-      {
-        labelKey: 'clientBackoffice.dashboard.totalOrders',
-        value: this.formatCount(stats.nb_commandes),
-        accent: 'success',
-      },
-      {
-        labelKey: 'clientBackoffice.dashboard.totalParcels',
-        value: this.formatCount(stats.nb_colis),
-        accent: 'neutral',
-      },
-    ];
-  });
-
-  protected readonly metricGroups = computed<MetricGroup[]>(() => {
-    const stats = this.dashboard()?.stats;
-    if (!stats) {
-      return [];
-    }
-
-    return [
-      {
-        titleKey: 'clientBackoffice.dashboard.sectionOrders',
-        metrics: [
-          { labelKey: 'clientBackoffice.dashboard.totalOrders', value: this.formatCount(stats.nb_commandes) },
-          { labelKey: 'clientBackoffice.dashboard.pendingOrders', value: this.formatCount(stats.nb_commandes_en_attente) },
-          { labelKey: 'clientBackoffice.dashboard.confirmedOrders', value: this.formatCount(stats.nb_commandes_confirmees) },
-        ],
-      },
-      {
-        titleKey: 'clientBackoffice.dashboard.sectionParcels',
-        metrics: [
-          { labelKey: 'clientBackoffice.dashboard.totalParcels', value: this.formatCount(stats.nb_colis) },
-          { labelKey: 'clientBackoffice.dashboard.parcelsInTransit', value: this.formatCount(stats.nb_colis_en_transit) },
-          { labelKey: 'clientBackoffice.dashboard.parcelsArrived', value: this.formatCount(stats.nb_colis_arrives) },
-        ],
-      },
-      {
-        titleKey: 'clientBackoffice.dashboard.sectionClaims',
-        metrics: [
-          { labelKey: 'clientBackoffice.dashboard.totalClaims', value: this.formatCount(stats.nb_reclamations) },
-          { labelKey: 'clientBackoffice.dashboard.openClaims', value: this.formatCount(stats.nb_reclamations_ouvertes) },
-        ],
-      },
-    ];
+  protected readonly selectedPeriodLabel = computed(() => {
+    const match = this.periodOptions.find((option) => option.value === this.selectedPeriode());
+    return match?.labelKey ?? 'backoffice.dashboard.periodeMonth';
   });
 
   protected readonly commandesStatusBars = computed(() =>
@@ -147,12 +125,12 @@ export class DashboardClient implements OnInit {
 
   protected statusClass(statut: string): string {
     if (statut === 'confirmée') {
-      return 'bg-verga-success-muted text-verga-success';
+      return 'cdash-badge cdash-badge--success';
     }
     if (statut === 'annulée') {
-      return 'bg-verga-surface text-verga-muted';
+      return 'cdash-badge cdash-badge--muted';
     }
-    return 'bg-verga-primary-muted text-verga-primary';
+    return 'cdash-badge cdash-badge--primary';
   }
 
   private loadDashboard(): void {
@@ -190,10 +168,6 @@ export class DashboardClient implements OnInit {
       ...item,
       percent: total > 0 ? Math.round((item.count / total) * 100) : 0,
     }));
-  }
-
-  private formatCount(value: number | null | undefined): string {
-    return (value ?? 0).toLocaleString('fr-FR');
   }
 
   private resolveLoadError(error: HttpErrorResponse): string {

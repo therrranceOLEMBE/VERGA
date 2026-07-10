@@ -3,8 +3,8 @@
     <div class="cespace-hero-bg" aria-hidden="true"></div>
     <div class="cespace-hero-inner">
       <p class="cespace-eyebrow">{{ 'clientBackoffice.space' | translate }}</p>
-      <h1 class="cespace-title">{{ 'clientBackoffice.reclamations.title' | translate }}</h1>
-      <p class="cespace-subtitle">{{ 'clientBackoffice.reclamations.subtitle' | translate }}</p>
+      <h1 class="cespace-title">{{ 'clientBackoffice.paiements.title' | translate }}</h1>
+      <p class="cespace-subtitle">{{ 'clientBackoffice.paiements.subtitle' | translate }}</p>
     </div>
   </header>
 
@@ -15,9 +15,21 @@
     <div class="cespace-panel-body">
       <div class="cespace-filters-grid">
         <div>
-          <label for="filter-reclamation-statut" class="cespace-field-label">{{ 'clientBackoffice.reclamations.filterStatus' | translate }}</label>
+          <label for="filter-paiement-search" class="cespace-field-label">{{ 'clientBackoffice.paiements.filterSearch' | translate }}</label>
+          <input
+            id="filter-paiement-search"
+            type="text"
+            [ngModel]="filterSearch()"
+            (ngModelChange)="filterSearch.set($event)"
+            (keyup.enter)="onFilterChange()"
+            class="verga-field"
+            [attr.placeholder]="'clientBackoffice.paiements.filterSearchPh' | translate"
+          />
+        </div>
+        <div>
+          <label for="filter-paiement-statut" class="cespace-field-label">{{ 'clientBackoffice.paiements.filterStatus' | translate }}</label>
           <select
-            id="filter-reclamation-statut"
+            id="filter-paiement-statut"
             [ngModel]="filterStatut()"
             (ngModelChange)="filterStatut.set($event); onFilterChange()"
             class="verga-field"
@@ -43,56 +55,48 @@
   @if (loading()) {
     <div class="cespace-loading">
       <span class="cespace-loading-dot" aria-hidden="true"></span>
-      {{ 'clientBackoffice.reclamations.loading' | translate }}
+      {{ 'clientBackoffice.paiements.loading' | translate }}
     </div>
   } @else {
     <div class="cespace-table-wrap">
-      <table class="cespace-table client-reclamations-table">
+      <table class="cespace-table client-paiements-table">
         <thead>
           <tr>
-            <th class="client-col-client">{{ 'clientBackoffice.reclamations.colClient' | translate }}</th>
-            <th class="client-col-objet">{{ 'clientBackoffice.reclamations.colObjet' | translate }}</th>
-            <th class="client-col-agence">{{ 'clientBackoffice.reclamations.colAgence' | translate }}</th>
-            <th class="client-col-status">{{ 'clientBackoffice.reclamations.colStatus' | translate }}</th>
-            <th class="client-col-date">{{ 'clientBackoffice.reclamations.colDate' | translate }}</th>
-            <th class="client-col-actions">{{ 'clientBackoffice.reclamations.colActions' | translate }}</th>
+            <th class="client-col-code">{{ 'clientBackoffice.paiements.colCode' | translate }}</th>
+            <th class="client-col-commande">{{ 'clientBackoffice.paiements.colCommande' | translate }}</th>
+            <th class="client-col-bamboo">{{ 'clientBackoffice.paiements.colBamboo' | translate }}</th>
+            <th class="client-col-quantite">{{ 'clientBackoffice.paiements.colQuantite' | translate }}</th>
+            <th class="client-col-amount text-right">{{ 'clientBackoffice.paiements.colAmount' | translate }}</th>
+            <th class="client-col-status">{{ 'clientBackoffice.paiements.colStatus' | translate }}</th>
+            <th class="client-col-date">{{ 'clientBackoffice.paiements.colDate' | translate }}</th>
           </tr>
         </thead>
         <tbody>
-          @for (item of reclamations(); track item.id) {
+          @for (paiement of paiements(); track paiement.id) {
             <tr>
-              <td class="client-col-client cespace-ink">
-                <span class="cespace-cell-truncate" [attr.title]="item.client">{{ item.client }}</span>
+              <td class="client-col-code cespace-table-code">{{ paiement.code }}</td>
+              <td class="client-col-commande cespace-ink">
+                <span class="cespace-cell-truncate" [attr.title]="paiement.commande">{{ paiement.commande }}</span>
               </td>
-              <td class="client-col-objet cespace-ink">
-                <span class="cespace-cell-truncate" [attr.title]="item.objet">{{ item.objet }}</span>
+              <td class="client-col-bamboo">
+                <span class="cespace-cell-truncate" [attr.title]="paiement.bambooReference">{{ paiement.bambooReference }}</span>
               </td>
-              <td class="client-col-agence">
-                <span class="cespace-cell-truncate" [attr.title]="item.agence">{{ item.agence }}</span>
-              </td>
+              <td class="client-col-quantite">{{ paiement.quantiteLabel }}</td>
+              <td class="client-col-amount text-right cespace-tabular cespace-strong">{{ paiement.montant }}</td>
               <td class="client-col-status">
-                @if (item.statut) {
-                  <span [class]="statusClass(item.statut)">
-                    {{ statusKey(item.statut) | translate }}
+                @if (paiement.statut) {
+                  <span [class]="statusClass(paiement.statut)">
+                    {{ statusKey(paiement.statut) | translate }}
                   </span>
                 } @else {
                   —
                 }
               </td>
-              <td class="client-col-date">{{ item.date }}</td>
-              <td class="client-col-actions">
-                @if (canViewCommande(item)) {
-                  <button type="button" class="cespace-action-btn" (click)="viewCommande(item)">
-                    {{ 'clientBackoffice.reclamations.actionViewCommande' | translate }}
-                  </button>
-                } @else {
-                  —
-                }
-              </td>
+              <td class="client-col-date">{{ paiement.date }}</td>
             </tr>
           } @empty {
             <tr>
-              <td colspan="6" class="cespace-empty">{{ 'clientBackoffice.reclamations.empty' | translate }}</td>
+              <td colspan="7" class="cespace-empty">{{ 'clientBackoffice.paiements.empty' | translate }}</td>
             </tr>
           }
         </tbody>

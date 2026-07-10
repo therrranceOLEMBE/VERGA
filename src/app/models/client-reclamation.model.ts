@@ -74,3 +74,15 @@ export interface ClientReclamationsPage {
   from: number;
   to: number;
 }
+
+export interface ClientReclamationCreateRequest {
+  commande_id: string;
+  agence_id: string;
+  objet: string;
+  description: string;
+}
+
+export interface ClientReclamationCreateResponse {
+  data?: ClientReclamationRaw;
+  message?: string;
+}

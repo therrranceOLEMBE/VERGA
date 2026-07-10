@@ -14,7 +14,7 @@ interface NavItem {
 interface OfferItem {
   labelKey: string;
   path: string;
-  icon: 'create' | 'history';
+  icon: 'create' | 'history' | 'createType' | 'typeHistory';
 }
 
 interface CollaboratorItem {
@@ -60,6 +60,8 @@ export class BackofficeSidebar {
   protected readonly offersNav: OfferItem[] = [
     { labelKey: 'backoffice.nav.createOffer', path: '/backoffice/creer-offre', icon: 'create' },
     { labelKey: 'backoffice.nav.offerHistory', path: '/backoffice/historique-offres', icon: 'history' },
+    { labelKey: 'backoffice.nav.createTypeOffre', path: '/backoffice/creer-type-offre', icon: 'createType' },
+    { labelKey: 'backoffice.nav.typeOffreHistory', path: '/backoffice/historique-types-offres', icon: 'typeHistory' },
   ];
 
   protected readonly collaboratorsNav: CollaboratorItem[] = [

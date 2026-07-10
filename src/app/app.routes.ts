@@ -14,13 +14,19 @@ import { CreerCollaborateur } from './pages/creer-collaborateur/creer-collaborat
 
 import { CreerOffre } from './pages/creer-offre/creer-offre';
 
+import { CreerTypeOffre } from './pages/creer-type-offre/creer-type-offre';
+
 import { ColisClient } from './pages/colis-client/colis-client';
 
 import { CommandesClient } from './pages/commandes-client/commandes-client';
 
 import { DashboardClient } from './pages/dashboard-client/dashboard-client';
 
+import { PaiementsClient } from './pages/paiements-client/paiements-client';
+
 import { HistoriqueOffres } from './pages/historique-offres/historique-offres';
+
+import { HistoriqueTypesOffres } from './pages/historique-types-offres/historique-types-offres';
 
 import { ListeCollaborateurs } from './pages/liste-collaborateurs/liste-collaborateurs';
 
@@ -107,6 +113,10 @@ export const routes: Routes = [
 
       { path: 'historique-offres', component: HistoriqueOffres },
 
+      { path: 'creer-type-offre', component: CreerTypeOffre },
+
+      { path: 'historique-types-offres', component: HistoriqueTypesOffres },
+
       { path: 'commandes', component: Commandes },
 
       { path: 'transactions', redirectTo: 'paiements', pathMatch: 'full' },
@@ -153,11 +163,13 @@ export const routes: Routes = [
 
       { path: 'commandes', component: CommandesClient },
 
+      { path: 'paiements', component: PaiementsClient },
+
       { path: 'colis', component: ColisClient },
 
       { path: 'reclamations', component: ReclamationsClient },
 
-      { path: 'historique-transactions', redirectTo: 'commandes', pathMatch: 'full' },
+      { path: 'historique-transactions', redirectTo: 'paiements', pathMatch: 'full' },
 
       { path: 'profil', component: ProfilClient },
 
