@@ -116,7 +116,7 @@ export class ParticulierService {
 
     return this.http.post<ClientCommandeCreateResponse>(`${this.baseUrl}/commandes`, formData, options);
   }
-
+// juste pour le push vu que j'ai recup la branche integration_api
   payCommandeSolde(
     token: string,
     commandeId: string,
