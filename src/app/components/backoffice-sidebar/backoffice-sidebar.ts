@@ -42,6 +42,7 @@ export class BackofficeSidebar {
   private readonly agenceService = inject(AgenceService);
   readonly open = input(false);
   readonly navigate = output<void>();
+  protected readonly agencyLogoUrl = this.agenceSession.agence;
   protected readonly offersOpen = signal(false);
   protected readonly collaboratorsOpen = signal(false);
   protected readonly accountOpen = signal(false);

@@ -18,6 +18,13 @@ import { AgenceOffreCreateRequest, AgenceOffreCreateResponse, AgenceOffreDeleteR
 import { mapAgenceMeToProfile } from '../utils/agence-me.util';
 import { AgenceService } from './agence.service';
 
+export interface AgenceProfileDocument {
+  id: string;
+  typeDocument: string;
+  url: string;
+  fileName: string;
+}
+
 export interface AgenceProfile {
   companyName: string;
   status: string;
@@ -33,6 +40,8 @@ export interface AgenceProfile {
   fullAddress: string;
   gerantName: string;
   gerantEmail: string;
+  logoUrl: string;
+  documents: AgenceProfileDocument[];
 }
 
 const AGENCE_TOKEN_KEY = 'verga-agence-token';
@@ -52,6 +61,8 @@ const EMPTY_PROFILE: AgenceProfile = {
   fullAddress: '',
   gerantName: '',
   gerantEmail: '',
+  logoUrl: '',
+  documents: [],
 };
 
 @Injectable({ providedIn: 'root' })

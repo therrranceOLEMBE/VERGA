@@ -101,6 +101,17 @@ export class ProfilClient implements OnInit {
     this.accountType = profile.accountType;
   }
 
+  protected isImageUrl(url: string): boolean {
+    return /\.(jpe?g|png|gif|webp|bmp|svg)(\?|$)/i.test(url);
+  }
+
+  protected formatDocType(typeDocument: string): string {
+    if (!typeDocument) return '—';
+    return typeDocument
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
+
   private resolveSaveError(error: HttpErrorResponse): string {
     const apiMessage = extractApiErrorMessage(error);
     if (apiMessage) {

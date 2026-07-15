@@ -16,6 +16,7 @@ export interface AgenceOffreEditForm {
   type: string;
   prix: number | null;
   capaciteTotale: number | null;
+  capaciteDisponible: number | null;
   origine: string;
   destination: string;
   description: string;
@@ -232,6 +233,14 @@ export function parseOffreEditForm(response: AgenceOffreDetailResponse): AgenceO
     type,
     prix: toNumber(source.prix),
     capaciteTotale: readNumberField(record, ['capacite_totale', 'capaciteTotale', 'capacite_totale_kg']),
+    capaciteDisponible: readNumberField(record, [
+      'capacite_disponible',
+      'capaciteDisponible',
+      'capacite_disponible_kg',
+      'disponible',
+      'stock_disponible',
+      'stock_restant',
+    ]),
     origine: source.origine?.trim() ?? '',
     destination: source.destination?.trim() ?? '',
     description: source.description?.trim() ?? '',

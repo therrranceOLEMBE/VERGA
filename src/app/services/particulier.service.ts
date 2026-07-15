@@ -32,7 +32,11 @@ import {
   ClientPaiementsListResponse,
   ClientPaiementsQueryParams,
 } from '../models/client-paiement.model';
-import { ClientRegisterRequest, ClientRegisterResponse } from '../models/client-register.model';
+import {
+  ClientRegisterDocument,
+  ClientRegisterRequest,
+  ClientRegisterResponse,
+} from '../models/client-register.model';
 import {
   ClientDashboardPeriode,
   ClientDashboardResponse,
@@ -53,8 +57,32 @@ export class ParticulierService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/client`;
 
-  register(payload: ClientRegisterRequest): Observable<ClientRegisterResponse> {
-    return this.http.post<ClientRegisterResponse>(`${this.baseUrl}/register`, payload);
+  register(
+    payload: ClientRegisterRequest,
+    documents?: ClientRegisterDocument[],
+  ): Observable<ClientRegisterResponse> {
+    const fd = new FormData();
+
+    fd.append('nom', payload.nom);
+    fd.append('prenom', payload.prenom);
+    fd.append('email', payload.email);
+    fd.append('password', payload.password);
+    fd.append('password_confirmation', payload.password_confirmation);
+    fd.append('telephone', payload.telephone);
+    if (payload.adresse) fd.append('adresse', payload.adresse);
+    if (payload.ville) fd.append('ville', payload.ville);
+    if (payload.pays) fd.append('pays', payload.pays);
+    if (payload.type) fd.append('type', payload.type);
+    if (payload.device_name) fd.append('device_name', payload.device_name);
+
+    if (documents?.length) {
+      documents.forEach((doc, i) => {
+        fd.append(`documents[${i}][fichier]`, doc.fichier, doc.fichier.name);
+        fd.append(`documents[${i}][type_document]`, doc.type_document);
+      });
+    }
+
+    return this.http.post<ClientRegisterResponse>(`${this.baseUrl}/register`, fd);
   }
 
   login(payload: ClientLoginRequest): Observable<ClientLoginResponse> {

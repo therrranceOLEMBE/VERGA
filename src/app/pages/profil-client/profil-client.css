@@ -1,0 +1,110 @@
+.cespace-card {
+  border: 1px solid var(--color-verga-border, #e2e8f0);
+  background: #fff;
+}
+
+.cespace-card-title {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--color-verga-border, #e2e8f0);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-verga-muted, #64748b);
+}
+
+@media (min-width: 640px) {
+  .cespace-card-title {
+    padding: 1.15rem 1.85rem;
+  }
+}
+
+.cespace-docs-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.cespace-doc-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.25rem;
+  border-bottom: 1px solid var(--color-verga-border, #e2e8f0);
+  transition: background-color 0.15s ease;
+}
+
+.cespace-doc-item:last-child {
+  border-bottom: none;
+}
+
+.cespace-doc-item:hover {
+  background: var(--color-verga-surface, #f8fafc);
+}
+
+@media (min-width: 640px) {
+  .cespace-doc-item {
+    padding: 0.85rem 1.85rem;
+  }
+}
+
+.cespace-doc-thumb {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border: 1px solid var(--color-verga-border, #e2e8f0);
+}
+
+.cespace-doc-thumb--file {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-verga-surface, #f8fafc);
+  color: var(--color-verga-muted, #64748b);
+}
+
+.cespace-doc-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.cespace-doc-type {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-verga-ink, #1e293b);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cespace-doc-name {
+  margin-top: 0.1rem;
+  font-size: 0.75rem;
+  color: var(--color-verga-muted, #64748b);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cespace-doc-view {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--color-verga-border, #e2e8f0);
+  background: #fff;
+  color: var(--color-verga-muted, #64748b);
+  text-decoration: none;
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.cespace-doc-view:hover {
+  border-color: var(--color-verga-primary, #5eadd6);
+  color: var(--color-verga-primary, #5eadd6);
+  background: var(--color-verga-primary-muted, #ebf6fc);
+}

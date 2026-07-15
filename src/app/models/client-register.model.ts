@@ -7,11 +7,16 @@ export interface ClientRegisterRequest {
   password: string;
   password_confirmation: string;
   telephone: string;
-  adresse: string;
-  ville: string;
-  pays: string;
-  type: 'particulier';
-  device_name: string;
+  adresse?: string;
+  ville?: string;
+  pays?: string;
+  type?: string;
+  device_name?: string;
+}
+
+export interface ClientRegisterDocument {
+  fichier: File;
+  type_document: string;
 }
 
 export interface ClientRegisterResponse extends ClientAuthTokenResponse {}

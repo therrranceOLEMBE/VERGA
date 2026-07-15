@@ -52,6 +52,7 @@ export class HistoriqueOffres implements OnInit {
   protected editType = '';
   protected editPrix: number | null = null;
   protected editCapaciteTotale: number | null = null;
+  protected editCapaciteDisponible: number | null = null;
   protected editOrigine = '';
   protected editDestination = '';
   protected editDescription = '';
@@ -441,6 +442,7 @@ export class HistoriqueOffres implements OnInit {
     this.editType = form.type;
     this.editPrix = form.prix;
     this.editCapaciteTotale = form.capaciteTotale;
+    this.editCapaciteDisponible = form.capaciteDisponible;
     this.editOrigine = form.origine;
     this.editDestination = form.destination;
     this.editDescription = form.description;
@@ -473,6 +475,7 @@ export class HistoriqueOffres implements OnInit {
     this.editType = '';
     this.editPrix = null;
     this.editCapaciteTotale = null;
+    this.editCapaciteDisponible = null;
     this.editOrigine = '';
     this.editDestination = '';
     this.editDescription = '';

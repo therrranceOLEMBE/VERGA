@@ -1,141 +1,190 @@
-<div
- class="connexion-page relative min-h-screen flex items-center justify-center bg-verga-surface p-4 font-sans sm:p-6 lg:p-10"
->
- <a routerLink="/accueil" class="connexion-back-link absolute left-4 top-4 z-10 inline-flex items-center gap-2 text-sm font-medium text-verga-muted transition hover:text-verga-primary sm:left-6 sm:top-6 lg:left-10 lg:top-10">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4" aria-hidden="true">
- <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
- </svg>
- {{ 'auth.login.backHome' | translate }}
- </a>
+<div class="auth-page">
+  <div class="auth-live" aria-hidden="true">
+    <div class="auth-orb auth-orb--a"></div>
+    <div class="auth-orb auth-orb--b"></div>
+    <div class="auth-orb auth-orb--c"></div>
+    <div class="auth-grid"></div>
+    <svg class="auth-routes" viewBox="0 0 1200 800" preserveAspectRatio="none">
+      <path d="M-40 160 C 220 80, 380 260, 620 180 S 980 60, 1240 140" />
+      <path d="M-20 420 C 260 520, 460 300, 720 390 S 1020 560, 1260 430" />
+      <path d="M-30 680 C 300 620, 520 740, 780 650 S 1080 560, 1280 700" />
+    </svg>
+    <span class="auth-beacon auth-beacon--1"></span>
+    <span class="auth-beacon auth-beacon--2"></span>
+    <span class="auth-beacon auth-beacon--3"></span>
+    <span class="auth-spark auth-spark--1"></span>
+    <span class="auth-spark auth-spark--2"></span>
+    <span class="auth-spark auth-spark--3"></span>
+    <span class="auth-spark auth-spark--4"></span>
+  </div>
 
- <div
- class="flex w-full max-w-[1200px] min-h-[520px] flex-col overflow-hidden md:flex-row"
- >
- <div
- class="relative hidden md:block md:w-1/2 bg-white overflow-hidden shrink-0"
- aria-hidden="true"
- >
- <img
- src="/images/logo_verga.jpeg"
- [attr.alt]="'common.logoAlt' | translate"
- class="absolute inset-0 h-full w-full object-contain object-center p-8 pointer-events-none select-none"
- />
- </div>
+  <a routerLink="/accueil" class="auth-back">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+    </svg>
+    {{ 'auth.login.backHome' | translate }}
+  </a>
 
- <div class="flex w-full flex-col bg-white px-8 py-8 sm:px-10 sm:py-10 md:w-1/2">
- <h1 class="text-center text-3xl font-semibold text-gray-900 tracking-tight">{{ 'auth.login.title' | translate }}</h1>
+  <div class="auth-shell">
+    <aside class="auth-brand" aria-hidden="true">
+      <div class="auth-brand-stage">
+        <div class="auth-orb auth-orb--a"></div>
+        <div class="auth-orb auth-orb--b"></div>
+        <div class="auth-brand-frame"></div>
+      </div>
 
- <div class="mt-6 grid grid-cols-2 border border-verga-border" role="tablist" [attr.aria-label]="'auth.login.formSwitcher' | translate">
- <button
- type="button"
- role="tab"
- [attr.aria-selected]="formType() === 'entreprise'"
- class="connexion-tab px-4 py-3 text-sm font-semibold transition"
- [class.is-active]="formType() === 'entreprise'"
- (click)="setFormType('entreprise')"
- >
- {{ 'auth.login.tabCompany' | translate }}
- </button>
- <button
- type="button"
- role="tab"
- [attr.aria-selected]="formType() === 'particulier'"
- class="connexion-tab px-4 py-3 text-sm font-semibold transition"
- [class.is-active]="formType() === 'particulier'"
- (click)="setFormType('particulier')"
- >
- {{ 'auth.login.tabIndividual' | translate }}
- </button>
- </div>
+      <div class="auth-brand-content">
+        <p class="auth-brand-kicker">{{ 'auth.brand.kicker' | translate }}</p>
+        <div class="auth-brand-logo">
+          <span class="auth-brand-logo-name">VERGA</span>
+          <span class="auth-brand-logo-tld">.com</span>
+        </div>
+        <p class="auth-brand-tagline">{{ 'auth.login.brandTagline' | translate }}</p>
+        <p class="auth-brand-copy">{{ 'auth.login.brandCopy' | translate }}</p>
+        <div class="auth-brand-points">
+          <span class="auth-brand-point">{{ 'auth.login.pointTrack' | translate }}</span>
+          <span class="auth-brand-point">{{ 'auth.login.pointSecure' | translate }}</span>
+          <span class="auth-brand-point">{{ 'auth.login.pointFast' | translate }}</span>
+        </div>
+        <div class="auth-brand-metric">
+          <div class="auth-metric-item">
+            <strong>24/7</strong>
+            <span>{{ 'auth.login.metricLive' | translate }}</span>
+          </div>
+          <div class="auth-metric-item">
+            <strong>SSL</strong>
+            <span>{{ 'auth.login.metricSecure' | translate }}</span>
+          </div>
+          <div class="auth-metric-item">
+            <strong>EU–AF</strong>
+            <span>{{ 'auth.login.metricRoutes' | translate }}</span>
+          </div>
+        </div>
+      </div>
+    </aside>
 
- <p class="mt-4 text-center text-sm text-verga-muted">
- @if (formType() === 'entreprise') {
- {{ 'auth.login.companySubtitle' | translate }}
- } @else {
- {{ 'auth.login.individualSubtitle' | translate }}
- }
- </p>
+    <div class="auth-panel">
+      <a routerLink="/accueil" class="auth-panel-mobile-brand">
+        <span class="auth-brand-logo-name">VERGA</span>
+        <span class="auth-brand-logo-tld">.com</span>
+      </a>
 
- <form class="mt-6 flex flex-col flex-1" (ngSubmit)="onSubmit($event)">
- <div class="space-y-5">
- <div>
- <label for="connexion-email" class="block text-sm text-gray-700">
- {{ 'auth.email' | translate }} <span class="text-verga-primary">*</span>
- </label>
- <input
- id="connexion-email"
- name="email"
- type="email"
- autocomplete="email"
- required
- [(ngModel)]="email"
- class="verga-field mt-2"
- />
- </div>
+      <p class="auth-eyebrow">VERGA</p>
+      <h1 class="auth-title">{{ 'auth.login.title' | translate }}</h1>
 
- <div>
- <label for="connexion-password" class="block text-sm text-gray-700">
- {{ 'auth.password' | translate }} <span class="text-verga-primary">*</span>
- </label>
- <div class="relative mt-2">
- <input
- id="connexion-password"
- name="password"
- [type]="showPassword() ? 'text' : 'password'"
- autocomplete="current-password"
- required
- [(ngModel)]="password"
- class="verga-field pr-12"
- />
- <button
- type="button"
- (click)="togglePassword()"
- class="absolute inset-y-0 right-0 flex items-center px-4 text-gray-500 hover:text-gray-700"
- [attr.aria-label]="(showPassword() ? 'aria.hidePassword' : 'aria.showPassword') | translate"
- >
- @if (showPassword()) {
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
- <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
- </svg>
- } @else {
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
- <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
- <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
- </svg>
- }
- </button>
- </div>
- <div class="mt-2 text-right">
- <a href="#" class="verga-link text-sm hover:underline">{{ 'auth.login.forgotPassword' | translate }}</a>
- </div>
- </div>
- </div>
+      <div class="auth-tabs" role="tablist" [attr.aria-label]="'auth.login.formSwitcher' | translate">
+        <button
+          type="button"
+          role="tab"
+          [attr.aria-selected]="formType() === 'entreprise'"
+          class="auth-tab"
+          [class.is-active]="formType() === 'entreprise'"
+          (click)="setFormType('entreprise')"
+        >
+          {{ 'auth.login.tabCompany' | translate }}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          [attr.aria-selected]="formType() === 'particulier'"
+          class="auth-tab"
+          [class.is-active]="formType() === 'particulier'"
+          (click)="setFormType('particulier')"
+        >
+          {{ 'auth.login.tabIndividual' | translate }}
+        </button>
+      </div>
 
- @if (errorMessage()) {
- <p class="mt-4 text-sm font-medium text-red-600" role="alert">
- @if (errorMessage().startsWith('auth.')) {
- {{ errorMessage() | translate }}
- } @else {
- {{ errorMessage() }}
- }
- </p>
- }
+      <p class="auth-subtitle">
+        @if (formType() === 'entreprise') {
+          {{ 'auth.login.companySubtitle' | translate }}
+        } @else {
+          {{ 'auth.login.individualSubtitle' | translate }}
+        }
+      </p>
 
- <button type="submit" class="verga-btn mt-6" [disabled]="submitting()">
- @if (submitting()) {
- {{ 'auth.login.submitting' | translate }}
- } @else if (formType() === 'entreprise') {
- {{ 'auth.login.submitCompany' | translate }}
- } @else {
- {{ 'auth.login.submitIndividual' | translate }}
- }
- </button>
+      <form class="auth-form" (ngSubmit)="onSubmit($event)">
+        <div class="auth-fields">
+          <div>
+            <label for="connexion-email" class="auth-label">
+              {{ 'auth.email' | translate }} <span class="auth-required">*</span>
+            </label>
+            <input
+              id="connexion-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              required
+              [(ngModel)]="email"
+              class="verga-field"
+            />
+          </div>
 
- <p class="mt-auto pt-10 text-center text-sm text-gray-700">
- {{ 'auth.login.noAccount' | translate }}
- <a routerLink="/inscription" class="verga-link font-medium hover:underline">{{ 'auth.login.signupLink' | translate }}</a>
- </p>
- </form>
- </div>
- </div>
+          <div>
+            <label for="connexion-password" class="auth-label">
+              {{ 'auth.password' | translate }} <span class="auth-required">*</span>
+            </label>
+            <div class="auth-password-wrap">
+              <input
+                id="connexion-password"
+                name="password"
+                [type]="showPassword() ? 'text' : 'password'"
+                autocomplete="current-password"
+                required
+                [(ngModel)]="password"
+                class="verga-field"
+              />
+              <button
+                type="button"
+                (click)="togglePassword()"
+                class="auth-password-toggle"
+                [attr.aria-label]="(showPassword() ? 'aria.hidePassword' : 'aria.showPassword') | translate"
+              >
+                @if (showPassword()) {
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                  </svg>
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                  </svg>
+                }
+              </button>
+            </div>
+            <div class="auth-forgot">
+              <a href="#" class="verga-link">{{ 'auth.login.forgotPassword' | translate }}</a>
+            </div>
+          </div>
+        </div>
+
+        @if (errorMessage()) {
+          <div class="auth-alert" role="alert">
+            @if (errorMessage().startsWith('auth.')) {
+              {{ errorMessage() | translate }}
+            } @else {
+              {{ errorMessage() }}
+            }
+          </div>
+        }
+
+        <div class="auth-actions">
+          <button type="submit" class="verga-btn auth-submit" [disabled]="submitting()">
+            @if (submitting()) {
+              {{ 'auth.login.submitting' | translate }}
+            } @else if (formType() === 'entreprise') {
+              {{ 'auth.login.submitCompany' | translate }}
+            } @else {
+              {{ 'auth.login.submitIndividual' | translate }}
+            }
+          </button>
+        </div>
+
+        <p class="auth-footer">
+          {{ 'auth.login.noAccount' | translate }}
+          <a routerLink="/inscription" class="verga-link">{{ 'auth.login.signupLink' | translate }}</a>
+        </p>
+      </form>
+    </div>
+  </div>
 </div>

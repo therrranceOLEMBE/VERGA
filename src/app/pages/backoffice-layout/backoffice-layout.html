@@ -23,14 +23,24 @@
  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
  </svg>
  </button>
- <a routerLink="/accueil" class="backoffice-mobile-bar__brand inline-flex min-w-0 flex-1 items-center">
+ <a routerLink="/backoffice/tableau-de-bord" class="backoffice-mobile-bar__brand inline-flex min-w-0 flex-1 items-center">
+ @if (agencyProfile().logoUrl) {
+ <img
+ [src]="agencyProfile().logoUrl"
+ [alt]="agencyProfile().companyName || ('common.logoAlt' | translate)"
+ class="backoffice-mobile-bar__logo"
+ width="120"
+ height="36"
+ />
+ } @else {
  <img
  src="/images/logo_verga.jpeg"
  [attr.alt]="'common.logoAlt' | translate"
  class="backoffice-mobile-bar__logo"
- width="160"
- height="48"
+ width="120"
+ height="36"
  />
+ }
  </a>
  </header>
 

@@ -1,5 +1,5 @@
-import { AgenceMeData, AgenceMeFields, AgenceMeResponse, AgenceMeUserFields } from '../models/agence-me.model';
-import { AgenceProfile } from '../services/agence-session.service';
+import { AgenceDocumentFields, AgenceMeData, AgenceMeFields, AgenceMeResponse, AgenceMeUserFields } from '../models/agence-me.model';
+import { AgenceProfile, AgenceProfileDocument } from '../services/agence-session.service';
 
 function unwrapMeData(response: AgenceMeResponse): AgenceMeData {
   return response.data ?? response;
@@ -92,5 +92,20 @@ export function mapAgenceMeToProfile(response: AgenceMeResponse): Partial<Agence
     fullAddress: joinAddress([address, city, country]),
     gerantName: (agence.gerant_name ?? user.name)?.trim() ?? '',
     gerantEmail: (agence.gerant_email ?? user.email)?.trim() ?? '',
+    logoUrl: agence.logo?.url?.trim() ?? '',
+    documents: mapDocuments(agence.documents),
   };
+}
+
+function mapDocuments(raw: AgenceDocumentFields[] | undefined): AgenceProfileDocument[] {
+  if (!raw?.length) return [];
+
+  return raw
+    .filter((doc) => doc.id && doc.url)
+    .map((doc) => ({
+      id: doc.id!,
+      typeDocument: doc.type_document?.trim() ?? '',
+      url: doc.url!.trim(),
+      fileName: doc.nom_original?.trim() ?? '',
+    }));
 }

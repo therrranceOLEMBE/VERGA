@@ -4,7 +4,16 @@
  (click)="$event.stopPropagation()"
 >
  <div class="border-b border-verga-border px-5 py-6">
- <a routerLink="/accueil" class="backoffice-sidebar__brand block">
+ <a routerLink="/backoffice/tableau-de-bord" class="backoffice-sidebar__brand block">
+ @if (agencyLogoUrl().logoUrl) {
+ <img
+ [src]="agencyLogoUrl().logoUrl"
+ [alt]="agencyLogoUrl().companyName || ('common.logoAlt' | translate)"
+ class="backoffice-sidebar__logo"
+ width="168"
+ height="52"
+ />
+ } @else {
  <img
  src="/images/logo_verga.jpeg"
  [attr.alt]="'common.logoAlt' | translate"
@@ -12,8 +21,12 @@
  width="168"
  height="52"
  />
+ }
  </a>
- <p class="mt-3 text-xs font-medium uppercase tracking-wide text-verga-muted">{{ 'backoffice.space' | translate }}</p>
+ @if (agencyLogoUrl().companyName) {
+ <p class="mt-2 text-sm font-semibold text-verga-ink truncate">{{ agencyLogoUrl().companyName }}</p>
+ }
+ <p class="mt-1 text-xs font-medium uppercase tracking-wide text-verga-muted">{{ 'backoffice.space' | translate }}</p>
  </div>
 
  <nav class="min-h-0 flex-1 overflow-y-auto py-4" [attr.aria-label]="'backoffice.nav.label' | translate">

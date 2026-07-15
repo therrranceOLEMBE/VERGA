@@ -1,6 +1,6 @@
-import { ClientMeData, ClientMeFields, ClientMeResponse } from '../models/client-me.model';
+import { ClientDocumentFields, ClientMeData, ClientMeFields, ClientMeResponse } from '../models/client-me.model';
 import { ClientProfileUpdateRequest } from '../models/client-profile-update.model';
-import { ClientProfile } from '../services/client-session.service';
+import { ClientProfile, ClientProfileDocument } from '../services/client-session.service';
 
 function unwrapMeData(response: ClientMeResponse): ClientMeData {
   return response.data ?? response;
@@ -44,7 +44,21 @@ export function mapClientMeToProfile(response: ClientMeResponse): Partial<Client
     city: source.ville?.trim() ?? '',
     country: source.pays?.trim() ?? '',
     accountType: (source.type ?? data.role)?.trim() ?? '',
+    documents: mapClientDocuments(source.documents),
   };
+}
+
+function mapClientDocuments(raw: ClientDocumentFields[] | undefined): ClientProfileDocument[] {
+  if (!raw?.length) return [];
+
+  return raw
+    .filter((doc) => doc.id && doc.url)
+    .map((doc) => ({
+      id: doc.id!,
+      typeDocument: doc.type_document?.trim() ?? '',
+      url: doc.url!.trim(),
+      fileName: doc.nom_original?.trim() ?? '',
+    }));
 }
 
 export function mapProfileToApiPayload(profile: Partial<ClientProfile>): ClientProfileUpdateRequest {

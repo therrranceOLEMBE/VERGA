@@ -362,8 +362,19 @@
  <div>
  <label for="edit-offer-capacite" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.capaciteTotale' | translate }} *</label>
  <input id="edit-offer-capacite" name="editCapaciteTotale" type="number" min="1" step="1" required [(ngModel)]="editCapaciteTotale" class="verga-field mt-2" />
+ @if (editCapaciteDisponible != null) {
+ <p class="mt-1.5 text-xs text-verga-muted">
+ {{ 'backoffice.offerHistory.capaciteDisponibleHint' | translate:{ value: editCapaciteDisponible } }}
+ </p>
+ }
  </div>
  </div>
+
+ @if (editStatut === 'active' && editCapaciteDisponible != null && editCapaciteDisponible <= 0) {
+ <div class="border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="status">
+ {{ 'backoffice.offerHistory.activeNoCapacityWarning' | translate }}
+ </div>
+ }
 
  <div>
  <label for="edit-offer-description" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.description' | translate }} *</label>

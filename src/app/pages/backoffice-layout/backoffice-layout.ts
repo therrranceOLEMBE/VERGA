@@ -3,6 +3,7 @@ import { NavigationEnd, Router, RouterLink, RouterOutlet } from '@angular/router
 import { filter, Subscription } from 'rxjs';
 import { BackofficeSidebar } from '../../components/backoffice-sidebar/backoffice-sidebar';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { AgenceSessionService } from '../../services/agence-session.service';
 import { AuthRedirectService } from '../../services/auth-redirect.service';
 
 @Component({
@@ -14,9 +15,11 @@ import { AuthRedirectService } from '../../services/auth-redirect.service';
 export class BackofficeLayout implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly authRedirect = inject(AuthRedirectService);
+  private readonly agenceSession = inject(AgenceSessionService);
   private readonly navSub: Subscription;
 
   protected readonly sidebarOpen = signal(false);
+  protected readonly agencyProfile = this.agenceSession.agence;
 
   constructor() {
     this.navSub = this.router.events

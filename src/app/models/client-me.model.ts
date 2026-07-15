@@ -1,3 +1,11 @@
+export interface ClientDocumentFields {
+  id?: string;
+  type_document?: string;
+  chemin?: string;
+  url?: string;
+  nom_original?: string;
+}
+
 export interface ClientMeFields {
   id?: number | string;
   nom?: string;
@@ -8,6 +16,9 @@ export interface ClientMeFields {
   ville?: string | null;
   pays?: string | null;
   type?: string;
+  statut?: string;
+  documents?: ClientDocumentFields[];
+  created_at?: string;
 }
 
 export interface ClientMeData {
