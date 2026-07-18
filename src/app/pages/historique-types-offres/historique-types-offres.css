@@ -108,6 +108,14 @@
   gap: 0.4rem;
 }
 
+.type-offre-actions-hint {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-verga-muted, #64748b);
+  white-space: nowrap;
+}
+
 .type-offre-action-btn {
   flex-shrink: 0;
   border: 1px solid var(--color-verga-border, #e2e8f0);

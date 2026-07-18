@@ -15,6 +15,7 @@ export interface AgenceOffreEditForm {
   typeOffreId: string;
   type: string;
   prix: number | null;
+  capaciteIllimitee: boolean;
   capaciteTotale: number | null;
   capaciteDisponible: number | null;
   origine: string;
@@ -82,6 +83,10 @@ function toNumber(value: number | string | null | undefined): number | null {
   }
   const numeric = typeof value === 'number' ? value : Number(String(value).replace(/\s/g, '').replace(',', '.'));
   return Number.isFinite(numeric) ? numeric : null;
+}
+
+function toBoolean(value: unknown): boolean {
+  return value === true || value === 1 || value === '1' || value === 'true';
 }
 
 function readNumberField(record: Record<string, unknown>, keys: string[]): number | null {
@@ -232,6 +237,7 @@ export function parseOffreEditForm(response: AgenceOffreDetailResponse): AgenceO
     typeOffreId: resolveTypeOffreId(record),
     type,
     prix: toNumber(source.prix),
+    capaciteIllimitee: toBoolean(record['capacite_illimitee']),
     capaciteTotale: readNumberField(record, ['capacite_totale', 'capaciteTotale', 'capacite_totale_kg']),
     capaciteDisponible: readNumberField(record, [
       'capacite_disponible',

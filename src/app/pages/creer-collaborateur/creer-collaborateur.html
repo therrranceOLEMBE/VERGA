@@ -6,6 +6,22 @@
  </div>
  </header>
 
+ @if (errorMessage()) {
+ <div class="mb-4 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+ @if (errorMessage().startsWith('backoffice.')) {
+ {{ errorMessage() | translate }}
+ } @else {
+ {{ errorMessage() }}
+ }
+ </div>
+ }
+
+ @if (successMessage()) {
+ <div class="mb-4 border border-verga-success/30 bg-verga-success-muted px-4 py-3 text-sm font-medium text-verga-success" role="status">
+ {{ successMessage() | translate }}
+ </div>
+ }
+
  <form class="space-y-6 border border-verga-border bg-white p-4 sm:p-8" (ngSubmit)="onSubmit($event)">
  <div class="grid gap-5 sm:grid-cols-2">
  <div>
@@ -30,8 +46,33 @@
  </div>
 
  <div>
- <label for="collab-role" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createCollaborator.role' | translate }}</label>
- <input id="collab-role" name="role" type="text" readonly [value]="'backoffice.createCollaborator.roleSupport' | translate" class="verga-field mt-2 bg-verga-surface text-gray-700" />
+ <label for="collab-role" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createCollaborator.role' | translate }} *</label>
+ @if (rolesLoading()) {
+ <div class="mt-2 border border-verga-border bg-verga-surface px-4 py-3 text-sm text-verga-muted">
+ {{ 'backoffice.createCollaborator.rolesLoading' | translate }}
+ </div>
+ } @else if (roles().length > 0) {
+ <select id="collab-role" name="roleId" required [(ngModel)]="roleId" class="verga-field mt-2 appearance-none bg-white">
+ <option value="">{{ 'backoffice.createCollaborator.selectRole' | translate }}</option>
+ @for (role of roles(); track role.id) {
+ <option [value]="role.id">{{ role.nom }}</option>
+ }
+ </select>
+ @if (roleId) {
+ @for (role of roles(); track role.id) {
+ @if (role.id === roleId && role.description) {
+ <p class="mt-2 text-sm text-verga-muted">{{ role.description }}</p>
+ }
+ }
+ }
+ } @else {
+ <div class="mt-2 border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+ <p>{{ 'backoffice.createCollaborator.noRoles' | translate }}</p>
+ <button type="button" (click)="loadRoles()" class="mt-2 font-semibold text-verga-primary hover:underline">
+ {{ 'backoffice.createCollaborator.retryRoles' | translate }}
+ </button>
+ </div>
+ }
  </div>
 
  <div class="grid gap-5 sm:grid-cols-2">
@@ -78,6 +119,16 @@
  </div>
  </div>
 
- <button type="submit" class="verga-btn !w-auto px-8">{{ 'backoffice.createCollaborator.submit' | translate }}</button>
+ <button
+ type="submit"
+ class="verga-btn !w-auto px-8 disabled:cursor-not-allowed disabled:opacity-50"
+ [disabled]="submitting() || rolesLoading() || roles().length === 0"
+ >
+ @if (submitting()) {
+ {{ 'backoffice.createCollaborator.submitting' | translate }}
+ } @else {
+ {{ 'backoffice.createCollaborator.submit' | translate }}
+ }
+ </button>
  </form>
 </div>

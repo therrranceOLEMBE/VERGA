@@ -58,7 +58,7 @@
  </div>
  </a>
 
- <div class="grid grid-cols-2 gap-2 px-4 pb-4">
+ <div class="grid gap-2 px-4 pb-4" [class.grid-cols-2]="!offer().capaciteIllimitee" [class.grid-cols-1]="offer().capaciteIllimitee">
  <button
  type="button"
  (click)="openBooking('achete', $event)"
@@ -66,6 +66,7 @@
  >
  {{ 'offer.buy' | translate }}
  </button>
+ @if (!offer().capaciteIllimitee) {
  <button
  type="button"
  (click)="openBooking('reserve', $event)"
@@ -73,6 +74,7 @@
  >
  {{ 'offer.reserve' | translate }}
  </button>
+ }
  </div>
 
  <div class="flex items-center gap-2 border-t border-gray-100 px-4 pb-4 pt-3">

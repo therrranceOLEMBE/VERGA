@@ -10,15 +10,15 @@
   line-height: 0;
 }
 
- .backoffice-sidebar__logo {
-   display: block;
-   width: 100%;
-   max-width: 15rem;
-   height: auto;
-   max-height: 5rem;
-   object-fit: contain;
-   object-position: left center;
- }
+.backoffice-sidebar__logo {
+  display: block;
+  width: 100%;
+  max-width: 10.5rem;
+  height: auto;
+  max-height: 3.25rem;
+  object-fit: contain;
+  object-position: left center;
+}
 
 .backoffice-sidebar a[class*='border-l-4'] {
   border-radius: 0 10px 10px 0;

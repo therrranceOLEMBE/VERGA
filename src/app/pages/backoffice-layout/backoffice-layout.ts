@@ -31,7 +31,15 @@ export class BackofficeLayout implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.authRedirect.ensureAgenceAccess(this.router.url);
+    if (!this.authRedirect.ensureAgenceAccess(this.router.url)) {
+      return;
+    }
+
+    this.agenceSession.loadProfile().subscribe({
+      error: () => {
+        // profil indisponible : la sidebar retombera sur le logo par défaut
+      },
+    });
   }
 
   ngOnDestroy(): void {

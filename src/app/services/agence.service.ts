@@ -34,6 +34,15 @@ import {
   AgenceRegisterResponse,
 } from '../models/agence-register.model';
 import {
+  AgenceRolesResponse,
+  AgenceUserCreateRequest,
+  AgenceUserCreateResponse,
+  AgenceUserDeleteResponse,
+  AgenceUserUpdateRequest,
+  AgenceUserUpdateResponse,
+  AgenceUsersListResponse,
+} from '../models/agence-user.model';
+import {
   AgenceColisDetailResponse,
   AgenceColisListResponse,
   AgenceColisQueryParams,
@@ -141,6 +150,40 @@ export class AgenceService {
 
   changePassword(token: string, payload: AgencePasswordUpdateRequest): Observable<AgencePasswordUpdateResponse> {
     return this.http.put<AgencePasswordUpdateResponse>(`${this.baseUrl}/password`, payload, {
+      headers: this.authHeaders(token),
+    });
+  }
+
+  getRoles(token: string): Observable<AgenceRolesResponse> {
+    return this.http.get<AgenceRolesResponse>(`${this.baseUrl}/roles`, {
+      headers: this.authHeaders(token),
+    });
+  }
+
+  createUser(token: string, payload: AgenceUserCreateRequest): Observable<AgenceUserCreateResponse> {
+    return this.http.post<AgenceUserCreateResponse>(`${this.baseUrl}/users`, payload, {
+      headers: this.authHeaders(token),
+    });
+  }
+
+  getUsers(token: string): Observable<AgenceUsersListResponse> {
+    return this.http.get<AgenceUsersListResponse>(`${this.baseUrl}/users`, {
+      headers: this.authHeaders(token),
+    });
+  }
+
+  updateUser(
+    token: string,
+    userId: number | string,
+    payload: AgenceUserUpdateRequest,
+  ): Observable<AgenceUserUpdateResponse> {
+    return this.http.patch<AgenceUserUpdateResponse>(`${this.baseUrl}/users/${userId}`, payload, {
+      headers: this.authHeaders(token),
+    });
+  }
+
+  deleteUser(token: string, userId: number | string): Observable<AgenceUserDeleteResponse> {
+    return this.http.delete<AgenceUserDeleteResponse>(`${this.baseUrl}/users/${userId}`, {
       headers: this.authHeaders(token),
     });
   }

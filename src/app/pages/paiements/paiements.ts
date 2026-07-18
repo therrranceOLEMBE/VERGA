@@ -237,20 +237,16 @@ export class Paiements implements OnInit {
     const t = (key: string) => this.language.translate(key);
     const header = [
       t('backoffice.payments.colCodeVerga'),
-      t('backoffice.payments.colBambooRef'),
       t('backoffice.payments.colCommande'),
       t('backoffice.payments.colAmount'),
-      t('backoffice.payments.colMethod'),
       t('backoffice.payments.colStatus'),
       t('backoffice.payments.colDate'),
     ];
 
     const data = this.paiements().map((paiement) => [
       paiement.codeVerga,
-      paiement.refBamboo,
       paiement.commande,
       paiement.montant,
-      paiement.methode,
       paiement.statut ? t(this.statusKey(paiement.statut)) : '—',
       paiement.date,
     ]);

@@ -142,7 +142,8 @@ function resolveQuantiteRestanteLabel(raw: AgenceCommandeRaw): string {
 }
 
 function resolveMontantSousTotal(raw: AgenceCommandeRaw): string {
-  return formatMontant(raw.montant_sous_total ?? raw.montant);
+  const record = raw as AgenceCommandeRaw & { montantSousTotal?: number | string | null };
+  return formatMontant(raw.montant_sous_total ?? record.montantSousTotal ?? raw.montant);
 }
 
 function resolveClientField(raw: AgenceCommandeRaw, field: string): string {

@@ -77,6 +77,10 @@
           <a routerLink="/connexion" class="mt-2 inline-block font-semibold text-verga-primary hover:underline">
             {{ 'backoffice.dashboard.goToLogin' | translate }}
           </a>
+        } @else {
+          <button type="button" (click)="reload()" class="mt-2 font-semibold text-verga-primary hover:underline">
+            {{ 'backoffice.typeOffreHistory.retry' | translate }}
+          </button>
         }
       </div>
     }
@@ -130,12 +134,18 @@
                   <button type="button" class="type-offre-action-btn" (click)="openDetail(item)">
                     {{ 'backoffice.typeOffreHistory.actionDetail' | translate }}
                   </button>
-                  <button type="button" class="type-offre-action-btn" (click)="openEdit(item)">
-                    {{ 'backoffice.typeOffreHistory.actionEdit' | translate }}
-                  </button>
-                  <button type="button" class="type-offre-action-btn type-offre-action-btn--danger" (click)="openDelete(item)">
-                    {{ 'backoffice.typeOffreHistory.actionDelete' | translate }}
-                  </button>
+                  @if (canManage(item)) {
+                    <button type="button" class="type-offre-action-btn" (click)="openEdit(item)">
+                      {{ 'backoffice.typeOffreHistory.actionEdit' | translate }}
+                    </button>
+                    <button type="button" class="type-offre-action-btn type-offre-action-btn--danger" (click)="openDelete(item)">
+                      {{ 'backoffice.typeOffreHistory.actionDelete' | translate }}
+                    </button>
+                  } @else {
+                    <span class="type-offre-actions-hint" [attr.title]="'backoffice.typeOffreHistory.platformReadOnly' | translate">
+                      {{ 'backoffice.typeOffreHistory.platformReadOnlyShort' | translate }}
+                    </span>
+                  }
                 </div>
               </td>
             </tr>
@@ -233,20 +243,22 @@
 
       <div class="bo-modal__footer">
         <div class="flex flex-wrap gap-3">
-          <button
-            type="button"
-            (click)="openEditFromDetail()"
-            class="verga-btn !w-auto px-6"
-          >
-            {{ 'backoffice.typeOffreHistory.actionEdit' | translate }}
-          </button>
-          <button
-            type="button"
-            (click)="openDeleteFromDetail()"
-            class="verga-btn !w-auto border border-red-200 bg-white px-6 !text-red-600"
-          >
-            {{ 'backoffice.typeOffreHistory.actionDelete' | translate }}
-          </button>
+          @if (selectedType(); as type) {
+            @if (canManage(type)) {
+              <button type="button" (click)="openEditFromDetail()" class="verga-btn !w-auto px-6">
+                {{ 'backoffice.typeOffreHistory.actionEdit' | translate }}
+              </button>
+              <button
+                type="button"
+                (click)="openDeleteFromDetail()"
+                class="verga-btn !w-auto border border-red-200 bg-white px-6 !text-red-600"
+              >
+                {{ 'backoffice.typeOffreHistory.actionDelete' | translate }}
+              </button>
+            } @else {
+              <p class="self-center text-xs text-verga-muted">{{ 'backoffice.typeOffreHistory.platformReadOnly' | translate }}</p>
+            }
+          }
           <button
             type="button"
             (click)="closeDetail()"
@@ -335,8 +347,8 @@
               id="edit-type-quantite-min"
               name="editQuantiteMin"
               type="number"
-              min="0.001"
-              step="any"
+              [min]="editQuantiteEntier ? 1 : 0.001"
+              [step]="editQuantiteEntier ? 1 : 0.001"
               required
               [(ngModel)]="editQuantiteMin"
               class="verga-field mt-2"
@@ -344,7 +356,13 @@
           </div>
           <div class="flex flex-col justify-end gap-3 pb-1">
             <label class="inline-flex items-center gap-2 text-sm text-gray-700">
-              <input type="checkbox" name="editQuantiteEntier" [(ngModel)]="editQuantiteEntier" class="h-4 w-4 accent-[var(--color-verga-primary,#5eadd6)]" />
+              <input
+                type="checkbox"
+                name="editQuantiteEntier"
+                [ngModel]="editQuantiteEntier"
+                (ngModelChange)="onEditQuantiteEntierChange($event)"
+                class="h-4 w-4 accent-[var(--color-verga-primary,#5eadd6)]"
+              />
               {{ 'backoffice.createTypeOffre.quantiteEntier' | translate }}
             </label>
             <label class="inline-flex items-center gap-2 text-sm text-gray-700">

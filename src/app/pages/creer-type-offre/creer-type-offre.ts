@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TypeOffreCreateRequest } from '../../models/type-offre.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { AgenceService } from '../../services/agence.service';
 import { AgenceSessionService } from '../../services/agence-session.service';
 import { extractApiErrorMessage } from '../../utils/api-error.util';
 import { slugifyTypeOffre } from '../../utils/type-offre.util';
@@ -18,7 +17,6 @@ import { slugifyTypeOffre } from '../../utils/type-offre.util';
 export class CreerTypeOffre {
   private readonly router = inject(Router);
   private readonly agenceSession = inject(AgenceSessionService);
-  private readonly agenceService = inject(AgenceService);
 
   protected nom = '';
   protected slug = '';
@@ -47,13 +45,19 @@ export class CreerTypeOffre {
     this.slug = slugifyTypeOffre(value);
   }
 
+  protected onQuantiteEntierChange(value: boolean): void {
+    this.quantiteEntier = value;
+    if (value && this.quantiteMin != null && !Number.isInteger(this.quantiteMin)) {
+      this.quantiteMin = Math.max(1, Math.ceil(this.quantiteMin));
+    }
+  }
+
   protected onSubmit(event: Event): void {
     event.preventDefault();
     this.errorMessage.set('');
     this.successMessage.set('');
 
-    const token = this.agenceSession.getToken();
-    if (!token) {
+    if (!this.agenceSession.isAuthenticated()) {
       this.unauthenticated.set(true);
       this.errorMessage.set('backoffice.createTypeOffre.authRequired');
       return;
@@ -77,7 +81,7 @@ export class CreerTypeOffre {
 
     this.submitting.set(true);
 
-    this.agenceService.createTypeOffre(token, payload).subscribe({
+    this.agenceSession.createTypeOffre(payload).subscribe({
       next: () => {
         this.successMessage.set('backoffice.createTypeOffre.success');
         this.submitting.set(false);
@@ -100,7 +104,8 @@ export class CreerTypeOffre {
       !!this.unite.trim() &&
       !!this.uniteLabel.trim() &&
       this.quantiteMin != null &&
-      this.quantiteMin > 0
+      this.quantiteMin > 0 &&
+      (!this.quantiteEntier || Number.isInteger(this.quantiteMin))
     );
   }
 

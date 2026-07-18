@@ -134,7 +134,7 @@
  </li>
  </ul>
 
- <div class="mt-10 grid gap-3 sm:grid-cols-2">
+ <div class="mt-10 grid gap-3" [class.sm:grid-cols-2]="!offer()?.capaciteIllimitee">
  <button
  type="button"
  (click)="openBooking('achete')"
@@ -143,6 +143,7 @@
  {{ 'offer.buy' | translate }}
  <span aria-hidden="true">&raquo;</span>
  </button>
+ @if (!offer()?.capaciteIllimitee) {
  <button
  type="button"
  (click)="openBooking('reserve')"
@@ -151,9 +152,11 @@
  {{ 'offer.reserve' | translate }}
  <span aria-hidden="true">&raquo;</span>
  </button>
+ }
  <a
  routerLink="/nous-contacter"
- class="inline-flex items-center justify-center gap-2 border border-verga-border bg-white px-4 py-4 text-center text-sm font-semibold text-verga-ink transition hover:border-verga-primary hover:text-verga-primary sm:col-span-2"
+ class="inline-flex items-center justify-center gap-2 border border-verga-border bg-white px-4 py-4 text-center text-sm font-semibold text-verga-ink transition hover:border-verga-primary hover:text-verga-primary"
+ [class.sm:col-span-2]="!offer()?.capaciteIllimitee"
  >
  {{ 'offerDetail.askAdvisor' | translate }}
  </a>

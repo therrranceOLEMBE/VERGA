@@ -7,7 +7,8 @@ export interface AgenceOffreCreateRequest {
   type_offre_id: string;
   type: string;
   prix: number;
-  capacite_totale: number;
+  capacite_illimitee: boolean;
+  capacite_totale: number | null;
   origine: string;
   destination: string;
   description: string;

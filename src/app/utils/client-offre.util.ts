@@ -212,6 +212,7 @@ export function mapClientOffreToOffer(raw: ClientOffreRaw): Offer {
     verified: flat.statut === 'active',
     quantiteMin: typeOffre?.quantite_min ?? undefined,
     quantiteEntier: typeOffre?.quantite_entier ?? undefined,
+    capaciteIllimitee: flat.capacite_illimitee === true,
   };
 }
 

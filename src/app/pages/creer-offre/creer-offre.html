@@ -15,7 +15,11 @@
 
  @if (errorMessage()) {
  <div class="mb-6 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+ @if (errorMessage().startsWith('backoffice.')) {
  {{ errorMessage() | translate }}
+ } @else {
+ {{ errorMessage() }}
+ }
  </div>
  }
 
@@ -51,6 +55,9 @@
  <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.createOffer.typeOffreLoading' | translate }}</p>
  } @else if (typeOffreOptions().length === 0) {
  <p class="mt-2 text-sm text-amber-700">{{ 'backoffice.createOffer.typeOffreLoadError' | translate }}</p>
+ <button type="button" (click)="loadTypeOffres()" class="mt-1 text-sm font-semibold text-verga-primary hover:underline">
+ {{ 'backoffice.createOffer.retryTypeOffres' | translate }}
+ </button>
  }
  </div>
 
@@ -72,7 +79,42 @@
  </div>
  <div>
  <label for="offer-capacite" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.capaciteTotale' | translate }} *</label>
- <input id="offer-capacite" name="capaciteTotale" type="number" min="1" step="1" required [(ngModel)]="capaciteTotale" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.capaciteTotalePh' | translate" />
+ <input
+ id="offer-capacite"
+ name="capaciteTotale"
+ type="number"
+ min="1"
+ step="1"
+ [required]="!capaciteIllimitee"
+ [disabled]="capaciteIllimitee"
+ [(ngModel)]="capaciteTotale"
+ class="verga-field mt-2 disabled:bg-verga-surface disabled:text-verga-muted"
+ [placeholder]="(capaciteIllimitee ? 'backoffice.createOffer.capaciteIllimiteePh' : 'backoffice.createOffer.capaciteTotalePh') | translate"
+ />
+ </div>
+ </div>
+
+ <div class="grid gap-5 sm:grid-cols-2">
+ <label class="flex items-start gap-3 border border-verga-border bg-verga-surface p-4 text-sm text-gray-700">
+ <input
+ type="checkbox"
+ name="capaciteIllimitee"
+ [ngModel]="capaciteIllimitee"
+ (ngModelChange)="onCapaciteIllimiteeChange($event)"
+ class="mt-0.5 h-4 w-4 accent-[var(--color-verga-primary,#5eadd6)]"
+ />
+ <span>
+ <span class="block font-semibold text-gray-900">{{ 'backoffice.createOffer.capaciteIllimitee' | translate }}</span>
+ <span class="mt-1 block text-xs text-verga-muted">{{ 'backoffice.createOffer.capaciteIllimiteeHint' | translate }}</span>
+ </span>
+ </label>
+ <div>
+ <label for="offer-statut" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.statut' | translate }} *</label>
+ <select id="offer-statut" name="statut" required [(ngModel)]="statut" class="verga-field mt-2 appearance-none bg-white">
+ @for (option of statutOptions; track option.value) {
+ <option [value]="option.value">{{ option.labelKey | translate }}</option>
+ }
+ </select>
  </div>
  </div>
 

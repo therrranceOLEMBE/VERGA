@@ -32,31 +32,23 @@
 }
 
 .paiements-col-code {
-  width: 13%;
-}
-
-.paiements-col-bamboo {
-  width: 15%;
+  width: 20%;
 }
 
 .paiements-col-commande {
-  width: 14%;
+  width: 22%;
 }
 
 .paiements-col-amount {
-  width: 14%;
-}
-
-.paiements-col-method {
-  width: 14%;
+  width: 18%;
 }
 
 .paiements-col-status {
-  width: 16%;
+  width: 20%;
 }
 
 .paiements-col-date {
-  width: 14%;
+  width: 20%;
 }
 
 .paiement-cell-truncate {
@@ -80,7 +72,7 @@
 
 @media (max-width: 1023px) {
   .paiements-table {
-    min-width: 60rem;
+    min-width: 40rem;
     table-layout: auto;
   }
 }

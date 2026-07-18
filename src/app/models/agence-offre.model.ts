@@ -30,6 +30,7 @@ export interface AgenceOffreRaw {
   quantite_vendue?: number | string | null;
   capacite_disponible?: number | string | null;
   capacite_totale?: number | string | null;
+  capacite_illimitee?: boolean;
   capacite?: {
     capacite_disponible?: number | string | null;
     capacite_totale?: number | string | null;

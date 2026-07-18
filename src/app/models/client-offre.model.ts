@@ -27,6 +27,7 @@ export interface ClientOffreRaw {
   type_offre_id?: string;
   type_offre?: ClientOffreTypeOffreRaw | null;
   prix?: number | string | null;
+  capacite_illimitee?: boolean;
   capacite_totale?: number | string | null;
   capacite_disponible?: number | string | null;
   origine?: string;

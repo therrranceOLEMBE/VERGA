@@ -15,6 +15,21 @@ import { AgenceReversementsListResponse, AgenceReversementsQueryParams } from '.
 import { AgenceSoldeResponse } from '../models/agence-solde.model';
 import { AgenceReclamationsListResponse, AgenceReclamationsQueryParams, AgenceReclamationDetailResponse, AgenceReclamationStatutUpdateRequest, AgenceReclamationStatutUpdateResponse, AgenceReclamationCreateRequest, AgenceReclamationCreateResponse } from '../models/agence-reclamation.model';
 import { AgenceOffreCreateRequest, AgenceOffreCreateResponse, AgenceOffreDeleteResponse, AgenceOffreUpdateRequest, AgenceOffreUpdateResponse } from '../models/agence-offre-create.model';
+import {
+  AgenceRolesResponse,
+  AgenceUserCreateRequest,
+  AgenceUserCreateResponse,
+  AgenceUserDeleteResponse,
+  AgenceUserUpdateRequest,
+  AgenceUserUpdateResponse,
+  AgenceUsersListResponse,
+} from '../models/agence-user.model';
+import {
+  TypeOffre,
+  TypeOffreCreateRequest,
+  TypeOffreDeleteResponse,
+  TypeOffreUpdateRequest,
+} from '../models/type-offre.model';
 import { mapAgenceMeToProfile } from '../utils/agence-me.util';
 import { AgenceService } from './agence.service';
 
@@ -166,6 +181,51 @@ export class AgenceSessionService {
     return this.agenceService.deleteOffre(token, offreId);
   }
 
+  loadTypeOffres(): Observable<TypeOffre[]> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No agence token'));
+    }
+
+    return this.agenceService.getTypeOffres(token);
+  }
+
+  loadTypeOffre(typeOffreId: string): Observable<TypeOffre> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No agence token'));
+    }
+
+    return this.agenceService.getTypeOffre(token, typeOffreId);
+  }
+
+  createTypeOffre(payload: TypeOffreCreateRequest): Observable<TypeOffre> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No agence token'));
+    }
+
+    return this.agenceService.createTypeOffre(token, payload);
+  }
+
+  updateTypeOffre(typeOffreId: string, payload: TypeOffreUpdateRequest): Observable<TypeOffre> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No agence token'));
+    }
+
+    return this.agenceService.updateTypeOffre(token, typeOffreId, payload);
+  }
+
+  deleteTypeOffre(typeOffreId: string): Observable<TypeOffreDeleteResponse> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No agence token'));
+    }
+
+    return this.agenceService.deleteTypeOffre(token, typeOffreId);
+  }
+
   loadCommandes(params: AgenceCommandesQueryParams = {}): Observable<AgenceCommandesListResponse> {
     const token = this.getToken();
     if (!token) {
@@ -221,6 +281,51 @@ export class AgenceSessionService {
     }
 
     return this.agenceService.getPaiements(token, params);
+  }
+
+  loadRoles(): Observable<AgenceRolesResponse> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No agence token'));
+    }
+
+    return this.agenceService.getRoles(token);
+  }
+
+  createUser(payload: AgenceUserCreateRequest): Observable<AgenceUserCreateResponse> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No agence token'));
+    }
+
+    return this.agenceService.createUser(token, payload);
+  }
+
+  loadUsers(): Observable<AgenceUsersListResponse> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No agence token'));
+    }
+
+    return this.agenceService.getUsers(token);
+  }
+
+  updateUser(userId: number | string, payload: AgenceUserUpdateRequest): Observable<AgenceUserUpdateResponse> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No agence token'));
+    }
+
+    return this.agenceService.updateUser(token, userId, payload);
+  }
+
+  deleteUser(userId: number | string): Observable<AgenceUserDeleteResponse> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No agence token'));
+    }
+
+    return this.agenceService.deleteUser(token, userId);
   }
 
   loadSolde(): Observable<AgenceSoldeResponse> {
