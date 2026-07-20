@@ -9,14 +9,14 @@ import {
 } from '../models/client-offre.model';
 
 const LOGO_GRADIENTS = [
-  'linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%)',
-  'linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%)',
-  'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
-  'linear-gradient(135deg, #065f46 0%, #10b981 100%)',
-  'linear-gradient(135deg, #b45309 0%, #f59e0b 100%)',
+  'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+  'linear-gradient(135deg, #1c1917 0%, #44403c 100%)',
   'linear-gradient(135deg, #7c2d12 0%, #ea580c 100%)',
-  'linear-gradient(135deg, #0c4a6e 0%, #38bdf8 100%)',
-  'linear-gradient(135deg, #831843 0%, #ec4899 100%)',
+  'linear-gradient(135deg, #14532d 0%, #166534 100%)',
+  'linear-gradient(135deg, #78350f 0%, #d97706 100%)',
+  'linear-gradient(135deg, #9a3412 0%, #ff6b35 100%)',
+  'linear-gradient(135deg, #334155 0%, #64748b 100%)',
+  'linear-gradient(135deg, #3f3f46 0%, #71717a 100%)',
 ];
 
 function asRecord(value: unknown): Record<string, unknown> | null {

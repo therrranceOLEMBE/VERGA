@@ -1,9 +1,31 @@
 .client-backoffice-shell {
+  /* Remap palette globale : plus de bleu ciel dans l’espace client */
+  --color-verga-primary: #ff6b35;
+  --color-verga-primary-dark: #e85a28;
+  --color-verga-primary-light: #ff8f66;
+  --color-verga-primary-muted: #fffaf7;
+  --color-verga-sky: #ff6b35;
+  --color-verga-sky-dark: #e85a28;
+  --color-verga-accent: #ff6b35;
+  --color-verga-accent-dark: #e85a28;
+  --font-sans: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+
   min-height: 100vh;
   min-height: 100dvh;
-  background:
-    radial-gradient(ellipse 60% 40% at 100% 0%, color-mix(in srgb, var(--color-verga-primary, #5eadd6) 10%, transparent) 0%, transparent 55%),
-    var(--color-verga-surface, #f8fafc);
+  background: #fafafa;
+  font-family: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  color: #0f172a;
+}
+
+.client-backoffice-shell h1,
+.client-backoffice-shell h2,
+.client-backoffice-shell h3,
+.client-backoffice-shell .cespace-title,
+.client-backoffice-shell .cespace-panel-title,
+.client-backoffice-shell .cdash-title,
+.client-backoffice-shell .cdash-section-title,
+.client-backoffice-shell .cdash-panel-title {
+  font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
 }
 
 .client-backoffice-main {
@@ -23,6 +45,60 @@
 }
 
 .client-backoffice-mobile-bar {
-  backdrop-filter: blur(8px);
-  background: rgba(255, 255, 255, 0.92);
+  background: #fff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.client-mobile-menu-btn {
+  display: flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  color: #0f172a;
+  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+}
+
+.client-mobile-menu-btn:hover {
+  border-color: #ff6b35;
+  background: #fffaf7;
+  color: #e85a28;
+}
+
+.client-mobile-brand__name {
+  font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.125rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+}
+
+.client-backoffice-shell .verga-btn {
+  background: #ff6b35;
+  font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+}
+
+.client-backoffice-shell .verga-btn:hover {
+  background: #e85a28;
+}
+
+.client-backoffice-shell .verga-field:focus {
+  border-color: #ff6b35;
+  box-shadow: 0 0 0 2px color-mix(in srgb, #ff6b35 25%, transparent);
+}
+
+.client-backoffice-shell .verga-link {
+  color: #e85a28;
+}
+
+.client-backoffice-shell .verga-link:hover {
+  color: #ff6b35;
 }

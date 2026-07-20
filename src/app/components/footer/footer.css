@@ -1,0 +1,220 @@
+/* Footer — style éditorial aligné page d’accueil */
+
+.site-footer {
+  --ft-accent: #ff6b35;
+  --ft-accent-dark: #e85a28;
+  --ft-ink: #0f172a;
+  --ft-muted: #64748b;
+  --ft-border: #e2e8f0;
+  --ft-font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --ft-font-body: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  margin-top: auto;
+  border-top: 2px solid var(--ft-ink);
+  background: #fff;
+  font-family: var(--ft-font-body);
+  color: var(--ft-muted);
+}
+
+.site-footer__inner {
+  display: grid;
+  gap: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2.25rem 1rem 2rem;
+}
+
+@media (min-width: 640px) {
+  .site-footer__inner {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .site-footer__inner {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 2fr);
+    gap: 3rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.site-footer__logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.site-footer__logo img {
+  display: block;
+  width: 2.75rem;
+  height: 2.75rem;
+  object-fit: contain;
+  border: 1px solid var(--ft-border);
+}
+
+.site-footer__brand-name {
+  font-family: var(--ft-font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ft-ink);
+}
+
+.site-footer__tagline {
+  margin: 0.85rem 0 0;
+  max-width: 28rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--ft-muted);
+}
+
+.site-footer__columns {
+  display: grid;
+  gap: 1.75rem;
+}
+
+@media (min-width: 640px) {
+  .site-footer__columns {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+.site-footer__heading {
+  margin: 0 0 0.85rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--ft-border);
+  font-family: var(--ft-font-display);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ft-ink);
+}
+
+.site-footer__links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.site-footer__links li + li {
+  margin-top: 0.55rem;
+}
+
+.site-footer__links a {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ft-muted);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.site-footer__links a:hover {
+  color: var(--ft-accent-dark);
+}
+
+.site-footer__bottom {
+  border-top: 1px solid var(--ft-border);
+  background: #fafafa;
+}
+
+.site-footer__bottom-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  .site-footer__bottom-inner {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .site-footer__bottom-inner {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+}
+
+.site-footer__legal {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.15rem;
+  font-size: 0.75rem;
+}
+
+.site-footer__legal a {
+  font-family: var(--ft-font-display);
+  font-weight: 700;
+  color: var(--ft-ink);
+  text-decoration: none;
+}
+
+.site-footer__legal a:hover {
+  color: var(--ft-accent-dark);
+}
+
+.site-footer__legal span {
+  color: var(--ft-muted);
+}
+
+.site-footer__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem 1rem;
+}
+
+.site-footer__social {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.site-footer__social a {
+  display: inline-flex;
+  color: var(--ft-ink);
+  transition: color 0.15s ease;
+}
+
+.site-footer__social a:hover {
+  color: var(--ft-accent);
+}
+
+.site-footer__social svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.site-footer__top {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--ft-accent-dark);
+  background: var(--ft-accent);
+  color: #fff;
+  transition: background-color 0.15s ease;
+}
+
+.site-footer__top:hover {
+  background: var(--ft-accent-dark);
+}
+
+.site-footer__top svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}

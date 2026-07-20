@@ -1,210 +1,123 @@
-<div class="flex min-h-screen flex-col bg-white font-sans">
- <app-header />
+<div class="detail-offre-page">
+  <app-header />
 
- <main class="main-with-header flex-1">
- @if (loading()) {
- <div class="mx-auto max-w-lg px-4 py-24 text-center sm:px-6">
- <p class="text-sm text-verga-muted">{{ 'home.loading' | translate }}</p>
- </div>
- } @else if (offer(); as o) {
- <div class="border-b border-verga-border bg-verga-surface">
- <div class="mx-auto flex max-w-[1400px] flex-wrap items-center gap-3 px-4 py-4 sm:px-6 lg:px-8">
- <button
- type="button"
- (click)="goBack()"
- class="inline-flex items-center gap-2 text-sm font-medium text-verga-muted transition hover:text-verga-primary"
- >
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
- <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
- </svg>
- {{ 'offerDetail.back' | translate }}
- </button>
- <span class="hidden h-4 w-px bg-verga-border sm:block" aria-hidden="true"></span>
- <span class="bg-verga-primary px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-white">
- {{ o.category }}
- </span>
- @if (o.promotion) {
- <span class="verga-badge-success px-2.5 py-1 text-xs font-bold uppercase">{{ 'offer.promo' | translate }}</span>
- }
- </div>
- </div>
+  <main class="main-with-header">
+    @if (loading()) {
+      <div class="od-state">
+        <p>{{ 'home.loading' | translate }}</p>
+      </div>
+    } @else if (offer(); as o) {
+      <div class="od-top">
+        <div class="od-top__inner">
+          <button type="button" class="od-back" (click)="goBack()">
+            <span aria-hidden="true">←</span>
+            {{ 'offerDetail.back' | translate }}
+          </button>
+          <span class="od-top__sep" aria-hidden="true"></span>
+          <span class="od-category">{{ o.category }}</span>
+          @if (o.promotion) {
+            <span class="od-promo">{{ 'offer.promo' | translate }}</span>
+          }
+        </div>
+      </div>
 
- <div class="mx-auto grid max-w-[1400px] gap-8 px-4 py-8 sm:px-6 lg:grid-cols-5 lg:gap-12 lg:px-8 lg:py-12">
- <!-- Colonne infos -->
- <div class="flex flex-col lg:col-span-3">
- <div class="flex items-start justify-between gap-4">
- <h1 class="text-2xl font-bold uppercase leading-tight tracking-wide text-gray-900 sm:text-3xl lg:text-4xl">
- {{ o.title }}
- </h1>
- <button
- type="button"
- (click)="toggleFavorite()"
- class="flex h-11 w-11 shrink-0 items-center justify-center border border-verga-border bg-white text-gray-500 transition hover:border-verga-primary hover:text-verga-primary"
- [attr.aria-label]="(favorited() ? 'offerDetail.removeFavorite' : 'offerDetail.addFavorite') | translate"
- [class.border-verga-primary]="favorited()"
- [class.text-verga-primary]="favorited()"
- [class.bg-verga-primary-muted]="favorited()"
- >
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6" [attr.fill]="favorited() ? 'currentColor' : 'none'">
- <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
- </svg>
- </button>
- </div>
+      <div class="od-layout">
+        <div class="od-copy">
+          <div class="od-head">
+            <h1 class="od-title">{{ o.title }}</h1>
+            <button
+              type="button"
+              class="od-fav"
+              [class.is-on]="favorited()"
+              (click)="toggleFavorite()"
+              [attr.aria-label]="(favorited() ? 'offerDetail.removeFavorite' : 'offerDetail.addFavorite') | translate"
+            >
+              {{ favorited() ? '♥' : '♡' }}
+            </button>
+          </div>
 
- <div class="mt-4 flex flex-wrap items-center gap-4 text-sm text-verga-muted">
- <span class="inline-flex items-center gap-1.5">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
- <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
- </svg>
- {{ o.likes }} {{ 'offerDetail.likes' | translate }}
- </span>
- <span class="verga-text-success text-base font-bold">{{ o.price }}</span>
- </div>
+          <div class="od-meta">
+            <p class="od-price">{{ o.price }}</p>
+            <p class="od-likes">{{ o.likes }} {{ 'offerDetail.likes' | translate }}</p>
+          </div>
 
- <div class="mt-8 border-l-4 border-verga-primary bg-verga-primary-muted/60 px-5 py-4">
- <p class="text-base leading-relaxed text-gray-600 whitespace-pre-line">{{ descriptionPreview() }}</p>
- @if (showReadMore()) {
- <button
- type="button"
- (click)="toggleDescription()"
- class="verga-link mt-3 inline-flex items-center gap-1 text-sm font-semibold"
- >
- {{ (expanded() ? 'offerDetail.readLess' : 'offerDetail.readMore') | translate }}
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4 transition" [class.rotate-180]="expanded()">
- <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
- </svg>
- </button>
- }
- </div>
+          <section class="od-desc">
+            <p class="od-desc__text">{{ descriptionPreview() }}</p>
+            @if (showReadMore()) {
+              <button type="button" class="od-desc__more" (click)="toggleDescription()">
+                {{ (expanded() ? 'offerDetail.readLess' : 'offerDetail.readMore') | translate }}
+              </button>
+            }
+          </section>
 
- <ul class="mt-8 space-y-5">
- <li class="flex items-start gap-4">
- <span class="verga-icon-circle h-10 w-10 shrink-0">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
- <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
- </svg>
- </span>
- <div>
- <p class="text-xs font-semibold uppercase tracking-wide text-verga-muted">{{ 'offerDetail.date' | translate }}</p>
- <p class="mt-1 text-base text-gray-800">{{ o.date }}</p>
- </div>
- </li>
- <li class="flex items-start gap-4">
- <span class="verga-icon-circle h-10 w-10 shrink-0">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
- <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
- <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
- </svg>
- </span>
- <div>
- <p class="text-xs font-semibold uppercase tracking-wide text-verga-muted">{{ 'offerDetail.location' | translate }}</p>
- <p class="mt-1 text-base text-gray-800">{{ o.location }}</p>
- </div>
- </li>
- <li class="flex items-start gap-4">
- <span class="verga-icon-circle h-10 w-10 shrink-0">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
- <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
- <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 10.5 0 0 0-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 0 1 15 0Z" />
- </svg>
- </span>
- <div>
- <p class="text-xs font-semibold uppercase tracking-wide text-verga-muted">{{ 'offerDetail.address' | translate }}</p>
- <p class="mt-1 text-base leading-relaxed text-gray-800">{{ o.address }}</p>
- </div>
- </li>
- <li class="flex items-start gap-4">
- <span class="verga-icon-circle h-10 w-10 shrink-0">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
- <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
- </svg>
- </span>
- <div class="flex min-w-0 flex-1 flex-wrap items-center justify-between gap-3">
- <div>
- <p class="text-xs font-semibold uppercase tracking-wide text-verga-muted">{{ 'offer.publishedBy' | translate }}</p>
- <p class="mt-1 text-base font-bold text-gray-900">{{ o.publisherHandle }}</p>
- </div>
- <button
- type="button"
- class="shrink-0 border border-verga-primary bg-white px-4 py-2 text-sm font-semibold text-verga-primary transition hover:bg-verga-primary hover:text-white"
- >
- {{ 'offer.subscribe' | translate }}
- </button>
- </div>
- </li>
- </ul>
+          <ul class="od-facts">
+            <li class="od-fact">
+              <p class="od-fact__label">{{ 'offerDetail.date' | translate }}</p>
+              <p class="od-fact__value">{{ o.date }}</p>
+            </li>
+            <li class="od-fact">
+              <p class="od-fact__label">{{ 'offerDetail.location' | translate }}</p>
+              <p class="od-fact__value">{{ o.location }}</p>
+            </li>
+            <li class="od-fact">
+              <p class="od-fact__label">{{ 'offerDetail.address' | translate }}</p>
+              <p class="od-fact__value">{{ o.address }}</p>
+            </li>
+            <li class="od-fact">
+              <p class="od-fact__label">{{ 'offer.publishedBy' | translate }}</p>
+              <p class="od-fact__value">{{ o.publisherHandle }}</p>
+            </li>
+          </ul>
 
- <div class="mt-10 grid gap-3" [class.sm:grid-cols-2]="!offer()?.capaciteIllimitee">
- <button
- type="button"
- (click)="openBooking('achete')"
- class="verga-btn inline-flex items-center justify-center gap-2 py-4 text-base font-bold uppercase tracking-wide"
- >
- {{ 'offer.buy' | translate }}
- <span aria-hidden="true">&raquo;</span>
- </button>
- @if (!offer()?.capaciteIllimitee) {
- <button
- type="button"
- (click)="openBooking('reserve')"
- class="inline-flex items-center justify-center gap-2 border border-verga-primary bg-white px-4 py-4 text-center text-base font-bold uppercase tracking-wide text-verga-primary transition hover:bg-verga-primary hover:text-white"
- >
- {{ 'offer.reserve' | translate }}
- <span aria-hidden="true">&raquo;</span>
- </button>
- }
- <a
- routerLink="/nous-contacter"
- class="inline-flex items-center justify-center gap-2 border border-verga-border bg-white px-4 py-4 text-center text-sm font-semibold text-verga-ink transition hover:border-verga-primary hover:text-verga-primary"
- [class.sm:col-span-2]="!offer()?.capaciteIllimitee"
- >
- {{ 'offerDetail.askAdvisor' | translate }}
- </a>
- </div>
+          <div class="od-actions" [class.od-actions--split]="!offer()?.capaciteIllimitee">
+            <button type="button" class="od-btn od-btn--primary" (click)="openBooking('achete')">
+              {{ 'offer.buy' | translate }}
+              <span aria-hidden="true">→</span>
+            </button>
+            @if (!offer()?.capaciteIllimitee) {
+              <button type="button" class="od-btn od-btn--secondary" (click)="openBooking('reserve')">
+                {{ 'offer.reserve' | translate }}
+                <span aria-hidden="true">→</span>
+              </button>
+            }
+            <a routerLink="/nous-contacter" class="od-btn od-btn--ghost">
+              {{ 'offerDetail.askAdvisor' | translate }}
+            </a>
+          </div>
 
- <div class="mt-8 flex flex-wrap gap-2">
- <span class="bg-verga-surface px-3 py-1.5 text-xs font-medium text-verga-muted">{{ 'offerDetail.securePayment' | translate }}</span>
- <span class="bg-verga-surface px-3 py-1.5 text-xs font-medium text-verga-muted">{{ 'offerDetail.instantConfirmation' | translate }}</span>
- <span class="bg-verga-surface px-3 py-1.5 text-xs font-medium text-verga-muted">{{ 'offerDetail.mobileTicket' | translate }}</span>
- </div>
- </div>
+          <div class="od-assurances">
+            <span class="od-assurance">{{ 'offerDetail.securePayment' | translate }}</span>
+            <span class="od-assurance">{{ 'offerDetail.instantConfirmation' | translate }}</span>
+            <span class="od-assurance">{{ 'offerDetail.mobileTicket' | translate }}</span>
+          </div>
+        </div>
 
- <!-- Colonne visuel -->
- <div class="relative min-h-[320px] overflow-hidden bg-verga-ink lg:col-span-2 lg:min-h-[520px]">
- <div
- class="offer-poster-blur absolute inset-0"
- [style.background]="o.logoBg"
- aria-hidden="true"
- ></div>
- <div class="relative flex h-full min-h-[320px] items-center justify-center p-6 sm:p-10 lg:min-h-[520px]">
- <div
- class="offer-poster-main relative flex aspect-[3/4] w-full max-w-[320px] flex-col items-center justify-center px-6 py-10 text-center sm:max-w-[360px]"
- [style.background]="o.logoBg"
- >
- @if (o.promotion) {
- <span class="absolute left-0 top-0 verga-badge-success px-3 py-1 text-xs font-bold uppercase">{{ 'offer.promo' | translate }}</span>
- }
- <p class="text-xs font-semibold uppercase tracking-[0.2em] text-white/80">{{ o.category }}</p>
- <p class="mt-4 text-2xl font-bold uppercase leading-tight text-white drop-shadow-md sm:text-3xl">
- {{ o.title }}
- </p>
- <p class="mt-6 text-sm font-medium text-white/90">{{ o.date }}</p>
- <p class="mt-2 text-lg font-bold text-white">{{ o.price }}</p>
- </div>
- </div>
- </div>
- </div>
- } @else {
- <div class="mx-auto max-w-lg px-4 py-24 text-center sm:px-6">
- <p class="text-lg font-semibold text-gray-900">{{ 'offerDetail.notFound' | translate }}</p>
- <a routerLink="/accueil" class="verga-btn mt-8 inline-block w-auto px-8">{{ 'offerDetail.backHome' | translate }}</a>
- </div>
- }
- </main>
+        <aside class="od-visual" aria-hidden="true">
+          <div class="od-visual__bg" [style.background]="o.logoBg || '#0f172a'"></div>
+          <div class="od-visual__frame">
+            <div class="od-poster" [style.background]="o.logoBg || '#0f172a'">
+              @if (o.promotion) {
+                <span class="od-poster__promo">{{ 'offer.promo' | translate }}</span>
+              }
+              <p class="od-poster__cat">{{ o.category }}</p>
+              <p class="od-poster__title">{{ o.title }}</p>
+              <p class="od-poster__date">{{ o.date }}</p>
+              <p class="od-poster__price">{{ o.price }}</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    } @else {
+      <div class="od-state">
+        <p class="od-state__title">{{ 'offerDetail.notFound' | translate }}</p>
+        <a routerLink="/accueil" class="od-state__cta">{{ 'offerDetail.backHome' | translate }}</a>
+      </div>
+    }
+  </main>
 
- @if (bookingOpen() && offer(); as o) {
- <app-offer-booking-modal [offer]="o" [action]="bookingAction()" (closed)="closeBooking()" />
- }
+  @if (bookingOpen() && offer(); as o) {
+    <app-offer-booking-modal [offer]="o" [action]="bookingAction()" (closed)="closeBooking()" />
+  }
 
- <app-footer />
+  <app-footer />
 </div>

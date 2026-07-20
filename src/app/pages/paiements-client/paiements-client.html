@@ -1,4 +1,4 @@
-<div class="cespace-page">
+﻿<div class="cespace-page">
   <header class="cespace-hero">
     <div class="cespace-hero-bg" aria-hidden="true"></div>
     <div class="cespace-hero-inner">
@@ -64,8 +64,6 @@
           <tr>
             <th class="client-col-code">{{ 'clientBackoffice.paiements.colCode' | translate }}</th>
             <th class="client-col-commande">{{ 'clientBackoffice.paiements.colCommande' | translate }}</th>
-            <th class="client-col-bamboo">{{ 'clientBackoffice.paiements.colBamboo' | translate }}</th>
-            <th class="client-col-quantite">{{ 'clientBackoffice.paiements.colQuantite' | translate }}</th>
             <th class="client-col-amount text-right">{{ 'clientBackoffice.paiements.colAmount' | translate }}</th>
             <th class="client-col-status">{{ 'clientBackoffice.paiements.colStatus' | translate }}</th>
             <th class="client-col-date">{{ 'clientBackoffice.paiements.colDate' | translate }}</th>
@@ -78,10 +76,6 @@
               <td class="client-col-commande cespace-ink">
                 <span class="cespace-cell-truncate" [attr.title]="paiement.commande">{{ paiement.commande }}</span>
               </td>
-              <td class="client-col-bamboo">
-                <span class="cespace-cell-truncate" [attr.title]="paiement.bambooReference">{{ paiement.bambooReference }}</span>
-              </td>
-              <td class="client-col-quantite">{{ paiement.quantiteLabel }}</td>
               <td class="client-col-amount text-right cespace-tabular cespace-strong">{{ paiement.montant }}</td>
               <td class="client-col-status">
                 @if (paiement.statut) {
@@ -96,7 +90,7 @@
             </tr>
           } @empty {
             <tr>
-              <td colspan="7" class="cespace-empty">{{ 'clientBackoffice.paiements.empty' | translate }}</td>
+              <td colspan="5" class="cespace-empty">{{ 'clientBackoffice.paiements.empty' | translate }}</td>
             </tr>
           }
         </tbody>
@@ -113,9 +107,7 @@
             class="cespace-page-btn"
             [attr.aria-label]="'aria.prevPage' | translate"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-            </svg>
+            ←
           </button>
           @for (page of pageNumbers(); track page) {
             <button
@@ -135,9 +127,7 @@
             class="cespace-page-btn"
             [attr.aria-label]="'aria.nextPage' | translate"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
-            </svg>
+            →
           </button>
         </nav>
         <p class="cespace-results">{{ resultsLabel() }}</p>

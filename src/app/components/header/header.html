@@ -1,16 +1,24 @@
 <header class="site-header fixed top-0 left-0 right-0 z-50 bg-white font-sans shadow-sm">
  <div class="border-b border-verga-border bg-white">
  <div class="site-header-inner mx-auto flex max-w-[1400px] flex-col gap-3 px-4 py-3 md:flex-row md:items-center md:gap-4 md:py-4 lg:gap-6">
- <a routerLink="/accueil" class="site-header-logo shrink-0 leading-none">
- <span class="text-xl font-bold tracking-tight text-verga-primary sm:text-2xl md:text-3xl">VERGA</span>
- <span class="ml-0.5 align-super text-[10px] font-semibold text-verga-primary-light sm:text-xs">.com</span>
+ <a routerLink="/accueil" class="site-header-logo shrink-0" [attr.aria-label]="'common.logoAlt' | translate">
+ <span class="site-header-logo__frame">
+ <img
+ src="/images/logo_verga.jpeg"
+ [attr.alt]="'common.logoAlt' | translate"
+ class="site-header-logo__img"
+ width="44"
+ height="44"
+ decoding="async"
+ />
+ </span>
  </a>
 
  <div class="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
  <div class="site-header-search-bar flex min-w-0 flex-1 overflow-hidden border border-verga-border bg-white shadow-sm">
  <button
  type="button"
- class="relative flex shrink-0 items-center justify-center bg-verga-primary px-3 py-2.5 text-white hover:bg-verga-primary-dark md:px-4 md:py-3"
+ class="relative flex shrink-0 items-center justify-center bg-verga-accent px-3 py-2.5 text-white hover:bg-verga-accent-dark md:px-4 md:py-3"
  [attr.aria-label]="'aria.filters' | translate"
  (click)="openFilters($event)"
  >
@@ -18,7 +26,7 @@
  <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
  </svg>
  @if (activeFiltersCount() > 0) {
- <span class="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-verga-primary">
+ <span class="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-white px-1 text-[10px] font-bold text-verga-accent">
  {{ activeFiltersCount() }}
  </span>
  }
@@ -34,7 +42,7 @@
  />
  <button
  type="button"
- class="flex shrink-0 items-center justify-center bg-verga-primary px-3 py-2.5 text-white hover:bg-verga-primary-dark md:px-4 md:py-3"
+ class="flex shrink-0 items-center justify-center bg-verga-accent px-3 py-2.5 text-white hover:bg-verga-accent-dark md:px-4 md:py-3"
  [attr.aria-label]="'aria.search' | translate"
  (click)="submitSearch()"
  >
@@ -47,70 +55,42 @@
  <div class="site-header-actions flex shrink-0 items-center gap-1.5 text-gray-800 sm:gap-2">
  <a
  routerLink="/connexion"
- class="whitespace-nowrap bg-verga-primary px-2 py-2 text-[10px] font-medium leading-tight text-white transition hover:bg-verga-primary-dark sm:px-4 sm:py-2.5 sm:text-sm"
+ class="site-header-publish whitespace-nowrap px-2 py-2 text-[10px] font-medium leading-tight text-white transition sm:px-4 sm:py-2.5 sm:text-sm"
  >
  {{ 'header.publishOffer' | translate }}
  </a>
- @if (showActionIcons()) {
- <a
- routerLink="/connexion"
- class="site-header-icon-btn flex h-10 w-10 items-center justify-center hover:text-verga-primary"
- [attr.aria-label]="'aria.favorites' | translate"
- >
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
- <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
- </svg>
- </a>
- <a
- routerLink="/connexion"
- class="site-header-icon-btn flex h-10 w-10 items-center justify-center hover:text-verga-primary"
- [attr.aria-label]="'aria.notifications' | translate"
- >
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
- <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
- </svg>
- </a>
- }
 
- <div class="relative z-50" data-menu-root>
+ <div class="site-header-menu relative z-50" data-menu-root>
  <button
  type="button"
  (click)="toggleMenu($event)"
- class="flex h-10 w-10 items-center justify-center border border-verga-border hover:border-verga-primary sm:h-auto sm:w-auto sm:gap-2 sm:px-2 sm:py-1.5"
+ class="site-header-menu__trigger"
  [attr.aria-expanded]="menuOpen()"
  aria-haspopup="true"
  [attr.aria-label]="(isClientAuthenticated() ? 'aria.userMenuConnected' : 'aria.userMenu') | translate"
  >
- <!-- Icône menu hamburger (inchangée) -->
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6 text-gray-800" aria-hidden="true">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="site-header-menu__burger" aria-hidden="true">
  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
  </svg>
 
- <!-- Icône contact / profil -->
  <span
- class="h-7 w-7 items-center justify-center border-2"
- [class.hidden]="!isClientAuthenticated()"
- [class.flex]="isClientAuthenticated()"
- [class.lg:flex]="!isClientAuthenticated()"
- [class.border-verga-success]="isClientAuthenticated()"
- [class.text-verga-success]="isClientAuthenticated()"
- [class.border-gray-800]="!isClientAuthenticated()"
- [class.text-gray-800]="!isClientAuthenticated()"
+ class="site-header-menu__avatar"
+ [class.is-auth]="isClientAuthenticated()"
+ [class.is-guest-hidden]="!isClientAuthenticated()"
  aria-hidden="true"
  >
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-4 w-4">
+ <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
  </svg>
  </span>
 
- <!-- Validation : visible uniquement si client particulier connecté -->
  @if (isClientAuthenticated()) {
  <span
- class="flex h-7 w-7 shrink-0 items-center justify-center text-verga-success"
+ class="site-header-menu__check"
  [attr.title]="'header.clientConnected' | translate"
  [attr.aria-label]="'header.clientConnected' | translate"
  >
- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-6 w-6">
+ <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
  <path
  fill-rule="evenodd"
  d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm13.36-1.814a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
@@ -123,14 +103,14 @@
 
  @if (menuOpen()) {
  <nav
- class="absolute right-0 top-full z-50 mt-2 min-w-[200px] border border-verga-border bg-white py-1 shadow-lg"
+ class="site-header-menu__panel"
  [attr.aria-label]="'aria.navigation' | translate"
  >
  @for (link of menuLinks(); track link.path) {
  <a
  [routerLink]="link.path"
  (click)="closeMenuAfterNavigate()"
- class="block px-4 py-2.5 text-sm text-verga-muted hover:bg-verga-primary-muted hover:text-verga-primary"
+ class="site-header-menu__link"
  >
  {{ link.labelKey | translate }}
  </a>
@@ -140,7 +120,7 @@
  type="button"
  (click)="logout($event)"
  [disabled]="loggingOut()"
- class="block w-full px-4 py-2.5 text-left text-sm text-red-600 hover:bg-red-50 disabled:opacity-40"
+ class="site-header-menu__logout"
  >
  {{ 'clientBackoffice.logout' | translate }}
  </button>

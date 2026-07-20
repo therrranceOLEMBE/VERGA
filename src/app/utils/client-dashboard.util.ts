@@ -4,7 +4,8 @@ import {
   ClientDashboardResponse,
   ClientDashboardStats,
 } from '../models/client-dashboard.model';
-import { formatDashboardMoney } from './agence-dashboard.util';
+import { ClientCommandeRaw } from '../models/client-commande.model';
+import { mapCommandeToRow } from './client-commande.util';
 
 export interface ClientDashboardStatusCount {
   key: string;
@@ -67,10 +68,6 @@ function resolveLabel(value: unknown): string {
     }
   }
   return '';
-}
-
-function formatCount(value: number | null | undefined): string {
-  return (value ?? 0).toLocaleString('fr-FR');
 }
 
 function formatDate(value: unknown): string {
@@ -144,20 +141,27 @@ function mapStatusCounts(
 
 function mapDernieresCommandes(items: Array<Record<string, unknown>> | undefined): ClientDashboardCommandeRow[] {
   return (items ?? []).map((item, index) => {
-    const statut = resolveLabel(item['statut']) || resolveLabel(item['status']);
+    const row = mapCommandeToRow(item as ClientCommandeRaw);
+    const statut = row.statut || resolveLabel(item['status']);
+    const quantitePayeeLabel =
+      (typeof item['quantite_payee_label'] === 'string' && item['quantite_payee_label'].trim()) ||
+      (row.quantitePayeeLabel !== '—' ? row.quantitePayeeLabel : '') ||
+      resolveLabel(item['quantite_payee']) ||
+      '—';
+
     return {
-      id: resolveLabel(item['id']) || String(index),
-      code: resolveLabel(item['code']) || resolveLabel(item['reference']) || '—',
+      id: row.id || resolveLabel(item['id']) || String(index),
+      code: row.code !== '—' ? row.code : resolveLabel(item['reference']) || '—',
       agence:
-        resolveLabel(item['agence']) ||
+        row.agence ||
         resolveLabel(item['agence_nom']) ||
         resolveLabel(item['agency']) ||
         '—',
-      quantite: formatCount(Number(item['quantite'] ?? item['quantity'] ?? 0)),
-      montant: formatDashboardMoney(Number(item['montant'] ?? item['amount'] ?? item['total'] ?? 0)),
+      quantite: quantitePayeeLabel,
+      montant: row.montant,
       statut,
       statutKey: resolveCommandeStatusKey(statut),
-      date: formatDate(item['date'] ?? item['created_at']),
+      date: row.date === '—' ? formatDate(item['updated_at']) : row.date,
     };
   });
 }

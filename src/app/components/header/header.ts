@@ -1,4 +1,4 @@
-import { Component, HostListener, computed, inject, input, signal } from '@angular/core';
+import { Component, HostListener, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { FiltersModal } from '../filters-modal/filters-modal';
@@ -24,8 +24,6 @@ export class Header {
   private readonly clientSession = inject(ClientSessionService);
   private readonly particulierService = inject(ParticulierService);
   private readonly filtersService = inject(OfferFiltersService);
-
-  readonly showActionIcons = input(true);
 
   protected readonly menuOpen = signal(false);
   protected readonly filtersOpen = signal(false);

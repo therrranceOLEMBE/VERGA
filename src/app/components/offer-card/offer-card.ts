@@ -8,6 +8,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   selector: 'app-offer-card',
   imports: [RouterLink, TranslatePipe, OfferBookingModal],
   templateUrl: './offer-card.html',
+  styleUrl: './offer-card.css',
 })
 export class OfferCard {
   readonly offer = input.required<Offer>();

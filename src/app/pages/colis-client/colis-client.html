@@ -1,4 +1,4 @@
-<div class="cespace-page">
+﻿<div class="cespace-page">
   <header class="cespace-hero">
     <div class="cespace-hero-bg" aria-hidden="true"></div>
     <div class="cespace-hero-inner">
@@ -115,9 +115,7 @@
             class="cespace-page-btn"
             [attr.aria-label]="'aria.prevPage' | translate"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-            </svg>
+            ←
           </button>
           @for (page of pageNumbers(); track page) {
             <button
@@ -137,9 +135,7 @@
             class="cespace-page-btn"
             [attr.aria-label]="'aria.nextPage' | translate"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
-            </svg>
+            →
           </button>
         </nav>
         <p class="cespace-results">{{ resultsLabel() }}</p>
@@ -155,13 +151,14 @@
     aria-modal="true"
     (click)="onModalBackdropClick($event)"
   >
-    <div class="cespace-modal" (click)="$event.stopPropagation()">
+    <div class="cespace-modal cespace-modal--wide" (click)="$event.stopPropagation()">
       <div class="cespace-modal-head">
-        <h2 class="cespace-modal-title">{{ 'clientBackoffice.colis.modalDetailTitle' | translate }}</h2>
+        <div class="cespace-modal-head-copy">
+          <p class="cespace-modal-eyebrow">{{ 'clientBackoffice.space' | translate }}</p>
+          <h2 class="cespace-modal-title">{{ 'clientBackoffice.colis.modalDetailTitle' | translate }}</h2>
+        </div>
         <button type="button" (click)="closeDetail()" class="cespace-modal-close" [attr.aria-label]="'aria.close' | translate">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-          </svg>
+          ×
         </button>
       </div>
 
@@ -283,6 +280,8 @@
           } @else {
             <span></span>
           }
+        } @else {
+          <span></span>
         }
         <button type="button" (click)="closeDetail()" class="verga-btn cespace-submit">
           {{ 'clientBackoffice.colis.close' | translate }}

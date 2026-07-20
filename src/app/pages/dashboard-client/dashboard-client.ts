@@ -23,7 +23,6 @@ interface StatusBarItem extends ClientDashboardStatusCount {
 interface QuickLink {
   labelKey: string;
   path: string;
-  icon: 'orders' | 'payments' | 'parcels' | 'claims' | 'home' | 'profile';
   hintKey: string;
 }
 
@@ -55,37 +54,31 @@ export class DashboardClient implements OnInit {
     {
       labelKey: 'clientBackoffice.nav.commandes',
       path: '/espace-client/commandes',
-      icon: 'orders',
       hintKey: 'clientBackoffice.dashboard.quickOrdersHint',
     },
     {
       labelKey: 'clientBackoffice.nav.paiements',
       path: '/espace-client/paiements',
-      icon: 'payments',
       hintKey: 'clientBackoffice.dashboard.quickPaymentsHint',
     },
     {
       labelKey: 'clientBackoffice.nav.colis',
       path: '/espace-client/colis',
-      icon: 'parcels',
       hintKey: 'clientBackoffice.dashboard.quickParcelsHint',
     },
     {
       labelKey: 'clientBackoffice.nav.reclamations',
       path: '/espace-client/reclamations',
-      icon: 'claims',
       hintKey: 'clientBackoffice.dashboard.quickClaimsHint',
     },
     {
       labelKey: 'clientBackoffice.dashboard.browseOffers',
       path: '/accueil',
-      icon: 'home',
       hintKey: 'clientBackoffice.dashboard.quickOffersHint',
     },
     {
       labelKey: 'clientBackoffice.nav.profile',
       path: '/espace-client/profil',
-      icon: 'profile',
       hintKey: 'clientBackoffice.dashboard.quickProfileHint',
     },
   ];
@@ -124,10 +117,16 @@ export class DashboardClient implements OnInit {
   }
 
   protected statusClass(statut: string): string {
-    if (statut === 'confirmée') {
+    const key = statut
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/\p{M}/gu, '')
+      .replace(/\s+/g, '_');
+    if (key === 'confirmee') {
       return 'cdash-badge cdash-badge--success';
     }
-    if (statut === 'annulée') {
+    if (key === 'annulee') {
       return 'cdash-badge cdash-badge--muted';
     }
     return 'cdash-badge cdash-badge--primary';

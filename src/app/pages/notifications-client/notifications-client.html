@@ -18,11 +18,6 @@
     <ul class="cespace-notif-list">
       @for (notif of notifications(); track notif.id) {
         <li class="cespace-notif-item" [class.is-read]="notif.read">
-          <span class="cespace-notif-icon" [class.is-unread]="!notif.read" [class.is-read]="notif.read">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-5 w-5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
-            </svg>
-          </span>
           <div class="min-w-0 flex-1">
             <p class="cespace-notif-title">{{ notif.titleKey | translate }}</p>
             <p class="cespace-notif-desc">{{ notif.descKey | translate }}</p>
@@ -43,19 +38,19 @@
     <div class="cespace-form-body">
       <label class="cespace-pref-row">
         <span>{{ 'clientBackoffice.notifications.emailNotif' | translate }}</span>
-        <input type="checkbox" [(ngModel)]="emailNotif" name="emailNotif" class="h-4 w-4 text-verga-primary focus:ring-verga-primary/40" />
+        <input type="checkbox" [(ngModel)]="emailNotif" name="emailNotif" class="cespace-checkbox" />
       </label>
       <label class="cespace-pref-row">
         <span>{{ 'clientBackoffice.notifications.smsNotif' | translate }}</span>
-        <input type="checkbox" [(ngModel)]="smsNotif" name="smsNotif" class="h-4 w-4 text-verga-primary focus:ring-verga-primary/40" />
+        <input type="checkbox" [(ngModel)]="smsNotif" name="smsNotif" class="cespace-checkbox" />
       </label>
       <label class="cespace-pref-row">
         <span>{{ 'clientBackoffice.notifications.shipmentNotif' | translate }}</span>
-        <input type="checkbox" [(ngModel)]="shipmentNotif" name="shipmentNotif" class="h-4 w-4 text-verga-primary focus:ring-verga-primary/40" />
+        <input type="checkbox" [(ngModel)]="shipmentNotif" name="shipmentNotif" class="cespace-checkbox" />
       </label>
       <label class="cespace-pref-row">
         <span>{{ 'clientBackoffice.notifications.promoNotif' | translate }}</span>
-        <input type="checkbox" [(ngModel)]="promoNotif" name="promoNotif" class="h-4 w-4 text-verga-primary focus:ring-verga-primary/40" />
+        <input type="checkbox" [(ngModel)]="promoNotif" name="promoNotif" class="cespace-checkbox" />
       </label>
       <button type="submit" class="verga-btn cespace-submit">{{ 'clientBackoffice.notifications.save' | translate }}</button>
     </div>

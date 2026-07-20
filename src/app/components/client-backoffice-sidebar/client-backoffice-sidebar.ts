@@ -8,7 +8,6 @@ import { ParticulierService } from '../../services/particulier.service';
 interface ClientNavItem {
   labelKey: string;
   path: string;
-  icon: 'dashboard' | 'commandes' | 'paiements' | 'colis' | 'reclamations' | 'profile' | 'password';
 }
 
 @Component({
@@ -26,13 +25,13 @@ export class ClientBackofficeSidebar {
   readonly navigate = output<void>();
 
   protected readonly navItems: ClientNavItem[] = [
-    { labelKey: 'clientBackoffice.nav.dashboard', path: '/espace-client/dashboard', icon: 'dashboard' },
-    { labelKey: 'clientBackoffice.nav.commandes', path: '/espace-client/commandes', icon: 'commandes' },
-    { labelKey: 'clientBackoffice.nav.paiements', path: '/espace-client/paiements', icon: 'paiements' },
-    { labelKey: 'clientBackoffice.nav.colis', path: '/espace-client/colis', icon: 'colis' },
-    { labelKey: 'clientBackoffice.nav.reclamations', path: '/espace-client/reclamations', icon: 'reclamations' },
-    { labelKey: 'clientBackoffice.nav.profile', path: '/espace-client/profil', icon: 'profile' },
-    { labelKey: 'clientBackoffice.nav.password', path: '/espace-client/mot-de-passe', icon: 'password' },
+    { labelKey: 'clientBackoffice.nav.dashboard', path: '/espace-client/dashboard' },
+    { labelKey: 'clientBackoffice.nav.commandes', path: '/espace-client/commandes' },
+    { labelKey: 'clientBackoffice.nav.paiements', path: '/espace-client/paiements' },
+    { labelKey: 'clientBackoffice.nav.colis', path: '/espace-client/colis' },
+    { labelKey: 'clientBackoffice.nav.reclamations', path: '/espace-client/reclamations' },
+    { labelKey: 'clientBackoffice.nav.profile', path: '/espace-client/profil' },
+    { labelKey: 'clientBackoffice.nav.password', path: '/espace-client/mot-de-passe' },
   ];
 
   protected onNavigate(): void {

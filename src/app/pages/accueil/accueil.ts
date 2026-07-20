@@ -34,7 +34,7 @@ import {
 interface DestinationFilter {
   value: '' | OfferDestinationRoute;
   labelKey: string;
-  icon: 'all' | 'route';
+  iconUrl: string;
 }
 
 interface HeroSlide {
@@ -115,7 +115,7 @@ export class Accueil implements OnInit {
   protected readonly destinationFilters: DestinationFilter[] = OFFER_DESTINATION_FILTERS.map(
     (dest) => ({
       ...dest,
-      icon: dest.value ? ('route' as const) : ('all' as const),
+      iconUrl: this.destinationIconUrl(dest.value),
     }),
   );
 
@@ -189,6 +189,29 @@ export class Accueil implements OnInit {
     const match = this.destinationFilters.find((dest) => dest.value === value);
     return match?.labelKey ?? 'home.destination.all';
   });
+
+  private destinationIconUrl(value: '' | OfferDestinationRoute): string {
+    const base = '/icons/destinations';
+    switch (value) {
+      case '':
+        return `${base}/all.svg`;
+      case 'gabon-chine':
+        return `${base}/ship.svg`;
+      case 'gabon-france':
+      case 'gabon-maroc':
+      case 'gabon-etats-unis':
+      case 'gabon-canada':
+        return `${base}/plane.svg`;
+      case 'gabon-senegal':
+      case 'gabon-burkina':
+        return `${base}/truck.svg`;
+      case 'libreville-port-gentil':
+      case 'libreville-franceville':
+        return `${base}/pin.svg`;
+      default:
+        return `${base}/globe.svg`;
+    }
+  }
 
   protected readonly pageNumbers = computed(() =>
     Array.from({ length: this.totalPages() }, (_, index) => index + 1),

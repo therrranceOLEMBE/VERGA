@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ClientLoginRequest, ClientLoginResponse, ClientLogoutResponse } from '../models/client-auth.model';
+import { tap } from 'rxjs/operators';
 import {
   ClientCommandesListResponse,
   ClientCommandesQueryParams,
@@ -134,7 +135,11 @@ export class ParticulierService {
     return this.http.get<ClientCommandesListResponse>(`${this.baseUrl}/commandes`, {
       headers: this.authHeaders(token),
       params: httpParams,
-    });
+    }).pipe(
+      tap((response) => {
+        console.log(response);
+      }),
+    );
   }
 
   createCommande(token: string | null, formData: FormData): Observable<ClientCommandeCreateResponse> {
