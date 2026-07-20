@@ -1,23 +1,4 @@
 <div class="auth-page">
-  <div class="auth-live" aria-hidden="true">
-    <div class="auth-orb auth-orb--a"></div>
-    <div class="auth-orb auth-orb--b"></div>
-    <div class="auth-orb auth-orb--c"></div>
-    <div class="auth-grid"></div>
-    <svg class="auth-routes" viewBox="0 0 1200 800" preserveAspectRatio="none">
-      <path d="M-40 160 C 220 80, 380 260, 620 180 S 980 60, 1240 140" />
-      <path d="M-20 420 C 260 520, 460 300, 720 390 S 1020 560, 1260 430" />
-      <path d="M-30 680 C 300 620, 520 740, 780 650 S 1080 560, 1280 700" />
-    </svg>
-    <span class="auth-beacon auth-beacon--1"></span>
-    <span class="auth-beacon auth-beacon--2"></span>
-    <span class="auth-beacon auth-beacon--3"></span>
-    <span class="auth-spark auth-spark--1"></span>
-    <span class="auth-spark auth-spark--2"></span>
-    <span class="auth-spark auth-spark--3"></span>
-    <span class="auth-spark auth-spark--4"></span>
-  </div>
-
   <a routerLink="/accueil" class="auth-back">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4" aria-hidden="true">
       <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
@@ -27,10 +8,20 @@
 
   <div class="auth-shell">
     <aside class="auth-brand" aria-hidden="true">
-      <div class="auth-brand-stage">
-        <div class="auth-orb auth-orb--a"></div>
-        <div class="auth-orb auth-orb--b"></div>
-        <div class="auth-brand-frame"></div>
+      <div class="auth-brand-slider">
+        @for (slide of authSlides; track slide.imageUrl; let i = $index) {
+          <div class="auth-brand-slide" [class.is-active]="activeSlide() === i">
+            <img
+              [src]="slide.imageUrl"
+              alt=""
+              width="900"
+              height="1200"
+              [attr.loading]="i === 0 ? 'eager' : 'lazy'"
+              decoding="async"
+            />
+          </div>
+        }
+        <div class="auth-brand-veil"></div>
       </div>
 
       <div class="auth-brand-content">
@@ -41,24 +32,17 @@
         </div>
         <p class="auth-brand-tagline">{{ 'auth.login.brandTagline' | translate }}</p>
         <p class="auth-brand-copy">{{ 'auth.login.brandCopy' | translate }}</p>
-        <div class="auth-brand-points">
-          <span class="auth-brand-point">{{ 'auth.login.pointTrack' | translate }}</span>
-          <span class="auth-brand-point">{{ 'auth.login.pointSecure' | translate }}</span>
-          <span class="auth-brand-point">{{ 'auth.login.pointFast' | translate }}</span>
-        </div>
-        <div class="auth-brand-metric">
-          <div class="auth-metric-item">
-            <strong>24/7</strong>
-            <span>{{ 'auth.login.metricLive' | translate }}</span>
-          </div>
-          <div class="auth-metric-item">
-            <strong>SSL</strong>
-            <span>{{ 'auth.login.metricSecure' | translate }}</span>
-          </div>
-          <div class="auth-metric-item">
-            <strong>EU–AF</strong>
-            <span>{{ 'auth.login.metricRoutes' | translate }}</span>
-          </div>
+        <p class="auth-brand-caption">{{ authSlides[activeSlide()].captionKey | translate }}</p>
+        <div class="auth-brand-dots">
+          @for (slide of authSlides; track slide.imageUrl; let i = $index) {
+            <button
+              type="button"
+              class="auth-brand-dot"
+              [class.is-active]="activeSlide() === i"
+              (click)="goToSlide(i)"
+              [attr.aria-label]="('auth.slider.goto' | translate:{ index: i + 1 })"
+            ></button>
+          }
         </div>
       </div>
     </aside>

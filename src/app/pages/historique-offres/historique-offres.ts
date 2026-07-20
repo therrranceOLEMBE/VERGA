@@ -57,6 +57,8 @@ export class HistoriqueOffres implements OnInit {
   protected editCapaciteDisponible: number | null = null;
   protected editOrigine = '';
   protected editDestination = '';
+  protected editDateDepart = '';
+  protected editDateDepotColis = '';
   protected editDescription = '';
   protected editStatut: AgenceOffreStatut = 'active';
 
@@ -317,6 +319,8 @@ export class HistoriqueOffres implements OnInit {
       capacite_totale: this.editCapaciteIllimitee ? null : Number(this.editCapaciteTotale),
       origine: this.editOrigine.trim(),
       destination: this.editDestination.trim(),
+      date_depart: this.editDateDepart.trim(),
+      date_depot_colis: this.editDateDepotColis.trim() || null,
       description: this.editDescription.trim(),
       statut: this.editStatut,
     };
@@ -464,6 +468,8 @@ export class HistoriqueOffres implements OnInit {
     this.editCapaciteDisponible = form.capaciteDisponible;
     this.editOrigine = form.origine;
     this.editDestination = form.destination;
+    this.editDateDepart = form.dateDepart;
+    this.editDateDepotColis = form.dateDepotColis;
     this.editDescription = form.description;
     this.editStatut = form.statut;
     this.syncEditTypeOffreSelection();
@@ -498,6 +504,8 @@ export class HistoriqueOffres implements OnInit {
     this.editCapaciteDisponible = null;
     this.editOrigine = '';
     this.editDestination = '';
+    this.editDateDepart = '';
+    this.editDateDepotColis = '';
     this.editDescription = '';
     this.editStatut = 'active';
   }
@@ -514,6 +522,7 @@ export class HistoriqueOffres implements OnInit {
         (this.editCapaciteTotale != null && this.editCapaciteTotale > 0)) &&
       !!this.editOrigine.trim() &&
       !!this.editDestination.trim() &&
+      !!this.editDateDepart.trim() &&
       !!this.editDescription.trim() &&
       !!this.editStatut
     );

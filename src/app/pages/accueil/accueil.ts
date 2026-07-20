@@ -2,16 +2,20 @@ import {
   afterNextRender,
   Component,
   computed,
+  DestroyRef,
   effect,
   ElementRef,
   HostListener,
   inject,
+  OnInit,
   signal,
   untracked,
   viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterLink } from '@angular/router';
+import { interval } from 'rxjs';
 import { Footer } from '../../components/footer/footer';
 import { Header } from '../../components/header/header';
 import { OfferCard } from '../../components/offer-card/offer-card';
@@ -33,16 +37,28 @@ interface DestinationFilter {
   icon: 'all' | 'route';
 }
 
+interface HeroSlide {
+  imageUrl: string;
+  imageAltKey: string;
+  captionKey: string;
+}
+
+interface FlagDestination {
+  code: string;
+  labelKey: string;
+}
+
 @Component({
   selector: 'app-accueil',
   imports: [Header, Footer, OfferCard, TranslatePipe, RouterLink],
   templateUrl: './accueil.html',
   styleUrl: './accueil.css',
 })
-export class Accueil {
+export class Accueil implements OnInit {
   private readonly filtersService = inject(OfferFiltersService);
   private readonly language = inject(LanguageService);
   private readonly catalogService = inject(ClientOfferCatalogService);
+  private readonly destroyRef = inject(DestroyRef);
 
   private readonly destinationScroll = viewChild<ElementRef<HTMLElement>>('destinationScroll');
 
@@ -51,6 +67,8 @@ export class Accueil {
   protected readonly showScrollTop = signal(false);
   protected readonly currentPage = signal(1);
   protected readonly pageSize = 15;
+  protected readonly activeSlide = signal(0);
+  protected readonly sliderPaused = signal(false);
 
   protected readonly offers = signal<Offer[]>([]);
   protected readonly totalPages = signal(1);
@@ -60,12 +78,70 @@ export class Accueil {
 
   private activeFilterKey = '';
 
+  /** Images Unsplash — fret maritime, aérien, conteneurs, entrepôts */
+  protected readonly heroSlides: HeroSlide[] = [
+    {
+      imageUrl:
+        'https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?auto=format&fit=crop&w=1920&q=80',
+      imageAltKey: 'home.slider.altShip',
+      captionKey: 'home.slider.captionShip',
+    },
+    {
+      imageUrl:
+        'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1920&q=80',
+      imageAltKey: 'home.slider.altContainers',
+      captionKey: 'home.slider.captionContainers',
+    },
+    {
+      imageUrl:
+        'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1920&q=80',
+      imageAltKey: 'home.slider.altAir',
+      captionKey: 'home.slider.captionAir',
+    },
+    {
+      imageUrl:
+        'https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=1920&q=80',
+      imageAltKey: 'home.slider.altPort',
+      captionKey: 'home.slider.captionPort',
+    },
+    {
+      imageUrl:
+        'https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?auto=format&fit=crop&w=1920&q=80',
+      imageAltKey: 'home.slider.altWarehouse',
+      captionKey: 'home.slider.captionWarehouse',
+    },
+  ];
+
   protected readonly destinationFilters: DestinationFilter[] = OFFER_DESTINATION_FILTERS.map(
     (dest) => ({
       ...dest,
       icon: dest.value ? ('route' as const) : ('all' as const),
     }),
   );
+
+  /** Destinations affichées en bandeau défilant (style marketplace internationale). */
+  protected readonly flagDestinations: FlagDestination[] = [
+    { code: 'ga', labelKey: 'home.flags.gabon' },
+    { code: 'cn', labelKey: 'home.flags.china' },
+    { code: 'fr', labelKey: 'home.flags.france' },
+    { code: 'sn', labelKey: 'home.flags.senegal' },
+    { code: 'ma', labelKey: 'home.flags.morocco' },
+    { code: 'us', labelKey: 'home.flags.usa' },
+    { code: 'ca', labelKey: 'home.flags.canada' },
+    { code: 'bf', labelKey: 'home.flags.burkina' },
+    { code: 'ci', labelKey: 'home.flags.ivoryCoast' },
+    { code: 'cm', labelKey: 'home.flags.cameroon' },
+    { code: 'cg', labelKey: 'home.flags.congo' },
+    { code: 'be', labelKey: 'home.flags.belgium' },
+    { code: 'de', labelKey: 'home.flags.germany' },
+    { code: 'gb', labelKey: 'home.flags.uk' },
+    { code: 'ae', labelKey: 'home.flags.uae' },
+    { code: 'tr', labelKey: 'home.flags.turkey' },
+  ];
+
+  protected flagImageUrl(code: string): string {
+    return `https://flagcdn.com/w80/${code}.png`;
+  }
 
   constructor() {
     afterNextRender(() => this.updateScrollTopVisibility());
@@ -87,6 +163,16 @@ export class Accueil {
         this.loadOffers(page);
       });
     });
+  }
+
+  ngOnInit(): void {
+    interval(6000)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (!this.sliderPaused()) {
+          this.nextSlide();
+        }
+      });
   }
 
   @HostListener('window:scroll')
@@ -120,6 +206,31 @@ export class Accueil {
       total,
     });
   });
+
+  protected goToSlide(index: number): void {
+    if (index < 0 || index >= this.heroSlides.length) {
+      return;
+    }
+    this.activeSlide.set(index);
+  }
+
+  protected nextSlide(): void {
+    this.activeSlide.update((current) => (current + 1) % this.heroSlides.length);
+  }
+
+  protected previousSlide(): void {
+    this.activeSlide.update(
+      (current) => (current - 1 + this.heroSlides.length) % this.heroSlides.length,
+    );
+  }
+
+  protected pauseSlider(): void {
+    this.sliderPaused.set(true);
+  }
+
+  protected resumeSlider(): void {
+    this.sliderPaused.set(false);
+  }
 
   protected selectDestination(value: '' | OfferDestinationRoute): void {
     this.filtersService.patch({ destinationRoute: value });
@@ -157,25 +268,25 @@ export class Accueil {
     this.catalogService
       .loadOffres(buildClientOffresQueryFromFilters(this.filtersService.filters(), page, this.pageSize))
       .subscribe({
-      next: (result) => {
-        this.offers.set(result.items);
-        this.currentPage.set(result.currentPage);
-        this.totalPages.set(result.lastPage);
-        this.totalItems.set(result.total);
-        this.resultsFrom.set(result.from);
-        this.resultsTo.set(result.to);
-        this.loading.set(false);
-      },
-      error: (error: HttpErrorResponse) => {
-        this.offers.set([]);
-        this.totalItems.set(0);
-        this.totalPages.set(1);
-        this.resultsFrom.set(0);
-        this.resultsTo.set(0);
-        this.errorMessage.set(this.resolveLoadError(error));
-        this.loading.set(false);
-      },
-    });
+        next: (result) => {
+          this.offers.set(result.items);
+          this.currentPage.set(result.currentPage);
+          this.totalPages.set(result.lastPage);
+          this.totalItems.set(result.total);
+          this.resultsFrom.set(result.from);
+          this.resultsTo.set(result.to);
+          this.loading.set(false);
+        },
+        error: (error: HttpErrorResponse) => {
+          this.offers.set([]);
+          this.totalItems.set(0);
+          this.totalPages.set(1);
+          this.resultsFrom.set(0);
+          this.resultsTo.set(0);
+          this.errorMessage.set(this.resolveLoadError(error));
+          this.loading.set(false);
+        },
+      });
   }
 
   private resolveLoadError(error: HttpErrorResponse): string {

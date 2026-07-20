@@ -1,7 +1,9 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { interval } from 'rxjs';
 import { AgenceRegisterDocument } from '../../models/agence-register.model';
 import { ClientRegisterDocument } from '../../models/client-register.model';
 import { TypeAgence } from '../../models/type-agence.model';
@@ -11,6 +13,7 @@ import { AgenceService } from '../../services/agence.service';
 import { ClientSessionService } from '../../services/client-session.service';
 import { ParticulierService } from '../../services/particulier.service';
 import { TransactionService } from '../../services/transaction.service';
+import { AUTH_SLIDES } from '../../utils/auth-slides';
 import { extractApiErrorMessage } from '../../utils/api-error.util';
 
 export type SignupFormType = 'entreprise' | 'particulier';
@@ -40,6 +43,7 @@ export class Inscription implements OnInit {
   private readonly transactionService = inject(TransactionService);
   private readonly particulierService = inject(ParticulierService);
   private readonly agenceService = inject(AgenceService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly formType = signal<SignupFormType>('entreprise');
   protected readonly companyStep = signal<CompanySignupStep>(1);
@@ -48,6 +52,8 @@ export class Inscription implements OnInit {
   protected readonly submitting = signal(false);
   protected readonly loadingTypeAgences = signal(false);
   protected readonly errorMessage = signal('');
+  protected readonly activeSlide = signal(0);
+  protected readonly authSlides = AUTH_SLIDES;
 
   protected readonly typeAgenceOptions = signal<TypeAgence[]>([]);
 
@@ -72,6 +78,17 @@ export class Inscription implements OnInit {
 
   ngOnInit(): void {
     this.loadTypeAgences();
+    interval(5500)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.activeSlide.update((current) => (current + 1) % this.authSlides.length);
+      });
+  }
+
+  protected goToSlide(index: number): void {
+    if (index >= 0 && index < this.authSlides.length) {
+      this.activeSlide.set(index);
+    }
   }
 
   protected setFormType(type: SignupFormType): void {

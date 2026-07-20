@@ -27,6 +27,8 @@ export class CreerOffre implements OnInit {
   protected capaciteTotale: number | null = null;
   protected origine = '';
   protected destination = '';
+  protected dateDepart = '';
+  protected dateDepotColis = '';
   protected description = '';
   protected statut: AgenceOffreStatut = 'active';
 
@@ -83,6 +85,8 @@ export class CreerOffre implements OnInit {
       capacite_totale: this.capaciteIllimitee ? null : Number(this.capaciteTotale),
       origine: this.origine.trim(),
       destination: this.destination.trim(),
+      date_depart: this.dateDepart.trim(),
+      date_depot_colis: this.dateDepotColis.trim() || null,
       description: this.description.trim(),
       statut: this.statut,
     };
@@ -142,6 +146,7 @@ export class CreerOffre implements OnInit {
         (this.capaciteTotale != null && this.capaciteTotale > 0)) &&
       !!this.origine.trim() &&
       !!this.destination.trim() &&
+      !!this.dateDepart.trim() &&
       !!this.description.trim()
     );
   }

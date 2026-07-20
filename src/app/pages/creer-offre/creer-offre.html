@@ -74,6 +74,18 @@
 
  <div class="grid gap-5 sm:grid-cols-2">
  <div>
+ <label for="offer-date-depart" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.departureDate' | translate }} *</label>
+ <input id="offer-date-depart" name="dateDepart" type="date" required [(ngModel)]="dateDepart" class="verga-field mt-2" />
+ </div>
+ <div>
+ <label for="offer-date-depot" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.depotDate' | translate }}</label>
+ <input id="offer-date-depot" name="dateDepotColis" type="date" [(ngModel)]="dateDepotColis" class="verga-field mt-2" />
+ <p class="mt-1.5 text-xs text-verga-muted">{{ 'backoffice.createOffer.depotDateHint' | translate }}</p>
+ </div>
+ </div>
+
+ <div class="grid gap-5 sm:grid-cols-2">
+ <div>
  <label for="offer-prix" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.price' | translate }} *</label>
  <input id="offer-prix" name="prix" type="number" min="1" step="1" required [(ngModel)]="prix" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.pricePh' | translate" />
  </div>

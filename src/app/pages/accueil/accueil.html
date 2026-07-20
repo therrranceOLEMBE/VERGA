@@ -2,22 +2,43 @@
   <app-header [showActionIcons]="false" />
 
   <main class="main-with-header flex-1">
-    <!-- Hero -->
-    <section class="home-hero" aria-labelledby="home-hero-title">
-      <div class="home-hero__bg" aria-hidden="true">
-        <div class="home-hero__orb home-hero__orb--1"></div>
-        <div class="home-hero__orb home-hero__orb--2"></div>
-        <div class="home-hero__grid"></div>
+    <!-- Hero slider plein écran -->
+    <section
+      class="home-hero"
+      aria-labelledby="home-hero-title"
+      (mouseenter)="pauseSlider()"
+      (mouseleave)="resumeSlider()"
+      (focusin)="pauseSlider()"
+      (focusout)="resumeSlider()"
+    >
+      <div class="home-hero__slides" aria-hidden="true">
+        @for (slide of heroSlides; track slide.imageUrl; let i = $index) {
+          <div
+            class="home-hero__slide"
+            [class.home-hero__slide--active]="activeSlide() === i"
+          >
+            <img
+              [src]="slide.imageUrl"
+              [alt]="slide.imageAltKey | translate"
+              class="home-hero__image"
+              width="1920"
+              height="1080"
+              [attr.loading]="i === 0 ? 'eager' : 'lazy'"
+              decoding="async"
+            />
+          </div>
+        }
+        <div class="home-hero__veil"></div>
       </div>
 
       <div class="home-hero__inner mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
-        <div class="home-hero__content">
-          <p class="home-hero__eyebrow">{{ 'home.hero.eyebrow' | translate }}</p>
+        <div class="home-hero__content home-hero__content--enter">
+          <p class="home-hero__brand">Verga</p>
           <h1 id="home-hero-title" class="home-hero__title">{{ 'home.hero.title' | translate }}</h1>
           <p class="home-hero__subtitle">{{ 'home.hero.subtitle' | translate }}</p>
 
           <div class="home-hero__actions">
-            <a href="#home-destinations" class="home-hero__cta home-hero__cta--primary">
+            <a href="#home-catalog" class="home-hero__cta home-hero__cta--primary">
               {{ 'home.hero.ctaBrowse' | translate }}
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 13.5 12 21m0 0-7.5-7.5M12 21V3" />
@@ -27,34 +48,117 @@
               {{ 'home.hero.ctaPricing' | translate }}
             </a>
           </div>
+
+          <p class="home-hero__slide-caption">
+            {{ heroSlides[activeSlide()].captionKey | translate }}
+          </p>
         </div>
 
-        <div class="home-hero__stats" [attr.aria-label]="'home.hero.statsLabel' | translate">
-          <article class="home-hero__stat">
-            <span class="home-hero__stat-value">
+        <div class="home-hero__controls">
+          <button
+            type="button"
+            class="home-hero__nav"
+            (click)="previousSlide()"
+            [attr.aria-label]="'home.slider.prev' | translate"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+            </svg>
+          </button>
+
+          <div class="home-hero__dots" role="tablist" [attr.aria-label]="'home.slider.label' | translate">
+            @for (slide of heroSlides; track slide.imageUrl; let i = $index) {
+              <button
+                type="button"
+                class="home-hero__dot"
+                [class.home-hero__dot--active]="activeSlide() === i"
+                (click)="goToSlide(i)"
+                [attr.aria-label]="('home.slider.goto' | translate:{ index: i + 1 })"
+                [attr.aria-selected]="activeSlide() === i"
+              ></button>
+            }
+          </div>
+
+          <button
+            type="button"
+            class="home-hero__nav"
+            (click)="nextSlide()"
+            [attr.aria-label]="'home.slider.next' | translate"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bandeau drapeaux défilants -->
+    <section class="home-flags" [attr.aria-label]="'home.flags.label' | translate">
+      <div class="home-flags__intro mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <p class="home-flags__eyebrow">{{ 'home.flags.eyebrow' | translate }}</p>
+        <h2 class="home-flags__title">{{ 'home.flags.title' | translate }}</h2>
+        <p class="home-flags__subtitle">{{ 'home.flags.subtitle' | translate }}</p>
+      </div>
+
+      <div class="home-flags__marquee" aria-hidden="true">
+        <div class="home-flags__track">
+          @for (flag of flagDestinations; track flag.code) {
+            <div class="home-flags__item">
+              <img
+                [src]="flagImageUrl(flag.code)"
+                [alt]="''"
+                width="40"
+                height="30"
+                loading="lazy"
+                decoding="async"
+                class="home-flags__img"
+              />
+              <span class="home-flags__name">{{ flag.labelKey | translate }}</span>
+            </div>
+          }
+          @for (flag of flagDestinations; track 'dup-' + flag.code) {
+            <div class="home-flags__item">
+              <img
+                [src]="flagImageUrl(flag.code)"
+                [alt]="''"
+                width="40"
+                height="30"
+                loading="lazy"
+                decoding="async"
+                class="home-flags__img"
+              />
+              <span class="home-flags__name">{{ flag.labelKey | translate }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- Bandeau confiance + stats -->
+    <section class="home-trust" [attr.aria-label]="'home.trust.label' | translate">
+      <div class="home-trust__inner mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <div class="home-trust__stats" [attr.aria-label]="'home.hero.statsLabel' | translate">
+          <article class="home-trust__stat">
+            <span class="home-trust__stat-value">
               @if (!loading() && totalItems() > 0) {
                 {{ totalItems() }}
               } @else {
                 —
               }
             </span>
-            <span class="home-hero__stat-label">{{ 'home.hero.statOffers' | translate }}</span>
+            <span class="home-trust__stat-label">{{ 'home.hero.statOffers' | translate }}</span>
           </article>
-          <article class="home-hero__stat">
-            <span class="home-hero__stat-value">24/7</span>
-            <span class="home-hero__stat-label">{{ 'home.hero.statAvailability' | translate }}</span>
+          <article class="home-trust__stat">
+            <span class="home-trust__stat-value">24/7</span>
+            <span class="home-trust__stat-label">{{ 'home.hero.statAvailability' | translate }}</span>
           </article>
-          <article class="home-hero__stat">
-            <span class="home-hero__stat-value">100%</span>
-            <span class="home-hero__stat-label">{{ 'home.hero.statSecure' | translate }}</span>
+          <article class="home-trust__stat">
+            <span class="home-trust__stat-value">100%</span>
+            <span class="home-trust__stat-label">{{ 'home.hero.statSecure' | translate }}</span>
           </article>
         </div>
-      </div>
-    </section>
 
-    <!-- Trust strip -->
-    <section class="home-trust" [attr.aria-label]="'home.trust.label' | translate">
-      <div class="home-trust__inner mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
         <div class="home-trust__grid">
           <div class="home-trust__item">
             <span class="home-trust__icon" aria-hidden="true">
@@ -66,7 +170,7 @@
             </div>
           </div>
           <div class="home-trust__item">
-            <span class="home-trust__icon" aria-hidden="true">
+            <span class="home-trust__icon home-trust__icon--sun" aria-hidden="true">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" /></svg>
             </span>
             <div>
@@ -75,7 +179,7 @@
             </div>
           </div>
           <div class="home-trust__item">
-            <span class="home-trust__icon" aria-hidden="true">
+            <span class="home-trust__icon home-trust__icon--coral" aria-hidden="true">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 0 0 8.716-6.747M12 21a9.004 9.004 0 0 1-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 0 1 7.843 4.582M12 3a8.997 8.997 0 0 0-7.843 4.582m15.686 0A11.953 11.953 0 0 1 12 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0 1 21 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0 1 12 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 0 1 3 12c0-1.605.42-3.113 1.157-4.418" /></svg>
             </span>
             <div>
@@ -87,7 +191,7 @@
       </div>
     </section>
 
-    <div class="home-body mx-auto max-w-[1400px] px-4 pb-12 pt-8 sm:px-6 lg:px-8">
+    <div class="home-body mx-auto max-w-[1400px] px-4 pb-14 pt-10 sm:px-6 lg:px-8">
       <!-- Destinations -->
       <section id="home-destinations" class="home-destinations" [attr.aria-label]="'home.destination.title' | translate">
         <div class="home-section-head">
@@ -148,11 +252,12 @@
       </section>
 
       <!-- Catalogue -->
-      <section class="home-catalog" aria-labelledby="home-catalog-title">
+      <section id="home-catalog" class="home-catalog" aria-labelledby="home-catalog-title">
         <div class="home-section-head home-section-head--catalog">
           <div>
             <p class="home-section-eyebrow">{{ 'home.offers.eyebrow' | translate }}</p>
             <h2 id="home-catalog-title" class="home-section-title">{{ 'home.offers.title' | translate }}</h2>
+            <p class="home-section-lead">{{ 'home.offers.lead' | translate }}</p>
           </div>
           @if (!loading() && totalItems() > 0) {
             <p class="home-catalog__count">{{ resultsLabel() }}</p>

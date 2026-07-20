@@ -11,6 +11,8 @@ export interface AgenceOffreCreateRequest {
   capacite_totale: number | null;
   origine: string;
   destination: string;
+  date_depart: string;
+  date_depot_colis?: string | null;
   description: string;
   statut: AgenceOffreStatut;
 }
