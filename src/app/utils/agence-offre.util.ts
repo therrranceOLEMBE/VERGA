@@ -15,9 +15,13 @@ export interface AgenceOffreEditForm {
   typeOffreId: string;
   type: string;
   prix: number | null;
+  capaciteIllimitee: boolean;
   capaciteTotale: number | null;
+  capaciteDisponible: number | null;
   origine: string;
   destination: string;
+  dateDepart: string;
+  dateDepotColis: string;
   description: string;
   statut: AgenceOffreStatut;
 }
@@ -81,6 +85,18 @@ function toNumber(value: number | string | null | undefined): number | null {
   }
   const numeric = typeof value === 'number' ? value : Number(String(value).replace(/\s/g, '').replace(',', '.'));
   return Number.isFinite(numeric) ? numeric : null;
+}
+
+function toBoolean(value: unknown): boolean {
+  return value === true || value === 1 || value === '1' || value === 'true';
+}
+
+function toDateInputValue(value: unknown): string {
+  if (typeof value !== 'string' || !value.trim()) {
+    return '';
+  }
+  const match = value.trim().match(/^(\d{4}-\d{2}-\d{2})/);
+  return match?.[1] ?? '';
 }
 
 function readNumberField(record: Record<string, unknown>, keys: string[]): number | null {
@@ -231,9 +247,20 @@ export function parseOffreEditForm(response: AgenceOffreDetailResponse): AgenceO
     typeOffreId: resolveTypeOffreId(record),
     type,
     prix: toNumber(source.prix),
+    capaciteIllimitee: toBoolean(record['capacite_illimitee']),
     capaciteTotale: readNumberField(record, ['capacite_totale', 'capaciteTotale', 'capacite_totale_kg']),
+    capaciteDisponible: readNumberField(record, [
+      'capacite_disponible',
+      'capaciteDisponible',
+      'capacite_disponible_kg',
+      'disponible',
+      'stock_disponible',
+      'stock_restant',
+    ]),
     origine: source.origine?.trim() ?? '',
     destination: source.destination?.trim() ?? '',
+    dateDepart: toDateInputValue(record['date_depart'] ?? record['dateDepart']),
+    dateDepotColis: toDateInputValue(record['date_depot_colis'] ?? record['dateDepotColis']),
     description: source.description?.trim() ?? '',
     statut: normalizeStatut(source.statut),
   };

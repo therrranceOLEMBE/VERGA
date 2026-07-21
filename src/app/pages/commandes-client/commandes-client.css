@@ -45,14 +45,14 @@
 }
 
 .cespace-action-btn--primary {
-  border-color: color-mix(in srgb, var(--color-verga-primary, #5eadd6) 55%, white);
-  background: color-mix(in srgb, var(--color-verga-primary, #5eadd6) 12%, white);
-  color: var(--color-verga-primary-dark, #3d94c4);
+  border-color: #e85a28;
+  background: #ff6b35;
+  color: #fff;
 }
 
 .cespace-action-btn--primary:hover {
-  border-color: var(--color-verga-primary, #5eadd6);
-  background: var(--color-verga-primary, #5eadd6);
+  border-color: #e85a28;
+  background: #e85a28;
   color: #fff;
 }
 

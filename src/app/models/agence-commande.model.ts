@@ -58,20 +58,42 @@ export interface AgenceCommandeRaw {
   } | string | null;
   paiement?: {
     id?: string | number;
+    code?: string;
     montant?: number | string | null;
     statut?: string;
     methode?: string;
     method?: string;
+    operateur?: string;
     reference?: string;
+    bamboo_reference?: string;
     date?: string | null;
     created_at?: string | null;
+    commande_code?: string;
   } | null;
   colis?: Array<{
     id?: string | number;
     code?: string;
     reference?: string;
+    description?: string;
+    poids?: number | string | null;
+    poids_label?: string;
+    volume?: number | string | null;
+    quantite_label?: string;
     statut?: string;
     tracking?: string;
+    created_at?: string | null;
+    commande?: {
+      id?: string;
+      code?: string;
+      quantite?: number | string;
+      quantite_label?: string;
+    };
+    photos?: Array<{
+      id?: string;
+      chemin?: string;
+      url?: string;
+      ordre?: number;
+    }>;
   }> | null;
   agence?: {
     id?: string | number;
@@ -122,16 +144,35 @@ export interface AgenceCommande {
   id: string;
   code: string;
   client: string;
+  clientEmail: string;
+  clientPhone: string;
+  offreTitre: string;
+  offreRoute: string;
   quantite: string;
-  montant: string;
+  quantitePayee: string;
+  quantiteRestante: string;
+  montantSousTotal: string;
+  montantCommission: string;
+  montantTotal: string;
   statut: string;
   date: string;
+}
+
+export interface AgenceCommandeColisPhoto {
+  id: string;
+  url: string;
+  ordre: number;
 }
 
 export interface AgenceCommandeColisItem {
   id: string;
   code: string;
+  description: string;
+  poidsLabel: string;
+  quantiteLabel: string;
   statut: string;
+  date: string;
+  photos: AgenceCommandeColisPhoto[];
 }
 
 export interface AgenceCommandeDetail {
@@ -161,12 +202,16 @@ export interface AgenceCommandeDetail {
   offreStatut: string;
   offreCreatedAt: string;
   offreUpdatedAt: string;
-  paiementMontant: string;
-  paiementStatut: string;
-  paiementMethode: string;
-  paiementReference: string;
-  paiementDate: string;
-  colis: AgenceCommandeColisItem[];
+    montantCommission: string;
+    montantTotal: string;
+    paiementCode: string;
+    paiementMontant: string;
+    paiementStatut: string;
+    paiementMethode: string;
+    paiementOperateur: string;
+    paiementReference: string;
+    paiementDate: string;
+    colis: AgenceCommandeColisItem[];
 }
 
 export interface AgenceCommandeDetailResponse {

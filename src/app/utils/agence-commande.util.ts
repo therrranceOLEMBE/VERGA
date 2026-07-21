@@ -1,6 +1,7 @@
 import {
   AgenceCommande,
   AgenceCommandeColisItem,
+  AgenceCommandeColisPhoto,
   AgenceCommandeDetail,
   AgenceCommandeDetailResponse,
   AgenceCommandeRaw,
@@ -141,7 +142,30 @@ function resolveQuantiteRestanteLabel(raw: AgenceCommandeRaw): string {
 }
 
 function resolveMontantSousTotal(raw: AgenceCommandeRaw): string {
-  return formatMontant(raw.montant_sous_total ?? raw.montant);
+  const record = raw as AgenceCommandeRaw & { montantSousTotal?: number | string | null };
+  return formatMontant(raw.montant_sous_total ?? record.montantSousTotal ?? raw.montant);
+}
+
+function resolveClientField(raw: AgenceCommandeRaw, field: string): string {
+  const client = asRecord(raw.client);
+  if (!client) return '';
+  const val = client[field];
+  return typeof val === 'string' ? val.trim() : '';
+}
+
+function resolveOffreRoute(raw: AgenceCommandeRaw): string {
+  const offre = asRecord(raw.offre);
+  if (!offre) return '';
+  const origine = typeof offre['origine'] === 'string' ? offre['origine'].trim() : '';
+  const destination = typeof offre['destination'] === 'string' ? offre['destination'].trim() : '';
+  if (origine && destination) return `${origine} → ${destination}`;
+  return origine || destination;
+}
+
+function resolveOffreTitre(raw: AgenceCommandeRaw): string {
+  const offre = asRecord(raw.offre);
+  if (!offre) return resolveLabel(raw.offre);
+  return readString(offre, ['titre', 'title']) || resolveLabel(raw.offre);
 }
 
 export function mapAgenceCommandeToRow(raw: AgenceCommandeRaw): AgenceCommande {
@@ -149,11 +173,30 @@ export function mapAgenceCommandeToRow(raw: AgenceCommandeRaw): AgenceCommande {
     id: String(raw.id ?? raw.code ?? ''),
     code: raw.code?.trim() ?? '—',
     client: resolveLabel(raw.client),
+    clientEmail: resolveClientField(raw, 'email'),
+    clientPhone: resolveClientField(raw, 'telephone') || resolveClientField(raw, 'phone'),
+    offreTitre: resolveOffreTitre(raw),
+    offreRoute: resolveOffreRoute(raw),
     quantite: resolveQuantiteLabel(raw),
-    montant: resolveMontantSousTotal(raw),
+    quantitePayee: resolveQuantitePayeeLabel(raw),
+    quantiteRestante: resolveQuantiteRestanteLabel(raw),
+    montantSousTotal: resolveMontantSousTotal(raw),
+    montantCommission: formatMontant(raw.montant_commission_client),
+    montantTotal: formatMontant(raw.montant_total),
     statut: raw.statut?.trim() ?? '',
     date: formatDate(raw.date ?? raw.created_at),
   };
+}
+
+function mapColisPhotos(photos: Array<{ id?: string; chemin?: string; url?: string; ordre?: number }> | undefined): AgenceCommandeColisPhoto[] {
+  if (!Array.isArray(photos)) return [];
+  return photos
+    .filter((p) => p.id && p.url)
+    .map((p) => ({
+      id: String(p.id),
+      url: p.url!.trim(),
+      ordre: p.ordre ?? 0,
+    }));
 }
 
 function mapColisItems(items: AgenceCommandeRaw['colis']): AgenceCommandeColisItem[] {
@@ -164,8 +207,13 @@ function mapColisItems(items: AgenceCommandeRaw['colis']): AgenceCommandeColisIt
   return items
     .map((item) => ({
       id: String(item.id ?? item.code ?? item.reference ?? ''),
-      code: (item.code ?? item.reference)?.trim() ?? '—',
+      code: (item.reference ?? item.code)?.trim() ?? '—',
+      description: item.description?.trim() ?? '',
+      poidsLabel: item.poids_label?.trim() ?? (item.poids != null ? String(item.poids) : '—'),
+      quantiteLabel: item.quantite_label?.trim() ?? '',
       statut: item.statut?.trim() ?? item.tracking?.trim() ?? '',
+      date: formatDate(item.created_at ?? null),
+      photos: mapColisPhotos(item.photos),
     }))
     .filter((item) => item.id || item.code !== '—');
 }
@@ -204,10 +252,14 @@ export function parseAgenceCommandeDetailResponse(response: AgenceCommandeDetail
     offreStatut: offre ? readString(offre, ['statut']) : '',
     offreCreatedAt: offre ? formatDate(readString(offre, ['created_at']) || null) : '—',
     offreUpdatedAt: offre ? formatDate(readString(offre, ['updated_at']) || null) : '—',
+    montantCommission: formatMontant(source.montant_commission_client),
+    montantTotal: formatMontant(source.montant_total),
+    paiementCode: paiement ? readString(paiement, ['code']) : '',
     paiementMontant: paiement ? formatMontant(paiement['montant'] as number | string | null) : '—',
     paiementStatut: paiement ? readString(paiement, ['statut']) : '',
     paiementMethode: paiement ? readString(paiement, ['methode', 'method']) : '',
-    paiementReference: paiement ? readString(paiement, ['reference']) : '',
+    paiementOperateur: paiement ? readString(paiement, ['operateur']) : '',
+    paiementReference: paiement ? readString(paiement, ['bamboo_reference', 'reference']) : '',
     paiementDate: paiement ? formatDate(readString(paiement, ['date', 'created_at']) || null) : '—',
     colis: mapColisItems(source.colis),
   };

@@ -25,7 +25,7 @@ export class OfferService {
       publisherName: 'Verga Transit GA',
       publisherHandle: '@VERGA_GA',
       publisherInitials: 'VG',
-      logoBg: 'linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%)',
+      logoBg: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
       description:
         'Envoi groupé maritime vers Shanghai et Guangzhou. Départs bi-mensuels, suivi colis en temps réel.',
       pricingType: 'kilo',
@@ -65,7 +65,7 @@ export class OfferService {
       publisherName: 'Euro Transit GA',
       publisherHandle: '@EURO_TRANSIT_GA',
       publisherInitials: 'ET',
-      logoBg: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)',
+      logoBg: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)',
       description:
         'Envoi express vers Paris, Lyon et Marseille. Idéal pour colis urgents et effets personnels.',
       pricingType: 'kilo',
@@ -124,7 +124,7 @@ export class OfferService {
       publisherName: 'Senegal Gabon Link',
       publisherHandle: '@SN_GA_LINK',
       publisherInitials: 'SG',
-      logoBg: 'linear-gradient(160deg, #0f172a 0%, #5eadd6 45%, #1e3a5f 100%)',
+      logoBg: 'linear-gradient(160deg, #0f172a 0%, #334155 55%, #1e293b 100%)',
       description:
         'Service rapide Dakar → Libreville. Suivi GPS et notification à chaque étape.',
       pricingType: 'kilo',
@@ -183,7 +183,7 @@ export class OfferService {
       publisherName: 'Atlantic Express',
       publisherHandle: '@ATLANTIC_EXP',
       publisherInitials: 'AE',
-      logoBg: 'linear-gradient(135deg, #0c4a6e 0%, #38bdf8 100%)',
+      logoBg: 'linear-gradient(135deg, #0f172a 0%, #475569 100%)',
       description:
         'Envoi vers New York, Houston et Miami. Assurance tous risques incluse.',
       pricingType: 'kilo',
@@ -402,9 +402,9 @@ export class OfferService {
     ];
 
     const publishers = [
-      { name: 'Verga Transit GA', handle: '@VERGA_GA', initials: 'VG', logoBg: 'linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%)' },
+      { name: 'Verga Transit GA', handle: '@VERGA_GA', initials: 'VG', logoBg: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)' },
       { name: 'Dragon Freight', handle: '@DRAGON_FREIGHT', initials: 'DF', logoBg: 'linear-gradient(135deg, #5b21b6 0%, #7c3aed 100%)' },
-      { name: 'Euro Transit GA', handle: '@EURO_TRANSIT_GA', initials: 'ET', logoBg: 'linear-gradient(135deg, #1e40af 0%, #3b82f6 100%)' },
+      { name: 'Euro Transit GA', handle: '@EURO_TRANSIT_GA', initials: 'ET', logoBg: 'linear-gradient(135deg, #0f172a 0%, #334155 100%)' },
       { name: 'Atlantique Shipping', handle: '@ATLANTIQUE_SHIP', initials: 'AS', logoBg: 'linear-gradient(135deg, #065f46 0%, #10b981 100%)' },
       { name: 'Afrique Ouest Cargo', handle: '@AFRIQUE_OUEST', initials: 'AO', logoBg: 'linear-gradient(135deg, #b45309 0%, #f59e0b 100%)' },
       { name: 'Maghreb Transit', handle: '@MAGHREB_TRANSIT', initials: 'MT', logoBg: 'linear-gradient(135deg, #7c2d12 0%, #ea580c 100%)' },

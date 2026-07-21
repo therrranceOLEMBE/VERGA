@@ -9,6 +9,7 @@ export interface AgencePaiementRaw {
   verga_code?: string | null;
   bamboo_ref?: string | null;
   ref_bamboo?: string | null;
+  bamboo_reference?: string | null;
   bamboo_billing_id?: string | null;
   billing_id?: string | null;
   statut?: AgencePaiementStatut | string;
@@ -19,6 +20,7 @@ export interface AgencePaiementRaw {
   updated_at?: string | null;
   methode?: string | null;
   method?: string | null;
+  operateur?: string | null;
   message?: string | null;
   client?: {
     id?: string | number;
@@ -32,6 +34,7 @@ export interface AgencePaiementRaw {
     code?: string;
   } | string | null;
   commande_id?: string | number | null;
+  commande_code?: string | null;
 }
 
 export interface AgencePaiementsPaginationMeta {

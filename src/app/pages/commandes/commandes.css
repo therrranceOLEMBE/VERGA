@@ -32,31 +32,47 @@
 }
 
 .commandes-col-code {
-  width: 12%;
+  width: 110px;
 }
 
 .commandes-col-client {
-  width: 24%;
+  width: 140px;
 }
 
-.commandes-col-quantity {
-  width: 11%;
+.commandes-col-offer {
+  width: 140px;
 }
 
-.commandes-col-amount {
-  width: 15%;
+.commandes-col-route {
+  width: 140px;
+}
+
+.commandes-col-qty {
+  width: 80px;
+}
+
+.commandes-col-qty-paid {
+  width: 80px;
+}
+
+.commandes-col-qty-remain {
+  width: 80px;
+}
+
+.commandes-col-total {
+  width: 120px;
 }
 
 .commandes-col-status {
-  width: 15%;
+  width: 100px;
 }
 
 .commandes-col-date {
-  width: 13%;
+  width: 120px;
 }
 
 .commandes-col-actions {
-  width: 16%;
+  width: 160px;
 }
 
 .commande-cell-truncate {
@@ -89,7 +105,7 @@
 
 @media (max-width: 1023px) {
   .commandes-table {
-    min-width: 56rem;
+    min-width: 76rem;
     table-layout: auto;
   }
 }

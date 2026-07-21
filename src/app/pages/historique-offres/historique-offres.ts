@@ -25,6 +25,7 @@ export class HistoriqueOffres implements OnInit {
 
   protected readonly loading = signal(true);
   protected readonly errorMessage = signal('');
+  protected readonly successMessage = signal('');
   protected readonly unauthenticated = signal(false);
   protected readonly filterSearch = signal('');
   protected readonly filterStatut = signal<AgenceOffreStatut | ''>('');
@@ -51,9 +52,13 @@ export class HistoriqueOffres implements OnInit {
   protected editTypeOffreId = '';
   protected editType = '';
   protected editPrix: number | null = null;
+  protected editCapaciteIllimitee = false;
   protected editCapaciteTotale: number | null = null;
+  protected editCapaciteDisponible: number | null = null;
   protected editOrigine = '';
   protected editDestination = '';
+  protected editDateDepart = '';
+  protected editDateDepotColis = '';
   protected editDescription = '';
   protected editStatut: AgenceOffreStatut = 'active';
 
@@ -189,6 +194,7 @@ export class HistoriqueOffres implements OnInit {
   }
 
   protected openDelete(offer: AgenceOffre): void {
+    this.successMessage.set('');
     this.closeDetail();
     this.closeEdit();
     this.deleteError.set('');
@@ -198,6 +204,9 @@ export class HistoriqueOffres implements OnInit {
   }
 
   protected closeDelete(): void {
+    if (this.deleteSubmitting()) {
+      return;
+    }
     this.deleteOpen.set(false);
     this.deleteSubmitting.set(false);
     this.deleteError.set('');
@@ -216,21 +225,25 @@ export class HistoriqueOffres implements OnInit {
       return;
     }
 
+    if (!this.agenceSession.isAuthenticated()) {
+      this.deleteError.set('backoffice.offerHistory.authRequired');
+      return;
+    }
+
     this.deleteError.set('');
     this.deleteSubmitting.set(true);
 
     this.agenceSession.deleteOffre(offer.id).subscribe({
       next: () => {
+        this.offers.update((list) => list.filter((item) => item.id !== offer.id));
+        this.totalItems.update((total) => Math.max(0, total - 1));
         this.deleteSubmitting.set(false);
         this.closeDelete();
+        this.successMessage.set('backoffice.offerHistory.deleteSuccess');
         this.loadOffres();
       },
       error: (error: HttpErrorResponse | Error) => {
-        if (error instanceof Error && error.message === 'No agence token') {
-          this.deleteError.set('backoffice.offerHistory.authRequired');
-        } else {
-          this.deleteError.set(this.resolveDeleteError(error as HttpErrorResponse));
-        }
+        this.deleteError.set(this.resolveDeleteError(error));
         this.deleteSubmitting.set(false);
       },
     });
@@ -280,6 +293,13 @@ export class HistoriqueOffres implements OnInit {
     this.editType = selected?.code ?? '';
   }
 
+  protected onEditCapaciteIllimiteeChange(value: boolean): void {
+    this.editCapaciteIllimitee = value;
+    if (value) {
+      this.editCapaciteTotale = null;
+    }
+  }
+
   protected onEditSubmit(event: Event): void {
     event.preventDefault();
     this.editError.set('');
@@ -295,9 +315,12 @@ export class HistoriqueOffres implements OnInit {
       type_offre_id: this.editTypeOffreId,
       type: (selected?.code ?? this.editType).trim(),
       prix: Number(this.editPrix),
-      capacite_totale: Number(this.editCapaciteTotale),
+      capacite_illimitee: this.editCapaciteIllimitee,
+      capacite_totale: this.editCapaciteIllimitee ? null : Number(this.editCapaciteTotale),
       origine: this.editOrigine.trim(),
       destination: this.editDestination.trim(),
+      date_depart: this.editDateDepart.trim(),
+      date_depot_colis: this.editDateDepotColis.trim() || null,
       description: this.editDescription.trim(),
       statut: this.editStatut,
     };
@@ -440,9 +463,13 @@ export class HistoriqueOffres implements OnInit {
     this.editTypeOffreId = form.typeOffreId;
     this.editType = form.type;
     this.editPrix = form.prix;
+    this.editCapaciteIllimitee = form.capaciteIllimitee;
     this.editCapaciteTotale = form.capaciteTotale;
+    this.editCapaciteDisponible = form.capaciteDisponible;
     this.editOrigine = form.origine;
     this.editDestination = form.destination;
+    this.editDateDepart = form.dateDepart;
+    this.editDateDepotColis = form.dateDepotColis;
     this.editDescription = form.description;
     this.editStatut = form.statut;
     this.syncEditTypeOffreSelection();
@@ -472,9 +499,13 @@ export class HistoriqueOffres implements OnInit {
     this.editTypeOffreId = '';
     this.editType = '';
     this.editPrix = null;
+    this.editCapaciteIllimitee = false;
     this.editCapaciteTotale = null;
+    this.editCapaciteDisponible = null;
     this.editOrigine = '';
     this.editDestination = '';
+    this.editDateDepart = '';
+    this.editDateDepotColis = '';
     this.editDescription = '';
     this.editStatut = 'active';
   }
@@ -487,10 +518,11 @@ export class HistoriqueOffres implements OnInit {
       !!this.editType.trim() &&
       this.editPrix != null &&
       this.editPrix > 0 &&
-      this.editCapaciteTotale != null &&
-      this.editCapaciteTotale > 0 &&
+      (this.editCapaciteIllimitee ||
+        (this.editCapaciteTotale != null && this.editCapaciteTotale > 0)) &&
       !!this.editOrigine.trim() &&
       !!this.editDestination.trim() &&
+      !!this.editDateDepart.trim() &&
       !!this.editDescription.trim() &&
       !!this.editStatut
     );
@@ -511,18 +543,26 @@ export class HistoriqueOffres implements OnInit {
     return apiMessage ?? 'backoffice.offerHistory.updateError';
   }
 
-  private resolveDeleteError(error: HttpErrorResponse): string {
+  private resolveDeleteError(error: HttpErrorResponse | Error): string {
+    if (error instanceof Error && !(error instanceof HttpErrorResponse)) {
+      return 'backoffice.offerHistory.authRequired';
+    }
     if (error.status === 401) {
       return 'backoffice.offerHistory.authRequired';
     }
+    if (error.status === 403) {
+      return 'backoffice.offerHistory.deleteForbidden';
+    }
     if (error.status === 404) {
-      return 'backoffice.offerHistory.detailNotFound';
+      return 'backoffice.offerHistory.deleteNotFound';
     }
     if (error.status === 422) {
       const apiMessage = extractApiErrorMessage(error);
-      return apiMessage ?? 'backoffice.offerHistory.deleteLinkedOrders';
+      if (apiMessage && !/the given data was invalid/i.test(apiMessage)) {
+        return apiMessage;
+      }
+      return 'backoffice.offerHistory.deleteLinkedOrders';
     }
-    const apiMessage = extractApiErrorMessage(error);
-    return apiMessage ?? 'backoffice.offerHistory.deleteError';
+    return extractApiErrorMessage(error) ?? 'backoffice.offerHistory.deleteError';
   }
 }

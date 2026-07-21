@@ -23,7 +23,6 @@ export class DetailOffre {
   private readonly language = inject(LanguageService);
 
   protected readonly expanded = signal(false);
-  protected readonly favorited = signal(false);
   protected readonly bookingOpen = signal(false);
   protected readonly bookingAction = signal<BookingAction>('achete');
   protected readonly loading = signal(true);
@@ -79,10 +78,6 @@ export class DetailOffre {
 
   protected toggleDescription(): void {
     this.expanded.update((v) => !v);
-  }
-
-  protected toggleFavorite(): void {
-    this.favorited.update((v) => !v);
   }
 
   protected openBooking(action: BookingAction): void {

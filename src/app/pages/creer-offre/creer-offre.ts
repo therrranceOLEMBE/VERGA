@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { TypeOffre } from '../../models/type-offre.model';
 import { AgenceOffreCreateRequest } from '../../models/agence-offre-create.model';
+import { AgenceOffreStatut } from '../../models/agence-offre.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { AgenceService } from '../../services/agence.service';
 import { AgenceSessionService } from '../../services/agence-session.service';
 import { extractApiErrorMessage } from '../../utils/api-error.util';
 
@@ -18,16 +18,19 @@ import { extractApiErrorMessage } from '../../utils/api-error.util';
 export class CreerOffre implements OnInit {
   private readonly router = inject(Router);
   private readonly agenceSession = inject(AgenceSessionService);
-  private readonly agenceService = inject(AgenceService);
 
   protected titre = '';
   protected typeOffreId = '';
   protected type = '';
   protected prix: number | null = null;
+  protected capaciteIllimitee = false;
   protected capaciteTotale: number | null = null;
   protected origine = '';
   protected destination = '';
+  protected dateDepart = '';
+  protected dateDepotColis = '';
   protected description = '';
+  protected statut: AgenceOffreStatut = 'active';
 
   protected readonly loadingTypeOffres = signal(false);
   protected readonly typeOffreOptions = signal<TypeOffre[]>([]);
@@ -35,6 +38,10 @@ export class CreerOffre implements OnInit {
   protected readonly errorMessage = signal('');
   protected readonly successMessage = signal('');
   protected readonly unauthenticated = signal(false);
+  protected readonly statutOptions: Array<{ value: AgenceOffreStatut; labelKey: string }> = [
+    { value: 'active', labelKey: 'backoffice.offerHistory.status.active' },
+    { value: 'inactive', labelKey: 'backoffice.offerHistory.status.inactive' },
+  ];
 
   ngOnInit(): void {
     this.loadTypeOffres();
@@ -43,6 +50,13 @@ export class CreerOffre implements OnInit {
   protected onTypeOffreChange(): void {
     const selected = this.typeOffreOptions().find((option) => option.id === this.typeOffreId);
     this.type = selected?.code ?? '';
+  }
+
+  protected onCapaciteIllimiteeChange(value: boolean): void {
+    this.capaciteIllimitee = value;
+    if (value) {
+      this.capaciteTotale = null;
+    }
   }
 
   protected onSubmit(event: Event): void {
@@ -67,11 +81,14 @@ export class CreerOffre implements OnInit {
       type_offre_id: this.typeOffreId,
       type: (selected?.code ?? this.type).trim(),
       prix: Number(this.prix),
-      capacite_totale: Number(this.capaciteTotale),
+      capacite_illimitee: this.capaciteIllimitee,
+      capacite_totale: this.capaciteIllimitee ? null : Number(this.capaciteTotale),
       origine: this.origine.trim(),
       destination: this.destination.trim(),
+      date_depart: this.dateDepart.trim(),
+      date_depot_colis: this.dateDepotColis.trim() || null,
       description: this.description.trim(),
-      statut: 'active',
+      statut: this.statut,
     };
 
     this.submitting.set(true);
@@ -94,19 +111,19 @@ export class CreerOffre implements OnInit {
     });
   }
 
-  private loadTypeOffres(): void {
+  protected loadTypeOffres(): void {
     if (this.loadingTypeOffres()) {
       return;
     }
 
-    const token = this.agenceSession.getToken();
-    if (!token) {
+    if (!this.agenceSession.isAuthenticated()) {
       this.typeOffreOptions.set([]);
+      this.unauthenticated.set(true);
       return;
     }
 
     this.loadingTypeOffres.set(true);
-    this.agenceService.getTypeOffres(token).subscribe({
+    this.agenceSession.loadTypeOffres().subscribe({
       next: (options) => {
         this.typeOffreOptions.set(options);
         this.loadingTypeOffres.set(false);
@@ -125,10 +142,11 @@ export class CreerOffre implements OnInit {
       !!this.type.trim() &&
       this.prix != null &&
       this.prix > 0 &&
-      this.capaciteTotale != null &&
-      this.capaciteTotale > 0 &&
+      (this.capaciteIllimitee ||
+        (this.capaciteTotale != null && this.capaciteTotale > 0)) &&
       !!this.origine.trim() &&
       !!this.destination.trim() &&
+      !!this.dateDepart.trim() &&
       !!this.description.trim()
     );
   }

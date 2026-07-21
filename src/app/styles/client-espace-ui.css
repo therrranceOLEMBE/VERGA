@@ -1,17 +1,23 @@
-/* Design system — espace client (particulier) */
+/* Design system — espace client (particulier) — style éditorial Verga */
 
 .cespace-page {
-  --cespace-primary: var(--color-verga-primary, #5eadd6);
-  --cespace-primary-dark: var(--color-verga-primary-dark, #3d94c4);
-  --cespace-primary-soft: color-mix(in srgb, var(--cespace-primary) 12%, white);
+  --cespace-accent: #ff6b35;
+  --cespace-accent-dark: #e85a28;
+  --cespace-primary: #ff6b35;
+  --cespace-primary-dark: #e85a28;
+  --cespace-primary-soft: #fffaf7;
   --cespace-success: var(--color-verga-success, #2e8b72);
-  --cespace-border: var(--color-verga-border, #e2e8f0);
-  --cespace-muted: var(--color-verga-muted, #64748b);
+  --cespace-border: #e2e8f0;
+  --cespace-muted: #64748b;
   --cespace-ink: #0f172a;
-  --cespace-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px rgba(15, 23, 42, 0.06);
+  --cespace-shadow: none;
+  --cespace-font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --cespace-font-body: 'Nunito', ui-sans-serif, system-ui, sans-serif;
   max-width: 1280px;
   margin: 0 auto;
   padding-bottom: 2rem;
+  font-family: var(--cespace-font-body);
+  color: var(--cespace-ink);
 }
 
 .cespace-page--narrow {
@@ -27,18 +33,13 @@
   position: relative;
   margin-bottom: 1.5rem;
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--cespace-primary) 24%, white);
+  border: 1px solid var(--cespace-border);
+  border-top: 2px solid var(--cespace-ink);
   background: #fff;
-  box-shadow: var(--cespace-shadow);
 }
 
 .cespace-hero-bg {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 70% 80% at 100% -10%, color-mix(in srgb, var(--cespace-primary) 32%, white) 0%, transparent 55%),
-    linear-gradient(120deg, color-mix(in srgb, var(--cespace-primary) 7%, white) 0%, #fff 50%);
-  pointer-events: none;
+  display: none;
 }
 
 .cespace-hero-inner {
@@ -53,16 +54,18 @@
 }
 
 .cespace-eyebrow {
+  font-family: var(--cespace-font-display);
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--cespace-primary);
+  color: var(--cespace-accent);
 }
 
 .cespace-title {
   margin-top: 0.4rem;
   max-width: 36rem;
+  font-family: var(--cespace-font-display);
   font-size: clamp(1.35rem, 2.2vw, 1.85rem);
   font-weight: 800;
   line-height: 1.2;
@@ -83,7 +86,6 @@
   margin-bottom: 1.25rem;
   border: 1px solid var(--cespace-border);
   background: #fff;
-  box-shadow: var(--cespace-shadow);
 }
 
 .cespace-panel-head {
@@ -94,13 +96,14 @@
   gap: 0.75rem 1rem;
   padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--cespace-border);
-  background: linear-gradient(180deg, #fafbfc 0%, #fff 100%);
+  background: #fff;
 }
 
 .cespace-panel-title {
-  font-size: 0.8125rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
+  font-family: var(--cespace-font-display);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--cespace-ink);
 }
@@ -222,7 +225,6 @@
   scrollbar-width: thin;
   border: 1px solid var(--cespace-border);
   background: #fff;
-  box-shadow: var(--cespace-shadow);
 }
 
 .cespace-table {
@@ -235,12 +237,13 @@
 .cespace-table th {
   border-bottom: 1px solid var(--cespace-border);
   padding: 0.85rem 1rem;
+  font-family: var(--cespace-font-display);
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.07em;
   text-transform: uppercase;
   color: var(--cespace-muted);
-  background: #f8fafc;
+  background: #fafafa;
   white-space: nowrap;
   vertical-align: middle;
 }
@@ -257,7 +260,7 @@
 }
 
 .cespace-table tbody tr:hover td {
-  background: color-mix(in srgb, var(--cespace-primary) 5%, white);
+  background: #fafafa;
 }
 
 .cespace-table tbody tr:last-child td {
@@ -268,11 +271,12 @@
   text-align: right;
 }
 
-.cespace-table-code {
+.cespace-table-code,
+.cespace-mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 0.75rem;
   font-weight: 700;
-  color: var(--cespace-primary-dark);
+  color: var(--cespace-ink);
   white-space: nowrap;
 }
 
@@ -322,7 +326,7 @@
 
 .cespace-badge--primary {
   background: var(--cespace-primary-soft);
-  color: var(--cespace-primary-dark);
+  color: var(--cespace-accent-dark);
 }
 
 .cespace-badge--warn {
@@ -336,12 +340,13 @@
   align-items: center;
   justify-content: center;
   gap: 0.3rem;
-  border: 1px solid color-mix(in srgb, var(--cespace-primary) 35%, white);
+  border: 1px solid var(--cespace-border);
   background: #fff;
   padding: 0.4rem 0.7rem;
+  font-family: var(--cespace-font-display);
   font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--cespace-primary-dark);
+  font-weight: 700;
+  color: var(--cespace-ink);
   cursor: pointer;
   transition:
     background-color 0.15s ease,
@@ -350,9 +355,9 @@
 }
 
 .cespace-action-btn:hover {
-  border-color: var(--cespace-primary);
+  border-color: var(--cespace-accent);
   background: var(--cespace-primary-soft);
-  color: var(--cespace-primary-dark);
+  color: var(--cespace-accent-dark);
 }
 
 /* Pagination */
@@ -381,9 +386,10 @@
   padding: 0 0.5rem;
   border: 1px solid var(--cespace-border);
   background: #fff;
+  font-family: var(--cespace-font-display);
   font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--cespace-primary-dark);
+  font-weight: 700;
+  color: var(--cespace-ink);
   cursor: pointer;
   transition:
     background-color 0.15s ease,
@@ -393,12 +399,13 @@
 
 .cespace-page-btn:hover:not(:disabled):not(.is-active) {
   background: var(--cespace-primary-soft);
-  border-color: color-mix(in srgb, var(--cespace-primary) 40%, white);
+  border-color: var(--cespace-accent);
+  color: var(--cespace-accent-dark);
 }
 
 .cespace-page-btn.is-active {
-  border-color: var(--cespace-primary);
-  background: var(--cespace-primary);
+  border-color: var(--cespace-accent-dark);
+  background: var(--cespace-accent);
   color: #fff;
 }
 
@@ -481,12 +488,12 @@
   justify-content: center;
   width: 4rem;
   height: 4rem;
-  background: linear-gradient(145deg, var(--cespace-primary) 0%, var(--cespace-primary-dark) 100%);
+  background: var(--cespace-accent);
+  font-family: var(--cespace-font-display);
   font-size: 1.15rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   color: #fff;
-  box-shadow: 0 8px 20px color-mix(in srgb, var(--cespace-primary) 35%, transparent);
 }
 
 .cespace-profile-name {
@@ -544,6 +551,7 @@
 .cespace-notif-item {
   display: flex;
   gap: 1rem;
+  align-items: flex-start;
   padding: 1.1rem 1.25rem;
   border-bottom: 1px solid #f1f5f9;
   transition: background-color 0.15s ease;
@@ -554,34 +562,15 @@
 }
 
 .cespace-notif-item:hover {
-  background: color-mix(in srgb, var(--cespace-primary) 4%, white);
+  background: #fafafa;
 }
 
 .cespace-notif-item.is-read {
   opacity: 0.72;
 }
 
-.cespace-notif-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.35rem;
-  height: 2.35rem;
-  flex-shrink: 0;
-  margin-top: 0.1rem;
-}
-
-.cespace-notif-icon.is-unread {
-  background: var(--cespace-primary-soft);
-  color: var(--cespace-primary-dark);
-}
-
-.cespace-notif-icon.is-read {
-  background: #f1f5f9;
-  color: var(--cespace-muted);
-}
-
 .cespace-notif-title {
+  font-family: var(--cespace-font-display);
   font-weight: 700;
   color: var(--cespace-ink);
 }
@@ -621,16 +610,26 @@
 }
 
 .cespace-pref-row:hover {
-  border-color: color-mix(in srgb, var(--cespace-primary) 40%, white);
-  background: color-mix(in srgb, var(--cespace-primary) 4%, white);
+  border-color: #ff6b35;
+  background: #fffaf7;
 }
 
 .cespace-pref-row span {
+  font-family: var(--cespace-font-display);
   font-size: 0.875rem;
+  font-weight: 600;
   color: #334155;
 }
 
-/* Modal */
+.cespace-checkbox {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  accent-color: #ff6b35;
+  cursor: pointer;
+}
+
+/* Modal — espace client */
 .cespace-modal-backdrop {
   position: fixed;
   inset: 0;
@@ -638,39 +637,65 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem;
   overflow-y: auto;
-  background: rgba(15, 23, 42, 0.45);
+  background: rgba(15, 23, 42, 0.5);
   -webkit-overflow-scrolling: touch;
 }
 
 @media (min-width: 640px) {
   .cespace-modal-backdrop {
     align-items: center;
+    padding: 2rem 1.25rem;
   }
 }
 
 .cespace-modal {
   width: 100%;
-  max-width: 42rem;
+  max-width: 40rem;
   border: 1px solid var(--cespace-border);
+  border-top: 3px solid var(--cespace-accent);
   background: #fff;
-  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.18);
+  font-family: var(--cespace-font-body);
+  color: var(--cespace-ink);
+}
+
+.cespace-modal--wide {
+  max-width: 48rem;
 }
 
 .cespace-modal-head {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1.1rem 1.35rem;
+  padding: 1.25rem 1.35rem 1.1rem;
   border-bottom: 1px solid var(--cespace-border);
-  background: linear-gradient(180deg, #fafbfc 0%, #fff 100%);
+  background: #fff;
+}
+
+.cespace-modal-head-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.cespace-modal-eyebrow {
+  margin: 0 0 0.35rem;
+  font-family: var(--cespace-font-display);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cespace-accent);
 }
 
 .cespace-modal-title {
-  font-size: 1.05rem;
+  margin: 0;
+  font-family: var(--cespace-font-display);
+  font-size: 1.125rem;
   font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
   color: var(--cespace-ink);
 }
 
@@ -680,8 +705,13 @@
   justify-content: center;
   width: 2.25rem;
   height: 2.25rem;
+  flex-shrink: 0;
   border: 1px solid var(--cespace-border);
   background: #fff;
+  font-family: var(--cespace-font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1;
   color: var(--cespace-muted);
   cursor: pointer;
   transition:
@@ -690,16 +720,50 @@
     background-color 0.15s ease;
 }
 
-.cespace-modal-close:hover {
-  color: var(--cespace-ink);
-  border-color: #cbd5e1;
-  background: #f8fafc;
+.cespace-modal-close:hover:not(:disabled) {
+  border-color: #ff6b35;
+  background: #fffaf7;
+  color: #e85a28;
+}
+
+.cespace-modal-close:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
 }
 
 .cespace-modal-body {
-  max-height: 70vh;
+  max-height: min(70vh, 32rem);
   overflow-y: auto;
-  padding: 1.35rem;
+  padding: 1.35rem 1.35rem 1.5rem;
+}
+
+.cespace-modal-hint {
+  margin: 0 0 1.25rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--cespace-muted);
+}
+
+.cespace-modal-field {
+  margin-bottom: 1.15rem;
+}
+
+.cespace-modal-field:last-child {
+  margin-bottom: 0;
+}
+
+.cespace-modal-field .verga-field {
+  font-family: var(--cespace-font-body);
+}
+
+.cespace-modal-field textarea.verga-field {
+  min-height: 6.5rem;
+  resize: vertical;
+}
+
+.cespace-modal-body .cespace-alert {
+  margin-top: 1.15rem;
+  margin-bottom: 0;
 }
 
 .cespace-modal-foot {
@@ -710,7 +774,13 @@
   gap: 0.75rem;
   padding: 1rem 1.35rem;
   border-top: 1px solid var(--cespace-border);
-  background: #fafbfc;
+  background: #fafafa;
+}
+
+.cespace-modal-foot .verga-btn.cespace-submit,
+.cespace-modal-foot .cespace-submit {
+  margin: 0;
+  min-width: 9rem;
 }
 
 .cespace-detail-section {
@@ -722,23 +792,25 @@
 }
 
 .cespace-detail-section + .cespace-detail-section {
-  padding-top: 1.5rem;
+  padding-top: 1.35rem;
   border-top: 1px solid var(--cespace-border);
 }
 
 .cespace-detail-label {
+  margin: 0;
+  font-family: var(--cespace-font-display);
   font-size: 0.6875rem;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--cespace-muted);
+  color: var(--cespace-ink);
 }
 
 .cespace-detail-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
-  margin-top: 0.85rem;
+  margin: 0.9rem 0 0;
 }
 
 @media (min-width: 640px) {
@@ -752,6 +824,8 @@
 }
 
 .cespace-detail-dt {
+  margin: 0;
+  font-family: var(--cespace-font-display);
   font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -760,8 +834,9 @@
 }
 
 .cespace-detail-dd {
-  margin-top: 0.3rem;
-  font-size: 0.875rem;
+  margin: 0.3rem 0 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
   color: var(--cespace-ink);
 }
 
@@ -783,7 +858,7 @@
   overflow: hidden;
   aspect-ratio: 1;
   border: 1px solid var(--cespace-border);
-  background: #f8fafc;
+  background: #fafafa;
 }
 
 .cespace-photo img {
@@ -794,11 +869,13 @@
 }
 
 .cespace-photo:hover img {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
 .cespace-history {
-  margin-top: 0.85rem;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  list-style: none;
   border: 1px solid var(--cespace-border);
 }
 
@@ -820,6 +897,6 @@
 }
 
 .cespace-history-comment {
-  margin-top: 0.5rem;
+  margin: 0.5rem 0 0;
   color: #64748b;
 }

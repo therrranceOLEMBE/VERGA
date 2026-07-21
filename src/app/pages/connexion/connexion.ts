@@ -1,12 +1,15 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { interval } from 'rxjs';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { AgenceSessionService } from '../../services/agence-session.service';
 import { AgenceService } from '../../services/agence.service';
 import { ClientSessionService } from '../../services/client-session.service';
 import { ParticulierService } from '../../services/particulier.service';
+import { AUTH_SLIDES } from '../../utils/auth-slides';
 import { extractApiErrorMessage } from '../../utils/api-error.util';
 
 export type LoginFormType = 'entreprise' | 'particulier';
@@ -24,11 +27,14 @@ export class Connexion implements OnInit {
   private readonly agenceSession = inject(AgenceSessionService);
   private readonly particulierService = inject(ParticulierService);
   private readonly agenceService = inject(AgenceService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly formType = signal<LoginFormType>('entreprise');
   protected readonly showPassword = signal(false);
   protected readonly submitting = signal(false);
   protected readonly errorMessage = signal('');
+  protected readonly activeSlide = signal(0);
+  protected readonly authSlides = AUTH_SLIDES;
 
   protected email = '';
   protected password = '';
@@ -39,6 +45,18 @@ export class Connexion implements OnInit {
       this.formType.set('particulier');
     } else if (scope === 'agence') {
       this.formType.set('entreprise');
+    }
+
+    interval(5500)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.activeSlide.update((current) => (current + 1) % this.authSlides.length);
+      });
+  }
+
+  protected goToSlide(index: number): void {
+    if (index >= 0 && index < this.authSlides.length) {
+      this.activeSlide.set(index);
     }
   }
 

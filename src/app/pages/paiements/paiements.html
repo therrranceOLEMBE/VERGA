@@ -85,20 +85,16 @@
  <table class="paiements-table w-full table-fixed text-left text-sm">
  <colgroup>
  <col class="paiements-col-code" />
- <col class="paiements-col-bamboo" />
  <col class="paiements-col-commande" />
  <col class="paiements-col-amount" />
- <col class="paiements-col-method" />
  <col class="paiements-col-status" />
  <col class="paiements-col-date" />
  </colgroup>
  <thead>
  <tr class="paiements-table-head">
  <th scope="col">{{ 'backoffice.payments.colCodeVerga' | translate }}</th>
- <th scope="col">{{ 'backoffice.payments.colBambooRef' | translate }}</th>
  <th scope="col">{{ 'backoffice.payments.colCommande' | translate }}</th>
  <th scope="col" class="text-right">{{ 'backoffice.payments.colAmount' | translate }}</th>
- <th scope="col">{{ 'backoffice.payments.colMethod' | translate }}</th>
  <th scope="col">{{ 'backoffice.payments.colStatus' | translate }}</th>
  <th scope="col">{{ 'backoffice.payments.colDate' | translate }}</th>
  </tr>
@@ -107,14 +103,10 @@
  @for (paiement of paiements(); track paiement.id) {
  <tr class="paiements-table-row transition hover:bg-verga-primary-muted/30">
  <td class="font-mono text-xs font-semibold text-verga-primary">{{ paiement.codeVerga }}</td>
- <td class="font-mono text-xs text-gray-600">{{ paiement.refBamboo }}</td>
  <td>
  <span class="paiement-cell-truncate" [attr.title]="paiement.commande">{{ paiement.commande }}</span>
  </td>
  <td class="text-right font-semibold text-gray-900 tabular-nums">{{ paiement.montant }}</td>
- <td>
- <span class="paiement-cell-truncate" [attr.title]="paiement.methode">{{ paiement.methode }}</span>
- </td>
  <td>
  @if (paiement.statut) {
  <span class="inline-block px-2.5 py-1 text-xs font-semibold uppercase" [class]="statusClass(paiement.statut)">
@@ -128,7 +120,7 @@
  </tr>
  } @empty {
  <tr>
- <td colspan="7" class="paiements-empty">{{ 'backoffice.payments.empty' | translate }}</td>
+ <td colspan="5" class="paiements-empty">{{ 'backoffice.payments.empty' | translate }}</td>
  </tr>
  }
  </tbody>

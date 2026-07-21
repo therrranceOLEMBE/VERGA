@@ -1,4 +1,4 @@
-import { Component, HostListener, computed, inject, input, signal } from '@angular/core';
+import { Component, HostListener, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { FiltersModal } from '../filters-modal/filters-modal';
@@ -24,8 +24,6 @@ export class Header {
   private readonly clientSession = inject(ClientSessionService);
   private readonly particulierService = inject(ParticulierService);
   private readonly filtersService = inject(OfferFiltersService);
-
-  readonly showActionIcons = input(true);
 
   protected readonly menuOpen = signal(false);
   protected readonly filtersOpen = signal(false);
@@ -120,15 +118,21 @@ export class Header {
       return;
     }
 
+    this.loggingOut.set(true);
+    this.closeMenu();
+
+    const startedAt = Date.now();
+    const minimumAnimationMs = 1800;
     const token = this.clientSession.getToken();
     const finishLogout = (): void => {
-      this.clientSession.clearSession();
-      this.loggingOut.set(false);
-      this.closeMenu();
-      void this.router.navigateByUrl('/accueil');
-    };
+      const remainingMs = Math.max(0, minimumAnimationMs - (Date.now() - startedAt));
 
-    this.loggingOut.set(true);
+      window.setTimeout(() => {
+        this.clientSession.clearSession();
+        this.loggingOut.set(false);
+        void this.router.navigateByUrl('/accueil');
+      }, remainingMs);
+    };
 
     if (!token) {
       finishLogout();

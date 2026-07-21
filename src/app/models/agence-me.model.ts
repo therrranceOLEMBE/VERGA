@@ -5,6 +5,21 @@ export interface AgenceTypeFields {
   label?: string;
 }
 
+export interface AgenceLogoFields {
+  id?: string;
+  chemin?: string;
+  url?: string;
+  nom_original?: string;
+}
+
+export interface AgenceDocumentFields {
+  id?: string;
+  type_document?: string;
+  chemin?: string;
+  url?: string;
+  nom_original?: string;
+}
+
 export interface AgenceMeFields {
   id?: string | number;
   nom?: string;
@@ -20,6 +35,8 @@ export interface AgenceMeFields {
   gerant_email?: string;
   type_agence?: AgenceTypeFields;
   type_agence_nom?: string;
+  logo?: AgenceLogoFields | null;
+  documents?: AgenceDocumentFields[];
 }
 
 export interface AgenceMeUserFields {

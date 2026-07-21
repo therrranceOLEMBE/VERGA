@@ -89,6 +89,7 @@ function resolveCodeVerga(raw: AgencePaiementRaw): string {
 
 function resolveRefBamboo(raw: AgencePaiementRaw): string {
   return (
+    readString(raw.bamboo_reference) ||
     readString(raw.reference) ||
     readString(raw.ref) ||
     readString(raw.bamboo_ref) ||
@@ -100,11 +101,12 @@ function resolveRefBamboo(raw: AgencePaiementRaw): string {
 }
 
 function resolveMethode(raw: AgencePaiementRaw): string {
-  return readString(raw.methode) || readString(raw.method) || '—';
+  return readString(raw.operateur) || readString(raw.methode) || readString(raw.method) || '—';
 }
 
 export function mapAgencePaiementToRow(raw: AgencePaiementRaw): AgencePaiement {
   const commande =
+    readString(raw.commande_code) ||
     resolveLabel(raw.commande) ||
     (raw.commande_id != null ? String(raw.commande_id) : '');
   const codeVerga = resolveCodeVerga(raw);

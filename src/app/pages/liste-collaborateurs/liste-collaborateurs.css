@@ -6,3 +6,8 @@
 .collaborator-table {
   min-width: 56rem;
 }
+
+.collaborator-modal-backdrop {
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+}

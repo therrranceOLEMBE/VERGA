@@ -117,7 +117,7 @@ function mapTopOffres(items: Array<Record<string, unknown>> | undefined): Agence
       '—',
     statut: resolveLabel(item['statut']) || resolveLabel(item['status']),
     quantite: formatCount(Number(item['quantite_vendue'] ?? item['quantite'] ?? item['sold_quantity'] ?? 0)),
-    montant: formatDashboardMoney(Number(item['montant'] ?? item['revenu'] ?? item['amount'] ?? 0)),
+    montant: formatDashboardMoney(Number(item['prix'] ?? item['montant'] ?? item['revenu'] ?? item['amount'] ?? 0)),
   }));
 }
 

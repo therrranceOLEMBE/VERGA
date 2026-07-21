@@ -5,6 +5,7 @@ import { ClientBackofficeSidebar } from '../../components/client-backoffice-side
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { AuthRedirectService } from '../../services/auth-redirect.service';
 import { ClientSessionService } from '../../services/client-session.service';
+import { ParticulierService } from '../../services/particulier.service';
 import { TransactionService } from '../../services/transaction.service';
 
 @Component({
@@ -17,10 +18,13 @@ export class ClientBackofficeLayout implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly clientSession = inject(ClientSessionService);
   private readonly authRedirect = inject(AuthRedirectService);
+  private readonly particulierService = inject(ParticulierService);
   private readonly transactionService = inject(TransactionService);
   private readonly navSub: Subscription;
+  private logoutTimer: number | null = null;
 
   protected readonly sidebarOpen = signal(false);
+  protected readonly loggingOut = signal(false);
 
   constructor() {
     this.navSub = this.router.events
@@ -52,6 +56,9 @@ export class ClientBackofficeLayout implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.navSub.unsubscribe();
+    if (this.logoutTimer != null) {
+      window.clearTimeout(this.logoutTimer);
+    }
   }
 
   @HostListener('window:pageshow', ['$event'])
@@ -67,5 +74,36 @@ export class ClientBackofficeLayout implements OnInit, OnDestroy {
 
   protected closeSidebar(): void {
     this.sidebarOpen.set(false);
+  }
+
+  protected onLogoutRequest(): void {
+    if (this.loggingOut()) {
+      return;
+    }
+
+    this.loggingOut.set(true);
+    this.closeSidebar();
+
+    const startedAt = Date.now();
+    const minDisplayMs = 2800;
+    const token = this.clientSession.getToken();
+
+    const finishLogout = (): void => {
+      const wait = Math.max(0, minDisplayMs - (Date.now() - startedAt));
+      this.logoutTimer = window.setTimeout(() => {
+        this.clientSession.clearSession();
+        this.authRedirect.redirectToLogin('client');
+      }, wait);
+    };
+
+    if (!token) {
+      finishLogout();
+      return;
+    }
+
+    this.particulierService.logout(token).subscribe({
+      next: () => finishLogout(),
+      error: () => finishLogout(),
+    });
   }
 }

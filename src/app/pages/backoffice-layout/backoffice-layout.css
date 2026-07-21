@@ -1,6 +1,16 @@
 .backoffice-shell {
+  --color-verga-primary: #ff6b35;
+  --color-verga-primary-dark: #e85a28;
+  --color-verga-primary-light: #ff8f66;
+  --color-verga-primary-muted: #fffaf7;
+  --color-verga-sky: #ff6b35;
+  --color-verga-sky-dark: #e85a28;
+  --color-verga-surface: #fafafa;
   min-height: 100vh;
   min-height: 100dvh;
+  background: #fafafa;
+  font-family: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  color: #0f172a;
 }
 
 .backoffice-main {
@@ -19,6 +29,22 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+.backoffice-mobile-bar {
+  border-bottom-color: #e2e8f0;
+  background: #fff;
+  backdrop-filter: none;
+}
+
+.backoffice-mobile-bar button {
+  color: #0f172a;
+}
+
+.backoffice-mobile-bar button:hover {
+  border-color: #ff6b35;
+  background: #fffaf7;
+  color: #e85a28;
+}
+
 .backoffice-mobile-bar__brand {
   line-height: 0;
 }
@@ -31,4 +57,98 @@
   max-height: 3rem;
   object-fit: contain;
   object-position: left center;
+}
+
+.agency-logout {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: 1.5rem;
+  background: #fff;
+  text-align: center;
+  animation: agency-logout-enter 0.3s ease-out both;
+}
+
+.agency-logout__orbit {
+  position: relative;
+  width: clamp(12rem, 32vw, 17rem);
+  aspect-ratio: 1;
+  border: 1px solid #fed7c7;
+  border-radius: 50%;
+  animation: agency-orbit-pulse 1.8s ease-in-out infinite;
+}
+
+.agency-logout__orbit::before,
+.agency-logout__orbit::after {
+  position: absolute;
+  border-radius: 50%;
+  content: '';
+}
+
+.agency-logout__orbit::before {
+  inset: 1.25rem;
+  border: 1px solid #ffb99e;
+}
+
+.agency-logout__orbit::after {
+  inset: 3rem;
+  border: 3px solid #ff6b35;
+  border-right-color: #ffe7dd;
+  animation: agency-orbit-spin 0.9s linear infinite;
+}
+
+.agency-logout__copy {
+  position: absolute;
+  width: min(24rem, calc(100% - 3rem));
+}
+
+.agency-logout__brand {
+  margin: 0 0 0.75rem;
+  color: #ff6b35;
+  font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+}
+
+.agency-logout__copy h2 {
+  margin: 0;
+  color: #0f172a;
+  font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(1.65rem, 4vw, 2.35rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+
+.agency-logout__copy > p:last-child {
+  margin: 0.5rem auto 0;
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+@keyframes agency-logout-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes agency-orbit-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes agency-orbit-pulse {
+  50% { border-color: #ff6b35; transform: scale(1.035); }
+}
+
+@media (max-width: 520px) {
+  .agency-logout__orbit { width: 13.5rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agency-logout,
+  .agency-logout__orbit,
+  .agency-logout__orbit::after { animation-duration: 0.01ms; animation-iteration-count: 1; }
 }

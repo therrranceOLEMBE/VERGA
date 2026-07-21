@@ -42,4 +42,16 @@ export class Profil implements OnInit {
   protected displayValue(value: string): string {
     return value.trim() || '—';
   }
+
+  protected isImageUrl(url: string): boolean {
+    const lower = url.toLowerCase();
+    return /\.(jpe?g|png|gif|webp|bmp|svg)(\?|$)/i.test(lower);
+  }
+
+  protected formatDocType(typeDocument: string): string {
+    if (!typeDocument) return '—';
+    return typeDocument
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, (c) => c.toUpperCase());
+  }
 }

@@ -39,6 +39,12 @@
  </button>
  </section>
 
+ @if (successMessage()) {
+ <div class="mb-4 border border-verga-success/30 bg-verga-success-muted px-4 py-3 text-sm text-verga-success" role="status">
+ {{ successMessage() | translate }}
+ </div>
+ }
+
  @if (loading()) {
  <p class="text-sm text-verga-muted">{{ 'backoffice.offerHistory.loading' | translate }}</p>
  } @else {
@@ -356,14 +362,61 @@
 
  <div class="grid gap-5 sm:grid-cols-2">
  <div>
+ <label for="edit-offer-date-depart" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.departureDate' | translate }} *</label>
+ <input id="edit-offer-date-depart" name="editDateDepart" type="date" required [(ngModel)]="editDateDepart" class="verga-field mt-2" />
+ </div>
+ <div>
+ <label for="edit-offer-date-depot" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.depotDate' | translate }}</label>
+ <input id="edit-offer-date-depot" name="editDateDepotColis" type="date" [(ngModel)]="editDateDepotColis" class="verga-field mt-2" />
+ <p class="mt-1.5 text-xs text-verga-muted">{{ 'backoffice.createOffer.depotDateHint' | translate }}</p>
+ </div>
+ </div>
+
+ <div class="grid gap-5 sm:grid-cols-2">
+ <div>
  <label for="edit-offer-prix" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.price' | translate }} *</label>
  <input id="edit-offer-prix" name="editPrix" type="number" min="1" step="1" required [(ngModel)]="editPrix" class="verga-field mt-2" />
  </div>
  <div>
  <label for="edit-offer-capacite" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.capaciteTotale' | translate }} *</label>
- <input id="edit-offer-capacite" name="editCapaciteTotale" type="number" min="1" step="1" required [(ngModel)]="editCapaciteTotale" class="verga-field mt-2" />
+ <input
+ id="edit-offer-capacite"
+ name="editCapaciteTotale"
+ type="number"
+ min="1"
+ step="1"
+ [required]="!editCapaciteIllimitee"
+ [disabled]="editCapaciteIllimitee"
+ [(ngModel)]="editCapaciteTotale"
+ class="verga-field mt-2 disabled:bg-verga-surface disabled:text-verga-muted"
+ />
+ @if (editCapaciteDisponible != null) {
+ <p class="mt-1.5 text-xs text-verga-muted">
+ {{ 'backoffice.offerHistory.capaciteDisponibleHint' | translate:{ value: editCapaciteDisponible } }}
+ </p>
+ }
  </div>
  </div>
+
+ <label class="flex items-start gap-3 border border-verga-border bg-verga-surface p-4 text-sm text-gray-700">
+ <input
+ type="checkbox"
+ name="editCapaciteIllimitee"
+ [ngModel]="editCapaciteIllimitee"
+ (ngModelChange)="onEditCapaciteIllimiteeChange($event)"
+ class="mt-0.5 h-4 w-4 accent-[var(--color-verga-primary,#5eadd6)]"
+ />
+ <span>
+ <span class="block font-semibold text-gray-900">{{ 'backoffice.createOffer.capaciteIllimitee' | translate }}</span>
+ <span class="mt-1 block text-xs text-verga-muted">{{ 'backoffice.createOffer.capaciteIllimiteeHint' | translate }}</span>
+ </span>
+ </label>
+
+ @if (!editCapaciteIllimitee && editStatut === 'active' && editCapaciteDisponible != null && editCapaciteDisponible <= 0) {
+ <div class="border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800" role="status">
+ {{ 'backoffice.offerHistory.activeNoCapacityWarning' | translate }}
+ </div>
+ }
 
  <div>
  <label for="edit-offer-description" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.description' | translate }} *</label>
@@ -427,6 +480,7 @@
  }
 
  <p class="text-sm text-gray-700">{{ 'backoffice.offerHistory.modalDeleteMessage' | translate }}</p>
+ <p class="mt-2 text-xs text-verga-muted">{{ 'backoffice.offerHistory.deleteHint' | translate }}</p>
 
  <dl class="mt-4 space-y-3 border border-verga-border bg-verga-surface/40 p-4 text-sm">
  <div>

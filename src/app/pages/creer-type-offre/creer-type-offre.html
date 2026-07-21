@@ -105,8 +105,8 @@
           id="type-offre-quantite-min"
           name="quantiteMin"
           type="number"
-          min="0.001"
-          step="any"
+          [min]="quantiteEntier ? 1 : 0.001"
+          [step]="quantiteEntier ? 1 : 0.001"
           required
           [(ngModel)]="quantiteMin"
           class="verga-field mt-2"
@@ -115,7 +115,13 @@
       </div>
       <div class="flex flex-col justify-end gap-3 pb-1">
         <label class="inline-flex items-center gap-2 text-sm text-gray-700">
-          <input type="checkbox" name="quantiteEntier" [(ngModel)]="quantiteEntier" class="h-4 w-4 accent-[var(--color-verga-primary,#5eadd6)]" />
+          <input
+            type="checkbox"
+            name="quantiteEntier"
+            [ngModel]="quantiteEntier"
+            (ngModelChange)="onQuantiteEntierChange($event)"
+            class="h-4 w-4 accent-[var(--color-verga-primary,#5eadd6)]"
+          />
           {{ 'backoffice.createTypeOffre.quantiteEntier' | translate }}
         </label>
         <label class="inline-flex items-center gap-2 text-sm text-gray-700">

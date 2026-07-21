@@ -15,12 +15,9 @@ import {
 interface DashboardMetric {
   labelKey: string;
   value: string;
-  icon: 'offers' | 'pending' | 'confirmed' | 'parcels' | 'transit' | 'claims' | 'payments' | 'commissions' | 'revenue' | 'payouts';
 }
 
-interface DashboardHighlight extends DashboardMetric {
-  accent: 'primary' | 'success' | 'neutral';
-}
+type DashboardHighlight = DashboardMetric;
 
 interface MetricGroup {
   titleKey: string;
@@ -36,7 +33,6 @@ interface PeriodOption {
 interface QuickLink {
   labelKey: string;
   path: string;
-  icon: 'commandes' | 'finances' | 'colis' | 'offers';
 }
 
 interface StatusBarItem extends AgenceDashboardStatusCount {
@@ -69,10 +65,10 @@ export class TableauDeBord implements OnInit {
   ];
 
   protected readonly quickLinks: QuickLink[] = [
-    { labelKey: 'backoffice.dashboard.quickCommandes', path: '/backoffice/commandes', icon: 'commandes' },
-    { labelKey: 'backoffice.dashboard.quickFinances', path: '/backoffice/finances', icon: 'finances' },
-    { labelKey: 'backoffice.dashboard.quickColis', path: '/backoffice/support-logistique', icon: 'colis' },
-    { labelKey: 'backoffice.dashboard.quickOffers', path: '/backoffice/historique-offres', icon: 'offers' },
+    { labelKey: 'backoffice.dashboard.quickCommandes', path: '/backoffice/commandes' },
+    { labelKey: 'backoffice.dashboard.quickFinances', path: '/backoffice/finances' },
+    { labelKey: 'backoffice.dashboard.quickColis', path: '/backoffice/support-logistique' },
+    { labelKey: 'backoffice.dashboard.quickOffers', path: '/backoffice/historique-offres' },
   ];
 
   protected readonly highlights = computed<DashboardHighlight[]>(() => {
@@ -85,20 +81,14 @@ export class TableauDeBord implements OnInit {
       {
         labelKey: 'backoffice.dashboard.netRevenue',
         value: formatDashboardMoney(stats.revenu_net_estime),
-        accent: 'primary',
-        icon: 'revenue',
       },
       {
         labelKey: 'backoffice.dashboard.totalOrders',
         value: this.formatCount(stats.nb_commandes),
-        accent: 'success',
-        icon: 'confirmed',
       },
       {
         labelKey: 'backoffice.dashboard.activeOffers',
         value: this.formatCount(stats.nb_offres_actives),
-        accent: 'neutral',
-        icon: 'offers',
       },
     ];
   });
@@ -114,22 +104,22 @@ export class TableauDeBord implements OnInit {
         titleKey: 'backoffice.dashboard.sectionOperations',
         descriptionKey: 'backoffice.dashboard.sectionOperationsHint',
         metrics: [
-          { labelKey: 'backoffice.dashboard.totalOffers', value: this.formatCount(stats.nb_offres), icon: 'offers' },
-          { labelKey: 'backoffice.dashboard.pendingOrders', value: this.formatCount(stats.nb_commandes_en_attente), icon: 'pending' },
-          { labelKey: 'backoffice.dashboard.confirmedOrders', value: this.formatCount(stats.nb_commandes_confirmees), icon: 'confirmed' },
-          { labelKey: 'backoffice.dashboard.totalParcels', value: this.formatCount(stats.nb_colis), icon: 'parcels' },
-          { labelKey: 'backoffice.dashboard.parcelsInTransit', value: this.formatCount(stats.nb_colis_en_transit), icon: 'transit' },
-          { labelKey: 'backoffice.dashboard.openClaims', value: this.formatCount(stats.nb_reclamations_ouvertes), icon: 'claims' },
+          { labelKey: 'backoffice.dashboard.totalOffers', value: this.formatCount(stats.nb_offres) },
+          { labelKey: 'backoffice.dashboard.pendingOrders', value: this.formatCount(stats.nb_commandes_en_attente) },
+          { labelKey: 'backoffice.dashboard.confirmedOrders', value: this.formatCount(stats.nb_commandes_confirmees) },
+          { labelKey: 'backoffice.dashboard.totalParcels', value: this.formatCount(stats.nb_colis) },
+          { labelKey: 'backoffice.dashboard.parcelsInTransit', value: this.formatCount(stats.nb_colis_en_transit) },
+          { labelKey: 'backoffice.dashboard.openClaims', value: this.formatCount(stats.nb_reclamations_ouvertes) },
         ],
       },
       {
         titleKey: 'backoffice.dashboard.sectionFinance',
         descriptionKey: 'backoffice.dashboard.sectionFinanceHint',
         metrics: [
-          { labelKey: 'backoffice.dashboard.totalPayments', value: formatDashboardMoney(stats.total_paiements), icon: 'payments' },
-          { labelKey: 'backoffice.dashboard.totalCommissions', value: formatDashboardMoney(stats.total_commissions), icon: 'commissions' },
-          { labelKey: 'backoffice.dashboard.netRevenue', value: formatDashboardMoney(stats.revenu_net_estime), icon: 'revenue' },
-          { labelKey: 'backoffice.dashboard.pendingPayouts', value: formatDashboardMoney(stats.reversements_en_attente), icon: 'payouts' },
+          { labelKey: 'backoffice.dashboard.totalPayments', value: formatDashboardMoney(stats.total_paiements) },
+          { labelKey: 'backoffice.dashboard.totalCommissions', value: formatDashboardMoney(stats.total_commissions) },
+          { labelKey: 'backoffice.dashboard.netRevenue', value: formatDashboardMoney(stats.revenu_net_estime) },
+          { labelKey: 'backoffice.dashboard.pendingPayouts', value: formatDashboardMoney(stats.reversements_en_attente) },
         ],
       },
     ];

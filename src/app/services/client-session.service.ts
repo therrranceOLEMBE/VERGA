@@ -5,6 +5,13 @@ import { ClientDashboardPeriode, ClientDashboardResponse } from '../models/clien
 import { mapClientMeToProfile, mapProfileToApiPayload } from '../utils/client-me.util';
 import { ParticulierService } from './particulier.service';
 
+export interface ClientProfileDocument {
+  id: string;
+  typeDocument: string;
+  url: string;
+  fileName: string;
+}
+
 export interface ClientProfile {
   firstName: string;
   lastName: string;
@@ -14,6 +21,7 @@ export interface ClientProfile {
   city: string;
   country: string;
   accountType: string;
+  documents: ClientProfileDocument[];
 }
 
 const CLIENT_TOKEN_KEY = 'verga-client-token';
@@ -27,6 +35,7 @@ const EMPTY_PROFILE: ClientProfile = {
   city: '',
   country: '',
   accountType: '',
+  documents: [],
 };
 
 @Injectable({ providedIn: 'root' })

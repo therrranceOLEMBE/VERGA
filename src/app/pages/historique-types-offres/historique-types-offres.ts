@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TypeOffre, TypeOffreUpdateRequest } from '../../models/type-offre.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { AgenceService } from '../../services/agence.service';
 import { AgenceSessionService } from '../../services/agence-session.service';
 import { extractApiErrorMessage } from '../../utils/api-error.util';
 
@@ -16,7 +15,6 @@ import { extractApiErrorMessage } from '../../utils/api-error.util';
 })
 export class HistoriqueTypesOffres implements OnInit {
   private readonly agenceSession = inject(AgenceSessionService);
-  private readonly agenceService = inject(AgenceService);
 
   protected readonly loading = signal(true);
   protected readonly errorMessage = signal('');
@@ -57,8 +55,8 @@ export class HistoriqueTypesOffres implements OnInit {
     const actif = this.filterActif();
 
     return this.items().filter((item) => {
-      if (scope === 'platform' && !item.isPlatform) return false;
-      if (scope === 'custom' && item.isPlatform) return false;
+      if (scope === 'platform' && !this.isPlatformType(item)) return false;
+      if (scope === 'custom' && !this.canManage(item)) return false;
       if (actif === 'actif' && !item.actif) return false;
       if (actif === 'inactif' && item.actif) return false;
 
@@ -86,6 +84,20 @@ export class HistoriqueTypesOffres implements OnInit {
     this.filterActif.set('all');
   }
 
+  protected reload(): void {
+    this.loadList();
+  }
+
+  /** Types plateforme VERGA : consultation seule. */
+  protected isPlatformType(item: TypeOffre): boolean {
+    return item.isPlatform === true || !item.agenceId;
+  }
+
+  /** Seuls les types créés par l’agence sont modifiables / supprimables. */
+  protected canManage(item: TypeOffre): boolean {
+    return !this.isPlatformType(item);
+  }
+
   protected openDetail(item: TypeOffre): void {
     this.successMessage.set('');
     this.detailOpen.set(true);
@@ -103,6 +115,12 @@ export class HistoriqueTypesOffres implements OnInit {
 
   protected openEdit(item: TypeOffre): void {
     this.successMessage.set('');
+
+    if (!this.canManage(item)) {
+      this.errorMessage.set('backoffice.typeOffreHistory.editForbidden');
+      return;
+    }
+
     this.closeDetail();
     this.editingType.set(item);
     this.applyEditForm(item);
@@ -118,17 +136,34 @@ export class HistoriqueTypesOffres implements OnInit {
   }
 
   protected closeEdit(): void {
+    if (this.editSubmitting()) return;
     this.editOpen.set(false);
     this.editSubmitting.set(false);
     this.editError.set('');
     this.editingType.set(null);
   }
 
+  protected onEditQuantiteEntierChange(value: boolean): void {
+    this.editQuantiteEntier = value;
+    if (value && this.editQuantiteMin != null && !Number.isInteger(this.editQuantiteMin)) {
+      this.editQuantiteMin = Math.max(1, Math.ceil(this.editQuantiteMin));
+    }
+  }
+
   protected onEditSubmit(event: Event): void {
     event.preventDefault();
     const item = this.editingType();
-    const token = this.agenceSession.getToken();
-    if (!item || !token) {
+    if (!item) {
+      this.editError.set('backoffice.typeOffreHistory.authRequired');
+      return;
+    }
+
+    if (!this.canManage(item)) {
+      this.editError.set('backoffice.typeOffreHistory.editForbidden');
+      return;
+    }
+
+    if (!this.agenceSession.isAuthenticated()) {
       this.editError.set('backoffice.typeOffreHistory.authRequired');
       return;
     }
@@ -151,14 +186,14 @@ export class HistoriqueTypesOffres implements OnInit {
     this.editSubmitting.set(true);
     this.editError.set('');
 
-    this.agenceService.updateTypeOffre(token, item.id, payload).subscribe({
+    this.agenceSession.updateTypeOffre(item.id, payload).subscribe({
       next: (updated) => {
         this.items.update((list) => list.map((row) => (row.id === updated.id ? updated : row)));
         this.successMessage.set('backoffice.typeOffreHistory.editSuccess');
         this.editSubmitting.set(false);
         this.closeEdit();
       },
-      error: (error: HttpErrorResponse) => {
+      error: (error: HttpErrorResponse | Error) => {
         this.editError.set(this.resolveEditError(error));
         this.editSubmitting.set(false);
       },
@@ -167,6 +202,12 @@ export class HistoriqueTypesOffres implements OnInit {
 
   protected openDelete(item: TypeOffre): void {
     this.successMessage.set('');
+
+    if (!this.canManage(item)) {
+      this.errorMessage.set('backoffice.typeOffreHistory.deleteForbidden');
+      return;
+    }
+
     this.closeDetail();
     this.deletingType.set(item);
     this.deleteError.set('');
@@ -181,6 +222,7 @@ export class HistoriqueTypesOffres implements OnInit {
   }
 
   protected closeDelete(): void {
+    if (this.deleteSubmitting()) return;
     this.deleteOpen.set(false);
     this.deleteSubmitting.set(false);
     this.deleteError.set('');
@@ -189,8 +231,17 @@ export class HistoriqueTypesOffres implements OnInit {
 
   protected confirmDelete(): void {
     const item = this.deletingType();
-    const token = this.agenceSession.getToken();
-    if (!item || !token) {
+    if (!item) {
+      this.deleteError.set('backoffice.typeOffreHistory.authRequired');
+      return;
+    }
+
+    if (!this.canManage(item)) {
+      this.deleteError.set('backoffice.typeOffreHistory.deleteForbidden');
+      return;
+    }
+
+    if (!this.agenceSession.isAuthenticated()) {
       this.deleteError.set('backoffice.typeOffreHistory.authRequired');
       return;
     }
@@ -198,14 +249,14 @@ export class HistoriqueTypesOffres implements OnInit {
     this.deleteSubmitting.set(true);
     this.deleteError.set('');
 
-    this.agenceService.deleteTypeOffre(token, item.id).subscribe({
+    this.agenceSession.deleteTypeOffre(item.id).subscribe({
       next: () => {
         this.items.update((list) => list.filter((row) => row.id !== item.id));
         this.successMessage.set('backoffice.typeOffreHistory.deleteSuccess');
         this.deleteSubmitting.set(false);
         this.closeDelete();
       },
-      error: (error: HttpErrorResponse) => {
+      error: (error: HttpErrorResponse | Error) => {
         this.deleteError.set(this.resolveDeleteError(error));
         this.deleteSubmitting.set(false);
       },
@@ -250,13 +301,13 @@ export class HistoriqueTypesOffres implements OnInit {
       !!this.editUnite.trim() &&
       !!this.editUniteLabel.trim() &&
       this.editQuantiteMin != null &&
-      this.editQuantiteMin > 0
+      this.editQuantiteMin > 0 &&
+      (!this.editQuantiteEntier || Number.isInteger(this.editQuantiteMin))
     );
   }
 
   private loadList(): void {
-    const token = this.agenceSession.getToken();
-    if (!token) {
+    if (!this.agenceSession.isAuthenticated()) {
       this.unauthenticated.set(true);
       this.errorMessage.set('backoffice.typeOffreHistory.authRequired');
       this.loading.set(false);
@@ -268,16 +319,21 @@ export class HistoriqueTypesOffres implements OnInit {
     this.errorMessage.set('');
     this.unauthenticated.set(false);
 
-    this.agenceService.getTypeOffres(token).subscribe({
+    this.agenceSession.loadTypeOffres().subscribe({
       next: (items) => {
         this.items.set(items);
         this.loading.set(false);
       },
-      error: (error: HttpErrorResponse) => {
+      error: (error: HttpErrorResponse | Error) => {
         this.items.set([]);
-        if (error.status === 401) {
+        if (error instanceof Error && !(error instanceof HttpErrorResponse)) {
           this.unauthenticated.set(true);
           this.errorMessage.set('backoffice.typeOffreHistory.authRequired');
+        } else if (error.status === 401) {
+          this.unauthenticated.set(true);
+          this.errorMessage.set('backoffice.typeOffreHistory.authRequired');
+        } else if (error.status === 403) {
+          this.errorMessage.set('backoffice.typeOffreHistory.forbidden');
         } else {
           this.errorMessage.set(
             extractApiErrorMessage(error) ?? 'backoffice.typeOffreHistory.loadError',
@@ -289,8 +345,7 @@ export class HistoriqueTypesOffres implements OnInit {
   }
 
   private loadDetail(id: string): void {
-    const token = this.agenceSession.getToken();
-    if (!token) {
+    if (!this.agenceSession.isAuthenticated()) {
       this.detailError.set('backoffice.typeOffreHistory.authRequired');
       return;
     }
@@ -298,13 +353,16 @@ export class HistoriqueTypesOffres implements OnInit {
     this.detailLoading.set(true);
     this.detailError.set('');
 
-    this.agenceService.getTypeOffre(token, id).subscribe({
+    this.agenceSession.loadTypeOffre(id).subscribe({
       next: (item) => {
         this.selectedType.set(item);
+        this.items.update((list) => list.map((row) => (row.id === item.id ? item : row)));
         this.detailLoading.set(false);
       },
-      error: (error: HttpErrorResponse) => {
-        if (error.status === 404) {
+      error: (error: HttpErrorResponse | Error) => {
+        if (error instanceof Error && !(error instanceof HttpErrorResponse)) {
+          this.detailError.set('backoffice.typeOffreHistory.authRequired');
+        } else if (error.status === 404) {
           this.detailError.set('backoffice.typeOffreHistory.detailNotFound');
         } else if (error.status === 403) {
           this.detailError.set('backoffice.typeOffreHistory.detailForbidden');
@@ -320,12 +378,18 @@ export class HistoriqueTypesOffres implements OnInit {
     });
   }
 
-  private resolveEditError(error: HttpErrorResponse): string {
+  private resolveEditError(error: HttpErrorResponse | Error): string {
+    if (error instanceof Error && !(error instanceof HttpErrorResponse)) {
+      return 'backoffice.typeOffreHistory.authRequired';
+    }
     if (error.status === 401) {
       return 'backoffice.typeOffreHistory.authRequired';
     }
     if (error.status === 403) {
       return 'backoffice.typeOffreHistory.editForbidden';
+    }
+    if (error.status === 404) {
+      return 'backoffice.typeOffreHistory.detailNotFound';
     }
     if (error.status === 422) {
       return extractApiErrorMessage(error) ?? 'backoffice.typeOffreHistory.editValidationError';
@@ -333,12 +397,18 @@ export class HistoriqueTypesOffres implements OnInit {
     return extractApiErrorMessage(error) ?? 'backoffice.typeOffreHistory.editError';
   }
 
-  private resolveDeleteError(error: HttpErrorResponse): string {
+  private resolveDeleteError(error: HttpErrorResponse | Error): string {
+    if (error instanceof Error && !(error instanceof HttpErrorResponse)) {
+      return 'backoffice.typeOffreHistory.authRequired';
+    }
     if (error.status === 401) {
       return 'backoffice.typeOffreHistory.authRequired';
     }
     if (error.status === 403) {
       return 'backoffice.typeOffreHistory.deleteForbidden';
+    }
+    if (error.status === 404) {
+      return 'backoffice.typeOffreHistory.detailNotFound';
     }
     if (error.status === 422) {
       return extractApiErrorMessage(error) ?? 'backoffice.typeOffreHistory.deleteInUse';

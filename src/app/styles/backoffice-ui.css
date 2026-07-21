@@ -5,17 +5,17 @@
 
 :root,
 .backoffice-shell {
-  --bo-primary: var(--color-verga-primary, #5eadd6);
-  --bo-primary-soft: color-mix(in srgb, var(--bo-primary) 10%, white);
-  --bo-primary-muted: color-mix(in srgb, var(--bo-primary) 16%, white);
+  --bo-primary: #ff6b35;
+  --bo-primary-soft: #fffaf7;
+  --bo-primary-muted: #fff4ef;
   --bo-success: var(--color-verga-success, #2e8b72);
   --bo-warning: #d97706;
   --bo-danger: #dc2626;
   --bo-border: var(--color-verga-border, #e2e8f0);
   --bo-muted: var(--color-verga-muted, #64748b);
-  --bo-surface: #f8fafc;
-  --bo-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.06);
-  --bo-radius: 14px;
+  --bo-surface: #fafafa;
+  --bo-shadow: none;
+  --bo-radius: 0;
 }
 
 .backoffice-main {
@@ -126,7 +126,7 @@
 .bo-panel-filters,
 .backoffice-main section.mb-6.border.border-verga-border.bg-white.p-4 {
   border-bottom: 1px solid var(--bo-border);
-  background: linear-gradient(180deg, #fff 0%, #fafbfc 100%);
+  background: #fafafa;
 }
 
 .commandes-panel-filters h2,
@@ -296,9 +296,10 @@
 .reclamations-modal-backdrop > .bo-modal,
 .offer-modal-backdrop > .bo-modal {
   border: 1px solid var(--bo-border, #e2e8f0) !important;
-  border-radius: 16px !important;
+  border-top: 3px solid var(--bo-primary) !important;
+  border-radius: 0 !important;
   background: #ffffff !important;
-  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.18), 0 8px 16px rgba(15, 23, 42, 0.08) !important;
+  box-shadow: none !important;
   overflow: hidden;
   color: #0f172a;
 }
@@ -308,7 +309,7 @@
   align-items: center;
   justify-content: space-between;
   border-bottom: 1px solid var(--bo-border, #e2e8f0) !important;
-  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%) !important;
+  background: #fff !important;
   padding: 1.125rem 1.5rem !important;
 }
 
@@ -353,7 +354,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--bo-primary, #5eadd6);
+  color: var(--bo-primary);
 }
 
 .bo-modal dl {

@@ -28,7 +28,20 @@ import {
   AgencePasswordUpdateRequest,
   AgencePasswordUpdateResponse,
 } from '../models/agence-password.model';
-import { AgenceRegisterRequest, AgenceRegisterResponse } from '../models/agence-register.model';
+import {
+  AgenceRegisterDocument,
+  AgenceRegisterRequest,
+  AgenceRegisterResponse,
+} from '../models/agence-register.model';
+import {
+  AgenceRolesResponse,
+  AgenceUserCreateRequest,
+  AgenceUserCreateResponse,
+  AgenceUserDeleteResponse,
+  AgenceUserUpdateRequest,
+  AgenceUserUpdateResponse,
+  AgenceUsersListResponse,
+} from '../models/agence-user.model';
 import {
   AgenceColisDetailResponse,
   AgenceColisListResponse,
@@ -81,8 +94,38 @@ export class AgenceService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/agence`;
 
-  register(payload: AgenceRegisterRequest): Observable<AgenceRegisterResponse> {
-    return this.http.post<AgenceRegisterResponse>(`${this.baseUrl}/register`, payload);
+  register(
+    payload: AgenceRegisterRequest,
+    logo?: File | null,
+    documents?: AgenceRegisterDocument[],
+  ): Observable<AgenceRegisterResponse> {
+    const fd = new FormData();
+
+    fd.append('nom', payload.nom);
+    fd.append('email', payload.email);
+    fd.append('telephone', payload.telephone);
+    if (payload.type_agence_id) fd.append('type_agence_id', payload.type_agence_id);
+    if (payload.ville) fd.append('ville', payload.ville);
+    if (payload.adresse) fd.append('adresse', payload.adresse);
+    if (payload.pays) fd.append('pays', payload.pays);
+    fd.append('gerant_name', payload.gerant_name);
+    fd.append('gerant_email', payload.gerant_email);
+    fd.append('password', payload.password);
+    fd.append('password_confirmation', payload.password_confirmation);
+    if (payload.device_name) fd.append('device_name', payload.device_name);
+
+    if (logo) {
+      fd.append('logo', logo, logo.name);
+    }
+
+    if (documents?.length) {
+      documents.forEach((doc, i) => {
+        fd.append(`documents[${i}][fichier]`, doc.fichier, doc.fichier.name);
+        fd.append(`documents[${i}][type_document]`, doc.type_document);
+      });
+    }
+
+    return this.http.post<AgenceRegisterResponse>(`${this.baseUrl}/register`, fd);
   }
 
   login(payload: AgenceLoginRequest): Observable<AgenceLoginResponse> {
@@ -107,6 +150,40 @@ export class AgenceService {
 
   changePassword(token: string, payload: AgencePasswordUpdateRequest): Observable<AgencePasswordUpdateResponse> {
     return this.http.put<AgencePasswordUpdateResponse>(`${this.baseUrl}/password`, payload, {
+      headers: this.authHeaders(token),
+    });
+  }
+
+  getRoles(token: string): Observable<AgenceRolesResponse> {
+    return this.http.get<AgenceRolesResponse>(`${this.baseUrl}/roles`, {
+      headers: this.authHeaders(token),
+    });
+  }
+
+  createUser(token: string, payload: AgenceUserCreateRequest): Observable<AgenceUserCreateResponse> {
+    return this.http.post<AgenceUserCreateResponse>(`${this.baseUrl}/users`, payload, {
+      headers: this.authHeaders(token),
+    });
+  }
+
+  getUsers(token: string): Observable<AgenceUsersListResponse> {
+    return this.http.get<AgenceUsersListResponse>(`${this.baseUrl}/users`, {
+      headers: this.authHeaders(token),
+    });
+  }
+
+  updateUser(
+    token: string,
+    userId: number | string,
+    payload: AgenceUserUpdateRequest,
+  ): Observable<AgenceUserUpdateResponse> {
+    return this.http.patch<AgenceUserUpdateResponse>(`${this.baseUrl}/users/${userId}`, payload, {
+      headers: this.authHeaders(token),
+    });
+  }
+
+  deleteUser(token: string, userId: number | string): Observable<AgenceUserDeleteResponse> {
+    return this.http.delete<AgenceUserDeleteResponse>(`${this.baseUrl}/users/${userId}`, {
       headers: this.authHeaders(token),
     });
   }
@@ -138,7 +215,16 @@ export class AgenceService {
     return this.http.get<AgenceOffresListResponse>(`${this.baseUrl}/offres`, {
       headers: this.authHeaders(token),
       params: httpParams,
-    });
+    }).pipe(
+      map((response) => {
+        console.log('[AgenceService] getOffres — réponse:', JSON.stringify(response?.data));
+        return response;
+      }),
+      catchError((error) => {
+        console.error('[AgenceService] getOffres — erreur:', error);
+        return throwError(() => error);
+      }),
+    );
   }
 
   getOffre(token: string, offreId: string): Observable<AgenceOffreDetailResponse> {

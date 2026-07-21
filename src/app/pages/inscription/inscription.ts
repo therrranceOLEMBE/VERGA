@@ -1,7 +1,11 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { interval } from 'rxjs';
+import { AgenceRegisterDocument } from '../../models/agence-register.model';
+import { ClientRegisterDocument } from '../../models/client-register.model';
 import { TypeAgence } from '../../models/type-agence.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { AgenceSessionService } from '../../services/agence-session.service';
@@ -9,10 +13,22 @@ import { AgenceService } from '../../services/agence.service';
 import { ClientSessionService } from '../../services/client-session.service';
 import { ParticulierService } from '../../services/particulier.service';
 import { TransactionService } from '../../services/transaction.service';
+import { AUTH_SLIDES } from '../../utils/auth-slides';
 import { extractApiErrorMessage } from '../../utils/api-error.util';
 
 export type SignupFormType = 'entreprise' | 'particulier';
 export type CompanySignupStep = 1 | 2;
+
+interface DocumentEntry {
+  fichier: File;
+  type_document: string;
+  preview: string | null;
+}
+
+const LOGO_MAX_SIZE = 5 * 1024 * 1024;
+const DOC_MAX_SIZE = 10 * 1024 * 1024;
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+const ACCEPTED_DOC_TYPES = [...ACCEPTED_IMAGE_TYPES, 'application/pdf'];
 
 @Component({
   selector: 'app-inscription',
@@ -27,6 +43,7 @@ export class Inscription implements OnInit {
   private readonly transactionService = inject(TransactionService);
   private readonly particulierService = inject(ParticulierService);
   private readonly agenceService = inject(AgenceService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly formType = signal<SignupFormType>('entreprise');
   protected readonly companyStep = signal<CompanySignupStep>(1);
@@ -35,8 +52,14 @@ export class Inscription implements OnInit {
   protected readonly submitting = signal(false);
   protected readonly loadingTypeAgences = signal(false);
   protected readonly errorMessage = signal('');
+  protected readonly activeSlide = signal(0);
+  protected readonly authSlides = AUTH_SLIDES;
 
   protected readonly typeAgenceOptions = signal<TypeAgence[]>([]);
+
+  protected readonly logoFile = signal<File | null>(null);
+  protected readonly logoPreview = signal<string | null>(null);
+  protected readonly documents = signal<DocumentEntry[]>([]);
 
   protected companyName = '';
   protected email = '';
@@ -55,12 +78,24 @@ export class Inscription implements OnInit {
 
   ngOnInit(): void {
     this.loadTypeAgences();
+    interval(5500)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.activeSlide.update((current) => (current + 1) % this.authSlides.length);
+      });
+  }
+
+  protected goToSlide(index: number): void {
+    if (index >= 0 && index < this.authSlides.length) {
+      this.activeSlide.set(index);
+    }
   }
 
   protected setFormType(type: SignupFormType): void {
     this.formType.set(type);
     this.companyStep.set(1);
     this.errorMessage.set('');
+    this.documents.set([]);
     if (type === 'entreprise') {
       this.loadTypeAgences();
     }
@@ -78,6 +113,95 @@ export class Inscription implements OnInit {
     this.companyStep.set(1);
     this.errorMessage.set('');
   }
+
+  /* ── Logo ── */
+
+  protected onLogoSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+      this.errorMessage.set('auth.signup.logoInvalidType');
+      input.value = '';
+      return;
+    }
+    if (file.size > LOGO_MAX_SIZE) {
+      this.errorMessage.set('auth.signup.logoTooLarge');
+      input.value = '';
+      return;
+    }
+
+    this.errorMessage.set('');
+    this.logoFile.set(file);
+
+    const reader = new FileReader();
+    reader.onload = () => this.logoPreview.set(reader.result as string);
+    reader.readAsDataURL(file);
+  }
+
+  protected removeLogo(): void {
+    this.logoFile.set(null);
+    this.logoPreview.set(null);
+  }
+
+  /* ── Documents ── */
+
+  protected onDocumentSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    if (!ACCEPTED_DOC_TYPES.includes(file.type)) {
+      this.errorMessage.set('auth.signup.docInvalidType');
+      input.value = '';
+      return;
+    }
+    if (file.size > DOC_MAX_SIZE) {
+      this.errorMessage.set('auth.signup.docTooLarge');
+      input.value = '';
+      return;
+    }
+
+    this.errorMessage.set('');
+
+    let preview: string | null = null;
+    const entry: DocumentEntry = { fichier: file, type_document: '', preview };
+
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        entry.preview = reader.result as string;
+        this.documents.update((docs) => [...docs]);
+      };
+      reader.readAsDataURL(file);
+    }
+
+    this.documents.update((docs) => [...docs, entry]);
+    input.value = '';
+  }
+
+  protected updateDocumentType(index: number, type: string): void {
+    this.documents.update((docs) => {
+      const copy = [...docs];
+      if (copy[index]) {
+        copy[index] = { ...copy[index], type_document: type };
+      }
+      return copy;
+    });
+  }
+
+  protected removeDocument(index: number): void {
+    this.documents.update((docs) => docs.filter((_, i) => i !== index));
+  }
+
+  protected formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} o`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} Ko`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} Mo`;
+  }
+
+  /* ── Submit ── */
 
   protected onSubmit(event: Event): void {
     event.preventDefault();
@@ -108,10 +232,7 @@ export class Inscription implements OnInit {
       !!this.companyName.trim() &&
       !!this.email.trim() &&
       !!this.phone.trim() &&
-      !!this.typeAgenceId &&
-      !!this.city.trim() &&
-      !!this.address.trim() &&
-      !!this.country.trim()
+      !!this.typeAgenceId
     );
   }
 
@@ -121,23 +242,39 @@ export class Inscription implements OnInit {
       return;
     }
 
+    const docs = this.documents();
+    const invalidDocs = docs.filter((d) => !d.type_document.trim());
+    if (invalidDocs.length > 0) {
+      this.errorMessage.set('auth.signup.docMissingType');
+      return;
+    }
+
     this.submitting.set(true);
 
+    const apiDocs: AgenceRegisterDocument[] = docs.map((d) => ({
+      fichier: d.fichier,
+      type_document: d.type_document.trim(),
+    }));
+
     this.agenceService
-      .register({
-        nom: this.companyName.trim(),
-        email: this.email.trim(),
-        telephone: this.phone.trim(),
-        type_agence_id: this.typeAgenceId,
-        ville: this.city.trim(),
-        adresse: this.address.trim(),
-        pays: this.country.trim(),
-        gerant_name: this.gerantName.trim(),
-        gerant_email: this.gerantEmail.trim(),
-        password: this.password,
-        password_confirmation: this.passwordConfirmation,
-        device_name: 'angular-backoffice',
-      })
+      .register(
+        {
+          nom: this.companyName.trim(),
+          email: this.email.trim(),
+          telephone: this.phone.trim(),
+          type_agence_id: this.typeAgenceId || undefined,
+          ville: this.city.trim() || undefined,
+          adresse: this.address.trim() || undefined,
+          pays: this.country.trim() || undefined,
+          gerant_name: this.gerantName.trim(),
+          gerant_email: this.gerantEmail.trim(),
+          password: this.password,
+          password_confirmation: this.passwordConfirmation,
+          device_name: 'angular-backoffice',
+        },
+        this.logoFile(),
+        apiDocs.length > 0 ? apiDocs : undefined,
+      )
       .subscribe({
         next: (response) => {
           this.agenceSession.setSession(response.token);
@@ -167,22 +304,37 @@ export class Inscription implements OnInit {
       return;
     }
 
+    const docs = this.documents();
+    const invalidDocs = docs.filter((d) => !d.type_document.trim());
+    if (invalidDocs.length > 0) {
+      this.errorMessage.set('auth.signup.docMissingType');
+      return;
+    }
+
     this.submitting.set(true);
 
+    const apiDocs: ClientRegisterDocument[] = docs.map((d) => ({
+      fichier: d.fichier,
+      type_document: d.type_document.trim(),
+    }));
+
     this.particulierService
-      .register({
-        nom,
-        prenom,
-        email,
-        password: this.password,
-        password_confirmation: this.passwordConfirmation,
-        telephone,
-        adresse,
-        ville,
-        pays,
-        type: 'particulier',
-        device_name: 'verga-web',
-      })
+      .register(
+        {
+          nom,
+          prenom,
+          email,
+          password: this.password,
+          password_confirmation: this.passwordConfirmation,
+          telephone,
+          adresse: adresse || undefined,
+          ville: ville || undefined,
+          pays: pays || undefined,
+          type: 'particulier',
+          device_name: 'verga-web',
+        },
+        apiDocs.length > 0 ? apiDocs : undefined,
+      )
       .subscribe({
         next: (response) => {
           this.clientSession.setSession(response.token, {

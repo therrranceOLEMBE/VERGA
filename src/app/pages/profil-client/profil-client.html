@@ -90,5 +90,37 @@
         </button>
       </div>
     </form>
+
+    @if (profile().documents.length > 0) {
+      <div class="cespace-card mt-6">
+        <h3 class="cespace-card-title">{{ 'clientBackoffice.profile.documentsSection' | translate }}</h3>
+        <div class="cespace-docs-list">
+          @for (doc of profile().documents; track doc.id) {
+            <div class="cespace-doc-item">
+              @if (isImageUrl(doc.url)) {
+                <img [src]="doc.url" alt="" class="cespace-doc-thumb" />
+              } @else {
+                <div class="cespace-doc-thumb cespace-doc-thumb--file" aria-hidden="true">PDF</div>
+              }
+              <div class="cespace-doc-meta">
+                <p class="cespace-doc-type">{{ formatDocType(doc.typeDocument) }}</p>
+                @if (doc.fileName) {
+                  <p class="cespace-doc-name">{{ doc.fileName }}</p>
+                }
+              </div>
+              <a
+                [href]="doc.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="cespace-doc-view"
+                [attr.aria-label]="'clientBackoffice.profile.viewDocument' | translate"
+              >
+                {{ 'clientBackoffice.profile.viewDocument' | translate }}
+              </a>
+            </div>
+          }
+        </div>
+      </div>
+    }
   }
 </div>

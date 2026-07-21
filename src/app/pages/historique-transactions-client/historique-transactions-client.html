@@ -1,80 +1,125 @@
-<div class="mx-auto max-w-[1200px]">
- <div class="mb-8">
- <h1 class="text-2xl font-bold text-gray-900">{{ 'clientBackoffice.transactions.title' | translate }}</h1>
- <p class="mt-2 text-sm text-verga-muted">{{ 'clientBackoffice.transactions.subtitle' | translate }}</p>
- </div>
+<div class="cespace-page">
+  <header class="cespace-hero">
+    <div class="cespace-hero-bg" aria-hidden="true"></div>
+    <div class="cespace-hero-inner">
+      <p class="cespace-eyebrow">{{ 'clientBackoffice.space' | translate }}</p>
+      <h1 class="cespace-title">{{ 'clientBackoffice.transactions.title' | translate }}</h1>
+      <p class="cespace-subtitle">{{ 'clientBackoffice.transactions.subtitle' | translate }}</p>
+    </div>
+  </header>
 
- <section class="mb-6 border border-verga-border bg-white p-4 sm:p-6">
- <h2 class="text-sm font-bold uppercase tracking-wide text-gray-900">{{ 'backoffice.transactions.filters' | translate }}</h2>
- <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
- <div>
- <label for="filter-code" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.transactions.filterCode' | translate }}</label>
- <input id="filter-code" type="text" [ngModel]="filterCode()" (ngModelChange)="filterCode.set($event); onFilterChange()" class="verga-field mt-1.5" placeholder="TRX-2026-..." />
- </div>
- <div>
- <label for="filter-date" class="block text-xs font-medium text-verga-muted">{{ 'backoffice.transactions.filterDate' | translate }}</label>
- <input id="filter-date" type="date" [ngModel]="filterDate()" (ngModelChange)="filterDate.set($event); onFilterChange()" class="verga-field mt-1.5" />
- </div>
- </div>
- <button type="button" (click)="resetFilters()" class="mt-4 text-sm font-semibold text-verga-primary hover:underline">
- {{ 'backoffice.transactions.reset' | translate }}
- </button>
- </section>
+  <section class="cespace-panel">
+    <div class="cespace-panel-head">
+      <h2 class="cespace-panel-title">{{ 'backoffice.transactions.filters' | translate }}</h2>
+    </div>
+    <div class="cespace-panel-body">
+      <div class="cespace-filters-grid">
+        <div>
+          <label for="filter-code" class="cespace-field-label">{{ 'backoffice.transactions.filterCode' | translate }}</label>
+          <input
+            id="filter-code"
+            type="text"
+            [ngModel]="filterCode()"
+            (ngModelChange)="filterCode.set($event); onFilterChange()"
+            class="verga-field"
+            placeholder="TRX-2026-..."
+          />
+        </div>
+        <div>
+          <label for="filter-date" class="cespace-field-label">{{ 'backoffice.transactions.filterDate' | translate }}</label>
+          <input
+            id="filter-date"
+            type="date"
+            [ngModel]="filterDate()"
+            (ngModelChange)="filterDate.set($event); onFilterChange()"
+            class="verga-field"
+          />
+        </div>
+      </div>
+      <div class="cespace-filters-actions">
+        <button type="button" (click)="resetFilters()" class="cespace-link-btn">
+          {{ 'backoffice.transactions.reset' | translate }}
+        </button>
+      </div>
+    </div>
+  </section>
 
- <div class="client-transactions-table-wrap overflow-x-auto border border-verga-border bg-white">
- <table class="client-transactions-table w-full text-left text-sm">
- <thead class="border-b border-verga-border bg-verga-surface text-xs font-semibold uppercase tracking-wide text-verga-muted">
- <tr>
- <th class="client-col-code px-4 py-3.5">{{ 'backoffice.transactions.colCode' | translate }}</th>
- <th class="client-col-date px-4 py-3.5">{{ 'backoffice.transactions.colDate' | translate }}</th>
- <th class="client-col-route px-4 py-3.5">{{ 'clientBackoffice.transactions.colRoute' | translate }}</th>
- <th class="client-col-description px-4 py-3.5">{{ 'backoffice.transactions.colPackageDescription' | translate }}</th>
- <th class="client-col-quantity px-4 py-3.5 text-right">{{ 'clientBackoffice.transactions.colQuantity' | translate }}</th>
- <th class="client-col-amount px-4 py-3.5 text-right">{{ 'backoffice.transactions.colAmount' | translate }}</th>
- </tr>
- </thead>
- <tbody class="divide-y divide-verga-border">
- @for (tx of displayedTransactions(); track tx.id) {
- <tr class="transition hover:bg-verga-primary-muted/30">
- <td class="client-col-code whitespace-nowrap px-4 py-3.5 font-mono text-xs font-semibold text-verga-primary">{{ tx.code }}</td>
- <td class="client-col-date whitespace-nowrap px-4 py-3.5 text-gray-600">{{ tx.date }}</td>
- <td class="client-col-route px-4 py-3.5">
- <div class="flex min-w-0 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-2">
- <span class="font-medium text-gray-900">{{ tx.departureCountry }}</span>
- <span class="hidden text-verga-muted sm:inline" aria-hidden="true">→</span>
- <span class="text-xs text-verga-muted sm:hidden">{{ 'clientBackoffice.transactions.to' | translate }}</span>
- <span class="font-medium text-gray-900">{{ tx.arrivalCountry }}</span>
- </div>
- </td>
- <td class="client-col-description px-4 py-3.5">
- <p class="client-description-cell text-gray-600" [attr.title]="tx.packageDescription">{{ tx.packageDescription }}</p>
- </td>
- <td class="client-col-quantity whitespace-nowrap px-4 py-3.5 text-right font-medium text-gray-900">{{ quantityLabel(tx) }}</td>
- <td class="client-col-amount whitespace-nowrap px-4 py-3.5 text-right font-semibold text-gray-900">{{ tx.amount }}</td>
- </tr>
- } @empty {
- <tr>
- <td colspan="6" class="px-4 py-12 text-center text-sm text-verga-muted">{{ 'clientBackoffice.transactions.empty' | translate }}</td>
- </tr>
- }
- </tbody>
- </table>
- </div>
+  <div class="cespace-panel">
+    <div class="client-transactions-table-wrap overflow-x-auto">
+      <table class="client-transactions-table cespace-table w-full text-left text-sm">
+        <thead>
+          <tr>
+            <th class="client-col-code">{{ 'backoffice.transactions.colCode' | translate }}</th>
+            <th class="client-col-date">{{ 'backoffice.transactions.colDate' | translate }}</th>
+            <th class="client-col-route">{{ 'clientBackoffice.transactions.colRoute' | translate }}</th>
+            <th class="client-col-description">{{ 'backoffice.transactions.colPackageDescription' | translate }}</th>
+            <th class="client-col-quantity text-right">{{ 'clientBackoffice.transactions.colQuantity' | translate }}</th>
+            <th class="client-col-amount text-right">{{ 'backoffice.transactions.colAmount' | translate }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (tx of displayedTransactions(); track tx.id) {
+            <tr>
+              <td class="client-col-code cespace-mono">{{ tx.code }}</td>
+              <td class="client-col-date">{{ tx.date }}</td>
+              <td class="client-col-route">
+                <div class="flex min-w-0 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-2">
+                  <span class="font-medium text-verga-ink">{{ tx.departureCountry }}</span>
+                  <span class="hidden text-verga-muted sm:inline" aria-hidden="true">→</span>
+                  <span class="text-xs text-verga-muted sm:hidden">{{ 'clientBackoffice.transactions.to' | translate }}</span>
+                  <span class="font-medium text-verga-ink">{{ tx.arrivalCountry }}</span>
+                </div>
+              </td>
+              <td class="client-col-description">
+                <p class="client-description-cell" [attr.title]="tx.packageDescription">{{ tx.packageDescription }}</p>
+              </td>
+              <td class="client-col-quantity text-right font-medium">{{ quantityLabel(tx) }}</td>
+              <td class="client-col-amount text-right font-semibold">{{ tx.amount }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6" class="cespace-empty">{{ 'clientBackoffice.transactions.empty' | translate }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
 
- @if (filteredTransactions().length > 0) {
- <div class="mt-6 flex flex-col items-center gap-4">
- <nav class="flex flex-wrap items-center justify-center gap-1" [attr.aria-label]="'aria.navigation' | translate">
- <button type="button" (click)="previousPage()" [disabled]="currentPage() === 1" class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40" [attr.aria-label]="'aria.prevPage' | translate">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
- </button>
- @for (page of pageNumbers(); track page) {
- <button type="button" (click)="goToPage(page)" class="flex h-9 min-w-9 items-center justify-center px-2 text-sm font-medium transition" [class.bg-verga-primary]="currentPage() === page" [class.text-white]="currentPage() === page" [class.border]="currentPage() !== page" [class.border-verga-border]="currentPage() !== page" [class.bg-white]="currentPage() !== page" [class.text-verga-primary]="currentPage() !== page" [class.hover:bg-verga-primary/10]="currentPage() !== page" [attr.aria-current]="currentPage() === page ? 'page' : null">{{ page }}</button>
- }
- <button type="button" (click)="nextPage()" [disabled]="currentPage() === totalPages()" class="flex h-9 w-9 items-center justify-center border border-verga-border bg-white text-verga-primary transition hover:bg-verga-primary/10 disabled:cursor-not-allowed disabled:opacity-40" [attr.aria-label]="'aria.nextPage' | translate">
- <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" /></svg>
- </button>
- </nav>
- <p class="text-center text-sm text-gray-600">{{ resultsLabel() }}</p>
- </div>
- }
+  @if (filteredTransactions().length > 0) {
+    <div class="cespace-pagination">
+      <nav class="cespace-pagination-nav" [attr.aria-label]="'aria.navigation' | translate">
+        <button
+          type="button"
+          (click)="previousPage()"
+          [disabled]="currentPage() === 1"
+          class="cespace-page-btn"
+          [attr.aria-label]="'aria.prevPage' | translate"
+        >
+          ←
+        </button>
+        @for (page of pageNumbers(); track page) {
+          <button
+            type="button"
+            (click)="goToPage(page)"
+            class="cespace-page-btn"
+            [class.is-active]="currentPage() === page"
+            [attr.aria-current]="currentPage() === page ? 'page' : null"
+          >
+            {{ page }}
+          </button>
+        }
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="currentPage() === totalPages()"
+          class="cespace-page-btn"
+          [attr.aria-label]="'aria.nextPage' | translate"
+        >
+          →
+        </button>
+      </nav>
+      <p class="cespace-results">{{ resultsLabel() }}</p>
+    </div>
+  }
 </div>

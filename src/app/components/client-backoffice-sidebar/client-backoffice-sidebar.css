@@ -3,35 +3,95 @@
   height: 100dvh;
   scrollbar-width: thin;
   transition: transform 0.25s ease;
-  background:
-    linear-gradient(180deg, color-mix(in srgb, var(--color-verga-primary, #5eadd6) 6%, white) 0%, #fff 12rem),
-    #fff;
+  background: #fff;
+  font-family: 'Nunito', ui-sans-serif, system-ui, sans-serif;
+  color: #0f172a;
 }
 
 .client-sidebar-brand {
-  background: linear-gradient(
-    120deg,
-    color-mix(in srgb, var(--color-verga-primary, #5eadd6) 8%, white) 0%,
-    transparent 70%
-  );
+  background: #fff;
+}
+
+.client-sidebar-brand a {
+  text-decoration: none;
+}
+
+.client-sidebar-brand__name {
+  font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #0f172a;
+}
+
+.client-sidebar-brand__space {
+  margin-top: 0.45rem;
+  font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #ff6b35;
+}
+
+.client-nav-list {
+  margin: 0;
+  padding: 0 0.75rem;
+  list-style: none;
+}
+
+.client-nav-list > li + li {
+  margin-top: 0.2rem;
 }
 
 .client-nav-link {
-  border: 1px solid transparent;
-  color: #334155;
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  border: 0;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: #475569;
+  text-decoration: none;
+  transition: color 0.15s ease, border-color 0.15s ease, background-color 0.15s ease;
 }
 
 .client-nav-link:hover {
-  border-color: color-mix(in srgb, var(--color-verga-primary, #5eadd6) 18%, white);
-  background: color-mix(in srgb, var(--color-verga-primary, #5eadd6) 8%, white);
-  color: var(--color-verga-primary-dark, #3d94c4);
+  background: #fafafa;
+  border-bottom-color: #ff6b35;
+  color: #0f172a;
 }
 
 .client-nav-active {
-  border-color: color-mix(in srgb, var(--color-verga-primary, #5eadd6) 28%, white) !important;
-  background: color-mix(in srgb, var(--color-verga-primary, #5eadd6) 12%, white) !important;
-  color: var(--color-verga-primary-dark, #3d94c4) !important;
+  background: #fffaf7 !important;
+  border-bottom-color: #e85a28 !important;
+  color: #e85a28 !important;
+}
+
+.client-nav-index {
+  flex-shrink: 0;
+  font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #94a3b8;
+}
+
+.client-nav-link:hover .client-nav-index,
+.client-nav-active .client-nav-index {
+  color: #ff6b35;
+}
+
+.client-nav-label {
+  font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.875rem;
   font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.client-nav-active .client-nav-label {
+  font-weight: 800;
 }
 
 .client-logout-btn {
@@ -39,24 +99,25 @@
   width: 100%;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
-  border: 1px solid #fecaca;
+  border: 1px solid #e2e8f0;
   background: #fff;
   padding: 0.8rem 1rem;
-  font-size: 0.875rem;
+  font-family: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.8125rem;
   font-weight: 700;
   color: #b91c1c;
   cursor: pointer;
-  transition:
-    background-color 0.15s ease,
-    border-color 0.15s ease,
-    color 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.client-logout-btn:hover {
-  border-color: #f87171;
+.client-logout-btn:hover:not(:disabled) {
+  border-color: #fecaca;
   background: #fef2f2;
-  color: #991b1b;
+}
+
+.client-logout-btn:disabled {
+  cursor: wait;
+  opacity: 0.55;
 }
 
 @media (max-width: 1023px) {

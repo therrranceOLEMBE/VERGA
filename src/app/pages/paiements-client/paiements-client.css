@@ -1,22 +1,14 @@
 .client-paiements-table {
-  min-width: 52rem;
+  min-width: 36rem;
   table-layout: fixed;
 }
 
 .client-col-code {
-  width: 9.5rem;
+  width: 10rem;
 }
 
 .client-col-commande {
-  width: 9.5rem;
-}
-
-.client-col-bamboo {
   width: 11rem;
-}
-
-.client-col-quantite {
-  width: 7rem;
 }
 
 .client-col-amount {
@@ -25,16 +17,16 @@
 }
 
 .client-col-status {
-  width: 8.5rem;
+  width: 9rem;
   padding-left: 0.35rem !important;
 }
 
 .client-col-date {
-  width: 7.5rem;
+  width: 8rem;
 }
 
 @media (max-width: 639px) {
   .client-paiements-table {
-    min-width: 42rem;
+    min-width: 32rem;
   }
 }

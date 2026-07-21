@@ -32,4 +32,6 @@ export interface Offer {
   verified?: boolean;
   quantiteMin?: number;
   quantiteEntier?: boolean;
+  /** Capacité illimitée : pas de réservation partielle possible */
+  capaciteIllimitee?: boolean;
 }

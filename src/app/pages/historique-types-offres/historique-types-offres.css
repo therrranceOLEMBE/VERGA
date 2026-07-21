@@ -82,8 +82,8 @@
 }
 
 .type-offre-badge--platform {
-  background: var(--color-verga-primary-muted, #ebf6fc);
-  color: var(--color-verga-primary, #5eadd6);
+  background: var(--color-verga-primary-muted, #fffaf7);
+  color: var(--color-verga-primary, #ff6b35);
 }
 
 .type-offre-badge--custom {
@@ -108,6 +108,14 @@
   gap: 0.4rem;
 }
 
+.type-offre-actions-hint {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-verga-muted, #64748b);
+  white-space: nowrap;
+}
+
 .type-offre-action-btn {
   flex-shrink: 0;
   border: 1px solid var(--color-verga-border, #e2e8f0);
@@ -116,13 +124,13 @@
   font-size: 0.6875rem;
   font-weight: 600;
   line-height: 1.2;
-  color: var(--color-verga-primary, #5eadd6);
+  color: var(--color-verga-primary, #ff6b35);
   white-space: nowrap;
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .type-offre-action-btn:hover {
-  background: var(--color-verga-primary-muted, #ebf6fc);
+  background: var(--color-verga-primary-muted, #fffaf7);
 }
 
 .type-offre-action-btn--danger {

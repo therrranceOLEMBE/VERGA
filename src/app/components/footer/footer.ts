@@ -7,6 +7,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
   selector: 'app-footer',
   imports: [RouterLink, TranslatePipe, LanguageSwitcher],
   templateUrl: './footer.html',
+  styleUrl: './footer.css',
 })
 export class Footer {
   readonly showBackToTop = input(true);

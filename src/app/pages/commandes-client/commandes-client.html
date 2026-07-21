@@ -1,4 +1,4 @@
-<div class="cespace-page">
+﻿<div class="cespace-page">
   <header class="cespace-hero">
     <div class="cespace-hero-bg" aria-hidden="true"></div>
     <div class="cespace-hero-inner">
@@ -142,9 +142,7 @@
             class="cespace-page-btn"
             [attr.aria-label]="'aria.prevPage' | translate"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-            </svg>
+            ←
           </button>
           @for (page of pageNumbers(); track page) {
             <button
@@ -164,9 +162,7 @@
             class="cespace-page-btn"
             [attr.aria-label]="'aria.nextPage' | translate"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-4 w-4">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5 15.75 12l-7.5 7.5" />
-            </svg>
+            →
           </button>
         </nav>
         <p class="cespace-results">{{ resultsLabel() }}</p>
@@ -184,7 +180,10 @@
   >
     <div class="cespace-modal" (click)="$event.stopPropagation()">
       <div class="cespace-modal-head">
-        <h2 class="cespace-modal-title">{{ 'clientBackoffice.commandes.createReclamationTitle' | translate }}</h2>
+        <div class="cespace-modal-head-copy">
+          <p class="cespace-modal-eyebrow">{{ 'clientBackoffice.space' | translate }}</p>
+          <h2 class="cespace-modal-title">{{ 'clientBackoffice.commandes.createReclamationTitle' | translate }}</h2>
+        </div>
         <button
           type="button"
           class="cespace-modal-close"
@@ -192,15 +191,13 @@
           [disabled]="createLoading()"
           [attr.aria-label]="'aria.close' | translate"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-          </svg>
+          ×
         </button>
       </div>
 
       <form (ngSubmit)="submitCreateReclamation($event)">
         <div class="cespace-modal-body">
-          <p class="cespace-form-hint" style="margin-top: 0; margin-bottom: 1rem">
+          <p class="cespace-modal-hint">
             {{ 'clientBackoffice.commandes.createReclamationHint' | translate }}
           </p>
 
@@ -215,7 +212,7 @@
             </div>
           </dl>
 
-          <div style="margin-bottom: 1.15rem">
+          <div class="cespace-modal-field">
             <label for="client-create-reclamation-objet" class="cespace-form-label">
               {{ 'clientBackoffice.commandes.createReclamationObjet' | translate }} *
             </label>
@@ -230,7 +227,7 @@
             />
           </div>
 
-          <div>
+          <div class="cespace-modal-field">
             <label for="client-create-reclamation-description" class="cespace-form-label">
               {{ 'clientBackoffice.commandes.createReclamationDescription' | translate }} *
             </label>
@@ -242,12 +239,11 @@
               [(ngModel)]="createDescription"
               [disabled]="createLoading()"
               class="verga-field"
-              style="min-height: 6rem; resize: vertical"
             ></textarea>
           </div>
 
           @if (createError()) {
-            <div class="cespace-alert" style="margin: 1rem 0 0" role="alert">
+            <div class="cespace-alert" role="alert">
               @if (createError().startsWith('clientBackoffice.')) {
                 {{ createError() | translate }}
               } @else {
@@ -288,7 +284,10 @@
   >
     <div class="cespace-modal" (click)="$event.stopPropagation()">
       <div class="cespace-modal-head">
-        <h2 class="cespace-modal-title">{{ 'clientBackoffice.commandes.paySoldeTitle' | translate }}</h2>
+        <div class="cespace-modal-head-copy">
+          <p class="cespace-modal-eyebrow">{{ 'clientBackoffice.space' | translate }}</p>
+          <h2 class="cespace-modal-title">{{ 'clientBackoffice.commandes.paySoldeTitle' | translate }}</h2>
+        </div>
         <button
           type="button"
           class="cespace-modal-close"
@@ -296,19 +295,17 @@
           [disabled]="payLoading()"
           [attr.aria-label]="'aria.close' | translate"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="h-5 w-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-          </svg>
+          ×
         </button>
       </div>
 
       <form (ngSubmit)="submitPaySolde($event)">
         <div class="cespace-modal-body">
-          <p class="cespace-form-hint" style="margin-top: 0; margin-bottom: 1rem">
+          <p class="cespace-modal-hint">
             {{ 'clientBackoffice.commandes.paySoldeHint' | translate }}
           </p>
 
-          <dl class="cespace-detail-grid" style="margin-bottom: 1.25rem">
+          <dl class="cespace-detail-grid">
             <div>
               <dt class="cespace-detail-dt">{{ 'clientBackoffice.commandes.colCode' | translate }}</dt>
               <dd class="cespace-detail-dd cespace-table-code">{{ payCommandeCode }}</dd>
@@ -324,7 +321,7 @@
           </dl>
 
           @if (payError()) {
-            <div class="cespace-alert" style="margin: 0" role="alert">
+            <div class="cespace-alert" role="alert" style="margin-top: 1.15rem">
               @if (payError().startsWith('clientBackoffice.')) {
                 {{ payError() | translate }}
               } @else {
