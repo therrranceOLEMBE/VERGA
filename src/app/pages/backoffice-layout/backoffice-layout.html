@@ -1,5 +1,5 @@
 <div class="backoffice-shell min-h-screen bg-verga-surface font-sans">
- @if (sidebarOpen()) {
+ @if (sidebarOpen() && !loggingOut()) {
  <button
  type="button"
  class="backoffice-overlay fixed inset-0 z-30 bg-black/40 lg:hidden"
@@ -8,7 +8,12 @@
  ></button>
  }
 
- <app-backoffice-sidebar [open]="sidebarOpen()" (navigate)="closeSidebar()" />
+ <app-backoffice-sidebar
+ [open]="sidebarOpen()"
+ [loggingOut]="loggingOut()"
+ (navigate)="closeSidebar()"
+ (logoutRequest)="onLogoutRequest()"
+ />
 
  <div class="backoffice-main flex min-h-screen min-h-dvh flex-col">
  <header class="backoffice-mobile-bar sticky top-0 z-20 flex items-center gap-3 border-b border-verga-border bg-white/95 px-4 py-3 backdrop-blur-sm lg:hidden">
@@ -48,4 +53,15 @@
  <router-outlet />
  </main>
  </div>
+
+ @if (loggingOut()) {
+ <div class="agency-logout" role="status" aria-live="polite" aria-busy="true">
+ <div class="agency-logout__orbit" aria-hidden="true"></div>
+ <div class="agency-logout__copy">
+ <p class="agency-logout__brand">VERGA</p>
+ <h2>{{ 'backoffice.logoutFarewell.title' | translate }}</h2>
+ <p>{{ 'backoffice.logoutFarewell.message' | translate }}</p>
+ </div>
+ </div>
+ }
 </div>

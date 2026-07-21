@@ -110,9 +110,14 @@
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.client-logout-btn:hover {
+.client-logout-btn:hover:not(:disabled) {
   border-color: #fecaca;
   background: #fef2f2;
+}
+
+.client-logout-btn:disabled {
+  cursor: wait;
+  opacity: 0.55;
 }
 
 @media (max-width: 1023px) {

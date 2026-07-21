@@ -215,7 +215,16 @@ export class AgenceService {
     return this.http.get<AgenceOffresListResponse>(`${this.baseUrl}/offres`, {
       headers: this.authHeaders(token),
       params: httpParams,
-    });
+    }).pipe(
+      map((response) => {
+        console.log('[AgenceService] getOffres — réponse:', JSON.stringify(response?.data));
+        return response;
+      }),
+      catchError((error) => {
+        console.error('[AgenceService] getOffres — erreur:', error);
+        return throwError(() => error);
+      }),
+    );
   }
 
   getOffre(token: string, offreId: string): Observable<AgenceOffreDetailResponse> {

@@ -1,9 +1,6 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '../../pipes/translate.pipe';
-import { AuthRedirectService } from '../../services/auth-redirect.service';
-import { ClientSessionService } from '../../services/client-session.service';
-import { ParticulierService } from '../../services/particulier.service';
 
 interface ClientNavItem {
   labelKey: string;
@@ -17,12 +14,10 @@ interface ClientNavItem {
   styleUrl: './client-backoffice-sidebar.css',
 })
 export class ClientBackofficeSidebar {
-  private readonly authRedirect = inject(AuthRedirectService);
-  private readonly clientSession = inject(ClientSessionService);
-  private readonly particulierService = inject(ParticulierService);
-
   readonly open = input(false);
   readonly navigate = output<void>();
+  readonly logoutRequest = output<void>();
+  readonly loggingOut = input(false);
 
   protected readonly navItems: ClientNavItem[] = [
     { labelKey: 'clientBackoffice.nav.dashboard', path: '/espace-client/dashboard' },
@@ -39,21 +34,9 @@ export class ClientBackofficeSidebar {
   }
 
   protected logout(): void {
-    const token = this.clientSession.getToken();
-    const finishLogout = (): void => {
-      this.clientSession.clearSession();
-      this.onNavigate();
-      this.authRedirect.redirectToLogin('client');
-    };
-
-    if (!token) {
-      finishLogout();
+    if (this.loggingOut()) {
       return;
     }
-
-    this.particulierService.logout(token).subscribe({
-      next: () => finishLogout(),
-      error: () => finishLogout(),
-    });
+    this.logoutRequest.emit();
   }
 }

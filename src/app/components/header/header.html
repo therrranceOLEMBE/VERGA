@@ -137,3 +137,18 @@
 @if (filtersOpen()) {
  <app-filters-modal (closed)="closeFilters()" (applied)="onFiltersApplied()" />
 }
+
+@if (loggingOut()) {
+ <div class="site-logout-overlay" role="status" aria-live="polite" aria-busy="true">
+ <div class="site-logout-overlay__content">
+ <div class="site-logout-spinner" aria-hidden="true">
+ <span class="site-logout-spinner__orbit site-logout-spinner__orbit--outer"></span>
+ <span class="site-logout-spinner__orbit site-logout-spinner__orbit--inner"></span>
+ <span class="site-logout-spinner__core">V</span>
+ </div>
+ <p class="site-logout-overlay__brand">VERGA</p>
+ <h2 class="site-logout-overlay__title">{{ 'clientBackoffice.logoutFarewell.title' | translate }}</h2>
+ <p class="site-logout-overlay__message">{{ 'clientBackoffice.logoutFarewell.message' | translate }}</p>
+ </div>
+ </div>
+}

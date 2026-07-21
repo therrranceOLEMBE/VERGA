@@ -118,15 +118,21 @@ export class Header {
       return;
     }
 
+    this.loggingOut.set(true);
+    this.closeMenu();
+
+    const startedAt = Date.now();
+    const minimumAnimationMs = 1800;
     const token = this.clientSession.getToken();
     const finishLogout = (): void => {
-      this.clientSession.clearSession();
-      this.loggingOut.set(false);
-      this.closeMenu();
-      void this.router.navigateByUrl('/accueil');
-    };
+      const remainingMs = Math.max(0, minimumAnimationMs - (Date.now() - startedAt));
 
-    this.loggingOut.set(true);
+      window.setTimeout(() => {
+        this.clientSession.clearSession();
+        this.loggingOut.set(false);
+        void this.router.navigateByUrl('/accueil');
+      }, remainingMs);
+    };
 
     if (!token) {
       finishLogout();

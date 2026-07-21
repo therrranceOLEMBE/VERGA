@@ -190,29 +190,6 @@
   color: var(--od-ink);
 }
 
-.od-fav {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  border: 1px solid var(--od-border);
-  background: #fff;
-  font-size: 1.25rem;
-  line-height: 1;
-  color: var(--od-muted);
-  cursor: pointer;
-  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease;
-}
-
-.od-fav:hover,
-.od-fav.is-on {
-  border-color: var(--od-accent);
-  background: #fffaf7;
-  color: var(--od-accent-dark);
-}
-
 .od-meta {
   display: flex;
   flex-wrap: wrap;
@@ -227,11 +204,6 @@
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--od-accent-dark);
-}
-
-.od-likes {
-  font-size: 0.8125rem;
-  color: var(--od-muted);
 }
 
 .od-desc {

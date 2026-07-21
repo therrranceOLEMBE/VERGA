@@ -25,20 +25,10 @@
         <div class="od-copy">
           <div class="od-head">
             <h1 class="od-title">{{ o.title }}</h1>
-            <button
-              type="button"
-              class="od-fav"
-              [class.is-on]="favorited()"
-              (click)="toggleFavorite()"
-              [attr.aria-label]="(favorited() ? 'offerDetail.removeFavorite' : 'offerDetail.addFavorite') | translate"
-            >
-              {{ favorited() ? '♥' : '♡' }}
-            </button>
           </div>
 
           <div class="od-meta">
             <p class="od-price">{{ o.price }}</p>
-            <p class="od-likes">{{ o.likes }} {{ 'offerDetail.likes' | translate }}</p>
           </div>
 
           <section class="od-desc">

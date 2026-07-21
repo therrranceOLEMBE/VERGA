@@ -29,7 +29,12 @@
   </nav>
 
   <div class="client-sidebar-logout mt-auto shrink-0 border-t border-verga-border p-4">
-    <button type="button" class="client-logout-btn" (click)="logout()">
+    <button
+      type="button"
+      class="client-logout-btn"
+      (click)="logout()"
+      [disabled]="loggingOut()"
+    >
       {{ 'clientBackoffice.logout' | translate }}
     </button>
   </div>
