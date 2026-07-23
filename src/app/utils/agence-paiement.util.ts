@@ -105,10 +105,15 @@ function resolveMethode(raw: AgencePaiementRaw): string {
 }
 
 export function mapAgencePaiementToRow(raw: AgencePaiementRaw): AgencePaiement {
+  const commandeNested =
+    raw.commande && typeof raw.commande === 'object' ? raw.commande : null;
+  const commandeId =
+    (commandeNested?.id != null ? String(commandeNested.id) : '') ||
+    (raw.commande_id != null ? String(raw.commande_id) : '');
   const commande =
     readString(raw.commande_code) ||
     resolveLabel(raw.commande) ||
-    (raw.commande_id != null ? String(raw.commande_id) : '');
+    commandeId;
   const codeVerga = resolveCodeVerga(raw);
   const refBamboo = resolveRefBamboo(raw);
 
@@ -117,6 +122,7 @@ export function mapAgencePaiementToRow(raw: AgencePaiementRaw): AgencePaiement {
     codeVerga: codeVerga || '—',
     refBamboo: refBamboo || '—',
     commande: commande || '—',
+    commandeId,
     montant: formatMontant(raw.montant, raw.amount),
     methode: resolveMethode(raw),
     statut: raw.statut?.trim() ?? '',

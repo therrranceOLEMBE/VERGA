@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AgenceColis, AgenceColisDetail, AgenceColisStatut } from '../../models/agence-colis.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LanguageService } from '../../services/language.service';
@@ -18,6 +18,7 @@ import { parseAgenceColisDetailResponse, parseAgenceColisListResponse, isAgenceC
 export class SupportLogistique implements OnInit {
   private readonly language = inject(LanguageService);
   private readonly agenceSession = inject(AgenceSessionService);
+  private readonly router = inject(Router);
 
   protected readonly loading = signal(true);
   protected readonly errorMessage = signal('');
@@ -181,6 +182,19 @@ export class SupportLogistique implements OnInit {
 
   protected canAdvance(item: AgenceColis | AgenceColisDetail): boolean {
     return Boolean(item.nextStatut?.trim());
+  }
+
+  protected canViewCommande(item: AgenceColis | AgenceColisDetail): boolean {
+    return Boolean(item.commandeId.trim()) || (item.commande.length > 0 && item.commande !== '—');
+  }
+
+  protected viewCommande(item: AgenceColis | AgenceColisDetail): void {
+    if (!this.canViewCommande(item)) {
+      return;
+    }
+    void this.router.navigate(['/backoffice/commandes'], {
+      queryParams: { search: item.commande !== '—' ? item.commande : item.commandeId },
+    });
   }
 
   protected isUpdating(itemId: string): boolean {

@@ -275,7 +275,9 @@ export function mapAgenceColisToRow(raw: AgenceColisRaw): AgenceColis {
     id: String(raw.id ?? raw.reference ?? raw.ref ?? raw.code ?? ''),
     reference: (raw.reference ?? raw.ref ?? raw.code)?.trim() ?? '—',
     commande: commande || '—',
-    commandeId: commandeNested?.id != null ? String(commandeNested.id) : '',
+    commandeId:
+      (commandeNested?.id != null ? String(commandeNested.id) : '') ||
+      (raw.commande_id != null ? String(raw.commande_id) : ''),
     commandeQuantite: resolveCommandeQuantite(raw),
     description: resolveDescription(raw),
     agence: resolveLabel(raw.agence) || '—',

@@ -54,6 +54,8 @@ import { ReclamationsClient } from './pages/reclamations-client/reclamations-cli
 
 import { QuiSommesNous } from './pages/qui-sommes-nous/qui-sommes-nous';
 
+import { LegalDocumentPage } from './pages/legal-document/legal-document';
+
 import { TableauDeBord } from './pages/tableau-de-bord/tableau-de-bord';
 
 import { Tarifs } from './pages/tarifs/tarifs';
@@ -92,6 +94,10 @@ export const routes: Routes = [
   { path: 'tarifs', component: Tarifs },
 
   { path: 'qui-sommes-nous', component: QuiSommesNous },
+
+  { path: 'politique-de-confidentialite', component: LegalDocumentPage },
+
+  { path: 'conditions-generales', component: LegalDocumentPage },
 
   {
 

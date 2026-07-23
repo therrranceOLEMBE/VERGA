@@ -1,114 +1,123 @@
-<div class="flex min-h-screen flex-col bg-white font-sans">
- <app-header />
+<div class="about-page flex min-h-screen flex-col">
+  <app-header />
 
- <main class="main-with-header flex-1">
- <!-- Intro -->
- <section class="px-4 py-16 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
- <div class="mx-auto max-w-4xl text-center">
- <h1 class="text-2xl font-bold uppercase tracking-wide text-gray-900 sm:text-3xl lg:text-4xl">
- {{ 'about.hero' | translate }}
- </h1>
- <div class="mx-auto mt-5 h-1 w-16 bg-verga-primary"></div>
- <p class="mx-auto mt-8 max-w-3xl text-base leading-relaxed text-gray-500 sm:text-lg">
- <span class="font-bold text-verga-primary">Verga</span>
- {{ 'about.intro' | translate }}
- </p>
- </div>
- </section>
+  <main class="main-with-header flex-1">
+    <section class="about-hero" aria-labelledby="about-hero-title">
+      <div class="about-hero__media" aria-hidden="true">
+        <img
+          src="https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?auto=format&fit=crop&w=1920&q=80"
+          alt=""
+          class="about-hero__image"
+          width="1920"
+          height="1080"
+          loading="eager"
+          decoding="async"
+        />
+        <div class="about-hero__veil"></div>
+      </div>
 
- <!-- Nos valeurs -->
- <section class="bg-verga-surface px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
- <div class="mx-auto max-w-[1200px]">
- <div class="text-center">
- <h2 class="text-2xl font-bold uppercase tracking-wide text-gray-900 sm:text-3xl">
-         {{ 'about.values' | translate }}
- </h2>
- <div class="mx-auto mt-5 h-1 w-16 bg-verga-primary"></div>
- </div>
+      <div class="about-hero__inner mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <div class="about-hero__content">
+          <p class="about-hero__brand">Verga</p>
+          <h1 id="about-hero-title" class="about-hero__title">{{ 'about.hero' | translate }}</h1>
+          <p class="about-hero__subtitle">{{ 'about.heroLead' | translate }}</p>
+          <div class="about-hero__actions">
+            <a routerLink="/" fragment="home-catalog" class="about-cta about-cta--primary">
+              {{ 'about.ctaBrowse' | translate }}
+            </a>
+            <a routerLink="/tarifs" class="about-cta about-cta--ghost">
+              {{ 'about.ctaPricing' | translate }}
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
 
- <div class="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3 md:gap-8">
- @for (value of values; track value.titleKey) {
- <article
- class="bg-white px-6 py-10 text-center"
- >
- <div class="mx-auto flex h-14 w-14 items-center justify-center text-verga-primary">
- @switch (value.icon) {
- @case ('innovation') {
- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-12 w-12">
- <path
- d="M12 .75a8.25 8.25 0 0 0-4.135 15.39.75.75 0 0 1 .668.668A8.25 8.25 0 1 0 12 .75Zm0 3a.75.75 0 0 1 .75.75v1.5a.75.75 0 0 1-1.5 0V4.5A.75.75 0 0 1 12 3.75ZM6.166 6.166a.75.75 0 0 1 1.06 0l1.061 1.06a.75.75 0 1 1-1.06 1.061l-1.06-1.06a.75.75 0 0 1 0-1.061Zm11.668 0a.75.75 0 0 1 0 1.06l-1.06 1.061a.75.75 0 1 1-1.061-1.06l1.06-1.061a.75.75 0 0 1 1.061 0ZM12 8.25a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5Z"
- />
- </svg>
- }
- @case ('engagement') {
- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-12 w-12">
- <path
- d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 0 1-.383-.218 25.18 25.18 0 0 1-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0 1 12 5.052 5.5 5.5 0 0 1 16.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.786 9.27a25.175 25.175 0 0 1-4.244 3.17 15.247 15.247 0 0 1-.383.219l-.022.012-.007.004-.003.001a.752.752 0 0 1-.704 0l-.003-.001Z"
- />
- </svg>
- }
- @case ('confiance') {
- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-12 w-12">
- <path
- fill-rule="evenodd"
- d="M12.516 2.17a.75.75 0 0 0-1.032 0 11.209 11.209 0 0 1-7.877 3.08.75.75 0 0 0-.722.515A12.74 12.74 0 0 0 2.75 9.75c0 5.942 4.064 10.933 9.645 12.214a.75.75 0 0 0 .71 0C18.936 20.683 23 15.692 23 9.75c0-1.39-.223-2.73-.635-3.985a.75.75 0 0 0-.722-.516l-.143.001c-2.996 0-5.717-1.17-7.734-3.08Zm3.094 8.016a.75.75 0 1 0-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 0 0-1.06 1.06l2.25 2.25a.75.75 0 0 0 1.14-.094l3.75-5.25Z"
- clip-rule="evenodd"
- />
- </svg>
- }
- }
- </div>
- <h3 class="mt-6 text-lg font-bold text-gray-900">{{ value.titleKey | translate }}</h3>
- <p class="mt-3 text-sm leading-relaxed text-gray-500">{{ value.descKey | translate }}</p>
- </article>
- }
- </div>
- </div>
- </section>
+    <section class="about-story" aria-labelledby="about-story-title">
+      <div class="about-story__inner mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <div class="about-story__copy">
+          <p class="about-eyebrow">{{ 'about.storyEyebrow' | translate }}</p>
+          <h2 id="about-story-title" class="about-section-title">{{ 'about.storyTitle' | translate }}</h2>
+          <p class="about-lead">
+            <span class="about-brand-inline">Verga</span>
+            {{ 'about.intro' | translate }}
+          </p>
+        </div>
+      </div>
+    </section>
 
- <!-- Notre mission -->
- <section class="bg-verga-surface px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
- <div class="mx-auto grid max-w-[1200px] items-center gap-10 lg:grid-cols-2 lg:gap-14">
- <div>
- <h2 class="text-2xl font-bold uppercase tracking-wide text-gray-900 sm:text-3xl">
- {{ 'about.mission' | translate }}
- </h2>
- <p class="mt-6 text-base leading-relaxed text-gray-500">
- <span class="font-bold text-verga-primary">Verga</span>
- {{ 'about.missionBody' | translate }}
- </p>
- <ul class="mt-8 space-y-5">
- @for (point of missionPoints; track point.textKey) {
- <li class="flex items-start gap-4">
- <span
- class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center bg-verga-primary text-white"
- >
- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4">
- <path
- fill-rule="evenodd"
- d="M16.704 4.153a.75.75 0 0 1 .143 1.052l-8 10.5a.75.75 0 0 1-1.127.075l-4.5-4.5a.75.75 0 0 1 1.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 0 1 1.05-.143Z"
- clip-rule="evenodd"
- />
- </svg>
- </span>
- <span class="text-base text-gray-600">{{ point.textKey | translate }}</span>
- </li>
- }
- </ul>
- </div>
+    <section class="about-values" aria-labelledby="about-values-title">
+      <div class="about-values__inner mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <div class="about-values__head">
+          <p class="about-eyebrow">{{ 'about.valuesEyebrow' | translate }}</p>
+          <h2 id="about-values-title" class="about-section-title">{{ 'about.values' | translate }}</h2>
+          <p class="about-section-lead">{{ 'about.valuesLead' | translate }}</p>
+        </div>
 
- <div
- class="verga-watermark-bg overflow-hidden bg-white p-4 sm:p-6"
- >
- <img
- src="/images/logo_verga.jpeg"
- [attr.alt]="'common.logoAlt' | translate"
- class="h-auto w-full object-contain object-center p-6"
- />
- </div>
- </div>
- </section>
- </main>
+        <ul class="about-values__list">
+          @for (value of values; track value.titleKey) {
+            <li class="about-values__row">
+              <span class="about-values__index" aria-hidden="true">{{ value.index }}</span>
+              <div class="about-values__copy">
+                <h3 class="about-values__title">{{ value.titleKey | translate }}</h3>
+                <p class="about-values__text">{{ value.descKey | translate }}</p>
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
+    </section>
 
- <app-footer />
+    <section class="about-mission" aria-labelledby="about-mission-title">
+      <div class="about-mission__inner mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <div class="about-mission__copy">
+          <p class="about-eyebrow">{{ 'about.missionEyebrow' | translate }}</p>
+          <h2 id="about-mission-title" class="about-section-title">{{ 'about.mission' | translate }}</h2>
+          <p class="about-lead">
+            <span class="about-brand-inline">Verga</span>
+            {{ 'about.missionBody' | translate }}
+          </p>
+
+          <ol class="about-mission__points">
+            @for (point of missionPoints; track point.textKey; let i = $index) {
+              <li class="about-mission__point">
+                <span class="about-mission__num" aria-hidden="true">{{ i + 1 }}</span>
+                <span>{{ point.textKey | translate }}</span>
+              </li>
+            }
+          </ol>
+        </div>
+
+        <figure class="about-mission__figure">
+          <img
+            src="/images/qui-sommes-mission.png"
+            [attr.alt]="'about.missionImageAlt' | translate"
+            class="about-mission__image"
+            width="960"
+            height="720"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+      </div>
+    </section>
+
+    <section class="about-close" aria-labelledby="about-close-title">
+      <div class="about-close__inner mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <p class="about-eyebrow">{{ 'about.closeEyebrow' | translate }}</p>
+        <h2 id="about-close-title" class="about-section-title">{{ 'about.closeTitle' | translate }}</h2>
+        <p class="about-section-lead">{{ 'about.closeText' | translate }}</p>
+        <div class="about-close__actions">
+          <a routerLink="/inscription" class="about-cta about-cta--primary">
+            {{ 'about.ctaSignup' | translate }}
+          </a>
+          <a routerLink="/nous-contacter" class="about-cta about-cta--outline">
+            {{ 'about.ctaContact' | translate }}
+          </a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <app-footer />
 </div>

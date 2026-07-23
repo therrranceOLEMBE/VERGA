@@ -1,0 +1,79 @@
+<div class="legal-page flex min-h-screen flex-col">
+  <app-header />
+
+  <main class="main-with-header flex-1">
+    <section class="legal-hero" aria-labelledby="legal-hero-title">
+      <div class="legal-hero__media" aria-hidden="true">
+        <img
+          [src]="heroImage()"
+          alt=""
+          class="legal-hero__image"
+          width="1920"
+          height="1080"
+          loading="eager"
+          decoding="async"
+        />
+        <div class="legal-hero__veil"></div>
+      </div>
+
+      <div class="legal-hero__inner mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <div class="legal-hero__content">
+          <p class="legal-hero__brand">Verga</p>
+          <h1 id="legal-hero-title" class="legal-hero__title">{{ title() }}</h1>
+          <p class="legal-hero__lead">{{ lead() }}</p>
+          <p class="legal-hero__meta">{{ updated() }}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="legal-doc" [attr.aria-label]="title()">
+      <div class="legal-doc__layout mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <nav class="legal-toc" [attr.aria-label]="'legal.tocLabel' | translate">
+          <p class="legal-toc__label">{{ 'legal.tocLabel' | translate }}</p>
+          <ul class="legal-toc__list">
+            @for (section of sections(); track section.id) {
+              <li>
+                <a
+                  [href]="'#' + section.id"
+                  (click)="scrollToSection(section.id, $event)"
+                >{{ section.title }}</a>
+              </li>
+            }
+          </ul>
+        </nav>
+
+        <div>
+          <ol class="legal-sections">
+            @for (section of sections(); track section.id) {
+              <li class="legal-section" [id]="section.id" [style.animation-delay]="section.delay">
+                <span class="legal-section__index" aria-hidden="true">{{ section.indexLabel }}</span>
+                <h2 class="legal-section__title">{{ section.title }}</h2>
+                <div class="legal-section__body">
+                  @for (paragraph of section.paragraphs; track $index) {
+                    <p>{{ paragraph }}</p>
+                  }
+                </div>
+              </li>
+            }
+          </ol>
+
+          <aside class="legal-close">
+            <p class="legal-close__eyebrow">{{ 'legal.closeEyebrow' | translate }}</p>
+            <h2 class="legal-close__title">{{ 'legal.closeTitle' | translate }}</h2>
+            <p class="legal-close__text">{{ 'legal.closeText' | translate }}</p>
+            <div class="legal-close__actions">
+              <a routerLink="/nous-contacter" class="legal-cta legal-cta--primary">
+                {{ 'legal.ctaContact' | translate }}
+              </a>
+              <a [routerLink]="otherLegalPath()" class="legal-cta legal-cta--outline">
+                {{ otherLegalLabelKey() | translate }}
+              </a>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <app-footer />
+</div>

@@ -1,0 +1,4 @@
+/* Styles principaux dans styles/legal-ui.css (import global). */
+:host {
+  display: block;
+}

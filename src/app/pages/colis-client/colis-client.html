@@ -154,21 +154,20 @@
     <div class="cespace-modal cespace-modal--wide" (click)="$event.stopPropagation()">
       <div class="cespace-modal-head">
         <div class="cespace-modal-head-copy">
-          <p class="cespace-modal-eyebrow">{{ 'clientBackoffice.space' | translate }}</p>
           <h2 class="cespace-modal-title">{{ 'clientBackoffice.colis.modalDetailTitle' | translate }}</h2>
         </div>
         <button type="button" (click)="closeDetail()" class="cespace-modal-close" [attr.aria-label]="'aria.close' | translate">
-          ×
+          {{ 'clientBackoffice.colis.close' | translate }}
         </button>
       </div>
 
       @if (detailLoading()) {
-        <div class="cespace-loading" style="margin: 1rem; border: none">
+        <div class="cespace-loading" style="margin: 1rem 1.35rem; border: none">
           <span class="cespace-loading-dot" aria-hidden="true"></span>
           {{ 'clientBackoffice.colis.detailLoading' | translate }}
         </div>
       } @else if (detailError()) {
-        <div class="cespace-alert" style="margin: 1rem" role="alert">
+        <div class="cespace-alert" style="margin: 1rem 1.35rem" role="alert">
           @if (detailError().startsWith('clientBackoffice.')) {
             {{ detailError() | translate }}
           } @else {

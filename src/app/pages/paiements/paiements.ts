@@ -1,7 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AgencePaiement, AgencePaiementStatut } from '../../models/agence-paiement.model';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { LanguageService } from '../../services/language.service';
@@ -18,6 +18,7 @@ import { parseAgencePaiementsListResponse } from '../../utils/agence-paiement.ut
 export class Paiements implements OnInit {
   private readonly language = inject(LanguageService);
   private readonly agenceSession = inject(AgenceSessionService);
+  private readonly router = inject(Router);
 
   protected readonly loading = signal(true);
   protected readonly errorMessage = signal('');
@@ -119,6 +120,19 @@ export class Paiements implements OnInit {
       return 'bg-verga-surface text-verga-muted';
     }
     return 'bg-verga-surface text-verga-muted';
+  }
+
+  protected canViewCommande(item: AgencePaiement): boolean {
+    return Boolean(item.commandeId.trim()) || (item.commande.length > 0 && item.commande !== '—');
+  }
+
+  protected viewCommande(item: AgencePaiement): void {
+    if (!this.canViewCommande(item)) {
+      return;
+    }
+    void this.router.navigate(['/backoffice/commandes'], {
+      queryParams: { search: item.commande !== '—' ? item.commande : item.commandeId },
+    });
   }
 
   protected exportExcel(): void {

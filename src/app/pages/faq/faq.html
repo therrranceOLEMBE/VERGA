@@ -1,9 +1,129 @@
-<div class="flex min-h-screen flex-col bg-white font-sans">
- <app-header />
- <main class="main-with-header flex-1">
- <div class="mx-auto max-w-[1400px] px-4 py-12 sm:px-6 lg:px-8">
- <h1 class="text-2xl font-semibold text-gray-900">{{ 'faq.title' | translate }}</h1>
- </div>
- </main>
- <app-footer />
+<div class="faq-page flex min-h-screen flex-col">
+  <app-header />
+
+  <main class="main-with-header flex-1">
+    <section class="faq-hero" aria-labelledby="faq-hero-title">
+      <div class="faq-hero__media" aria-hidden="true">
+        <img
+          src="https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?auto=format&fit=crop&w=1920&q=80"
+          alt=""
+          class="faq-hero__image"
+          width="1920"
+          height="1080"
+          loading="eager"
+          decoding="async"
+        />
+        <div class="faq-hero__veil"></div>
+      </div>
+
+      <div class="faq-hero__inner mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <div class="faq-hero__content">
+          <p class="faq-hero__brand">Verga</p>
+          <h1 id="faq-hero-title" class="faq-hero__title">{{ 'faq.title' | translate }}</h1>
+          <p class="faq-hero__subtitle">{{ 'faq.heroLead' | translate }}</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="faq-body" aria-labelledby="faq-list-title">
+      <div class="faq-body__inner mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
+        <div class="faq-toolbar">
+          <div class="faq-toolbar__copy">
+            <p class="faq-eyebrow">{{ 'faq.eyebrow' | translate }}</p>
+            <h2 id="faq-list-title" class="faq-section-title">{{ 'faq.listTitle' | translate }}</h2>
+            <p class="faq-section-lead">{{ 'faq.listLead' | translate }}</p>
+          </div>
+
+          <label class="faq-search">
+            <span class="sr-only">{{ 'faq.searchLabel' | translate }}</span>
+            <input
+              type="search"
+              class="faq-search__input"
+              [ngModel]="search()"
+              (ngModelChange)="onSearch($event)"
+              [placeholder]="'faq.searchPh' | translate"
+              autocomplete="off"
+            />
+          </label>
+        </div>
+
+        <div class="faq-filters" role="tablist" [attr.aria-label]="'faq.filtersLabel' | translate">
+          @for (item of filters; track item.value) {
+            <button
+              type="button"
+              role="tab"
+              class="faq-filter"
+              [class.faq-filter--active]="filter() === item.value"
+              [attr.aria-selected]="filter() === item.value"
+              (click)="setFilter(item.value)"
+            >
+              {{ item.labelKey | translate }}
+            </button>
+          }
+        </div>
+
+        <p class="faq-count">{{ resultsLabel() }}</p>
+
+        @if (visibleItems().length > 0) {
+          <ul class="faq-list">
+            @for (item of visibleItems(); track item.id; let i = $index) {
+              <li class="faq-item" [style.--faq-delay]="i * 35 + 'ms'">
+                <button
+                  type="button"
+                  class="faq-item__trigger"
+                  [attr.aria-expanded]="isOpen(item.id)"
+                  [attr.aria-controls]="'faq-panel-' + item.id"
+                  (click)="toggle(item.id)"
+                >
+                  <span class="faq-item__meta">
+                    <span class="faq-item__badge">{{ audienceLabelKey(item) | translate }}</span>
+                    <span class="faq-item__category">{{ categoryOf(item) }}</span>
+                  </span>
+                  <span class="faq-item__row">
+                    <span class="faq-item__question">{{ questionOf(item) }}</span>
+                    <span class="faq-item__icon" aria-hidden="true"></span>
+                  </span>
+                </button>
+
+                <div
+                  class="faq-item__panel"
+                  [id]="'faq-panel-' + item.id"
+                  [class.faq-item__panel--open]="isOpen(item.id)"
+                  role="region"
+                >
+                  <div class="faq-item__answer">
+                    <p>{{ answerOf(item) }}</p>
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+        } @else {
+          <div class="faq-empty">
+            <p class="faq-empty__title">{{ 'faq.emptyTitle' | translate }}</p>
+            <p class="faq-empty__text">{{ 'faq.emptyText' | translate }}</p>
+            <button type="button" class="faq-link" (click)="onSearch(''); setFilter('all')">
+              {{ 'faq.reset' | translate }}
+            </button>
+          </div>
+        }
+
+        <aside class="faq-close">
+          <p class="faq-eyebrow">{{ 'faq.closeEyebrow' | translate }}</p>
+          <h2 class="faq-section-title">{{ 'faq.closeTitle' | translate }}</h2>
+          <p class="faq-section-lead">{{ 'faq.closeText' | translate }}</p>
+          <div class="faq-close__actions">
+            <a routerLink="/nous-contacter" class="faq-cta faq-cta--primary">
+              {{ 'faq.ctaContact' | translate }}
+            </a>
+            <a routerLink="/" fragment="home-catalog" class="faq-cta faq-cta--outline">
+              {{ 'faq.ctaBrowse' | translate }}
+            </a>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <app-footer />
 </div>

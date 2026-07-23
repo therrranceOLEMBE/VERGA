@@ -80,6 +80,7 @@ export interface AgencePaiement {
   codeVerga: string;
   refBamboo: string;
   commande: string;
+  commandeId: string;
   montant: string;
   methode: string;
   statut: string;

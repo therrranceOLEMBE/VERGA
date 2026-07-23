@@ -181,7 +181,6 @@
     <div class="cespace-modal" (click)="$event.stopPropagation()">
       <div class="cespace-modal-head">
         <div class="cespace-modal-head-copy">
-          <p class="cespace-modal-eyebrow">{{ 'clientBackoffice.space' | translate }}</p>
           <h2 class="cespace-modal-title">{{ 'clientBackoffice.commandes.createReclamationTitle' | translate }}</h2>
         </div>
         <button
@@ -191,7 +190,7 @@
           [disabled]="createLoading()"
           [attr.aria-label]="'aria.close' | translate"
         >
-          ×
+          {{ 'clientBackoffice.colis.close' | translate }}
         </button>
       </div>
 
@@ -201,7 +200,7 @@
             {{ 'clientBackoffice.commandes.createReclamationHint' | translate }}
           </p>
 
-          <dl class="cespace-detail-grid" style="margin-bottom: 1.25rem">
+          <dl class="cespace-modal-summary">
             <div>
               <dt class="cespace-detail-dt">{{ 'clientBackoffice.commandes.colCode' | translate }}</dt>
               <dd class="cespace-detail-dd cespace-table-code">{{ createCommandeCode }}</dd>
@@ -285,7 +284,6 @@
     <div class="cespace-modal" (click)="$event.stopPropagation()">
       <div class="cespace-modal-head">
         <div class="cespace-modal-head-copy">
-          <p class="cespace-modal-eyebrow">{{ 'clientBackoffice.space' | translate }}</p>
           <h2 class="cespace-modal-title">{{ 'clientBackoffice.commandes.paySoldeTitle' | translate }}</h2>
         </div>
         <button
@@ -295,7 +293,7 @@
           [disabled]="payLoading()"
           [attr.aria-label]="'aria.close' | translate"
         >
-          ×
+          {{ 'clientBackoffice.colis.close' | translate }}
         </button>
       </div>
 
@@ -305,7 +303,7 @@
             {{ 'clientBackoffice.commandes.paySoldeHint' | translate }}
           </p>
 
-          <dl class="cespace-detail-grid">
+          <dl class="cespace-modal-summary">
             <div>
               <dt class="cespace-detail-dt">{{ 'clientBackoffice.commandes.colCode' | translate }}</dt>
               <dd class="cespace-detail-dd cespace-table-code">{{ payCommandeCode }}</dd>
@@ -321,7 +319,7 @@
           </dl>
 
           @if (payError()) {
-            <div class="cespace-alert" role="alert" style="margin-top: 1.15rem">
+            <div class="cespace-alert" role="alert">
               @if (payError().startsWith('clientBackoffice.')) {
                 {{ payError() | translate }}
               } @else {

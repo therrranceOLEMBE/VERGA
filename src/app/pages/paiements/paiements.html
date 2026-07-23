@@ -89,6 +89,7 @@
  <col class="paiements-col-amount" />
  <col class="paiements-col-status" />
  <col class="paiements-col-date" />
+ <col class="paiements-col-actions" />
  </colgroup>
  <thead>
  <tr class="paiements-table-head">
@@ -97,6 +98,7 @@
  <th scope="col" class="text-right">{{ 'backoffice.payments.colAmount' | translate }}</th>
  <th scope="col">{{ 'backoffice.payments.colStatus' | translate }}</th>
  <th scope="col">{{ 'backoffice.payments.colDate' | translate }}</th>
+ <th scope="col">{{ 'backoffice.payments.colActions' | translate }}</th>
  </tr>
  </thead>
  <tbody class="divide-y divide-verga-border">
@@ -117,10 +119,23 @@
  }
  </td>
  <td class="text-gray-600">{{ paiement.date }}</td>
+ <td>
+ @if (canViewCommande(paiement)) {
+ <button
+ type="button"
+ (click)="viewCommande(paiement)"
+ class="paiements-action-btn border border-verga-border bg-white px-2.5 py-1 text-xs font-semibold text-verga-primary transition hover:bg-verga-primary-muted"
+ >
+ {{ 'backoffice.payments.actionViewCommande' | translate }}
+ </button>
+ } @else {
+ —
+ }
+ </td>
  </tr>
  } @empty {
  <tr>
- <td colspan="5" class="paiements-empty">{{ 'backoffice.payments.empty' | translate }}</td>
+ <td colspan="6" class="paiements-empty">{{ 'backoffice.payments.empty' | translate }}</td>
  </tr>
  }
  </tbody>
