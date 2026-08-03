@@ -1,12 +1,14 @@
 import { Offer, OfferPricingType } from '../models/offer.model';
 import {
   ClientOffreDetailResponse,
+  ClientOffreDestinationRaw,
   ClientOffreRaw,
   ClientOffresListResponse,
   ClientOffresPage,
   ClientOffresPaginationMeta,
   ClientOffreTypeOffreRaw,
 } from '../models/client-offre.model';
+import { resolveMediaUrl } from './media-url.util';
 
 const LOGO_GRADIENTS = [
   'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
@@ -54,6 +56,13 @@ function toNumber(value: number | string | null | undefined): number | null {
   return Number.isFinite(numeric) ? numeric : null;
 }
 
+function capitalizePlace(value: string): string {
+  if (!value) {
+    return value;
+  }
+  return value.charAt(0).toUpperCase() + value.slice(1);
+}
+
 function formatCreatedAt(value: string | null | undefined): string {
   if (!value) {
     return '—';
@@ -76,6 +85,61 @@ function formatCreatedAt(value: string | null | undefined): string {
   return `${date} | ${time}`;
 }
 
+function formatPlainDate(value: string | null | undefined): string {
+  if (!value) {
+    return '';
+  }
+  const match = value.trim().match(/^(\d{4}-\d{2}-\d{2})/);
+  const iso = match?.[1] ?? value.trim();
+  const parsed = new Date(`${iso}T12:00:00`);
+  if (Number.isNaN(parsed.getTime())) {
+    return value.trim();
+  }
+  return parsed.toLocaleDateString('fr-FR', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+}
+
+function formatCount(value: number | null): string {
+  if (value == null) {
+    return '';
+  }
+  return new Intl.NumberFormat('fr-FR').format(value);
+}
+
+function resolveDestinationObject(raw: ClientOffreRaw): ClientOffreDestinationRaw | null {
+  return asRecord(raw.destination) as ClientOffreDestinationRaw | null;
+}
+
+function resolvePlaceString(value: unknown): string {
+  if (typeof value === 'string') {
+    return value.trim();
+  }
+  if (typeof value === 'number') {
+    return String(value);
+  }
+  return '';
+}
+
+function resolveRoute(raw: ClientOffreRaw): { depart: string; arrivee: string } {
+  const destinationObj = resolveDestinationObject(raw);
+  const depart =
+    resolvePlaceString(destinationObj?.depart) ||
+    resolvePlaceString(raw.origine) ||
+    '';
+  const arrivee =
+    resolvePlaceString(destinationObj?.arrivee) ||
+    (typeof raw.destination === 'string' ? raw.destination.trim() : '') ||
+    '';
+
+  return {
+    depart: capitalizePlace(depart),
+    arrivee: capitalizePlace(arrivee),
+  };
+}
+
 function resolvePricingType(raw: ClientOffreRaw, typeOffre?: ClientOffreTypeOffreRaw | null): OfferPricingType {
   const slug = (typeOffre?.slug ?? raw.type ?? '').toLowerCase();
   if (slug.includes('conteneur') || slug === 'container') {
@@ -88,7 +152,8 @@ function resolvePricingType(raw: ClientOffreRaw, typeOffre?: ClientOffreTypeOffr
 }
 
 function formatPrice(raw: ClientOffreRaw): string {
-  const prix = toNumber(raw.prix);
+  const destinationObj = resolveDestinationObject(raw);
+  const prix = toNumber(raw.prix) ?? toNumber(destinationObj?.montant);
   if (prix == null) {
     return '—';
   }
@@ -160,24 +225,35 @@ function resolveLogoBg(seed: string): string {
   return LOGO_GRADIENTS[hash] ?? LOGO_GRADIENTS[0];
 }
 
-function resolveLocation(raw: ClientOffreRaw): string {
-  const origine = raw.origine?.trim();
-  const destination = raw.destination?.trim();
-  const ville = raw.agence?.ville?.trim();
+function resolveAgencyLogoUrl(raw: ClientOffreRaw): string {
+  const logo = raw.agence?.logo;
+  return resolveMediaUrl(logo?.url, logo?.chemin);
+}
 
-  if (origine && destination) {
-    return `${origine} → ${destination}`;
+function resolveLocation(depart: string, arrivee: string, ville?: string): string {
+  if (depart && arrivee) {
+    return `${depart} → ${arrivee}`;
   }
-  if (destination) {
-    return destination;
+  if (arrivee) {
+    return arrivee;
   }
-  if (origine) {
-    return origine;
+  if (depart) {
+    return depart;
   }
-  if (ville) {
-    return ville;
+  if (ville?.trim()) {
+    return ville.trim();
   }
   return '—';
+}
+
+function resolveCapacityLabel(value: number | null, unlimited: boolean): string {
+  if (unlimited) {
+    return 'Illimitée';
+  }
+  if (value == null) {
+    return '—';
+  }
+  return formatCount(value);
 }
 
 function resolveMeta(response: ClientOffresListResponse): ClientOffresPaginationMeta {
@@ -187,10 +263,15 @@ function resolveMeta(response: ClientOffresListResponse): ClientOffresPagination
 export function mapClientOffreToOffer(raw: ClientOffreRaw): Offer {
   const flat = flattenOffreRaw(raw);
   const publisherName = resolvePublisherName(flat);
-  const origine = flat.origine?.trim() ?? '';
-  const destination = flat.destination?.trim() ?? '';
+  const { depart, arrivee } = resolveRoute(flat);
   const seed = flat.agence?.id ?? publisherName;
   const typeOffre = flat.type_offre;
+  const unlimited = flat.capacite_illimitee === true;
+  const disponible = toNumber(flat.capacite_disponible);
+  const totale = toNumber(flat.capacite_totale);
+  const ville = flat.agence?.ville?.trim() ?? '';
+  const logoUrl = resolveAgencyLogoUrl(flat);
+  const uniteLabel = typeOffre?.unite_label?.trim() || typeOffre?.unite?.trim() || '';
 
   return {
     id: String(flat.id ?? ''),
@@ -198,21 +279,28 @@ export function mapClientOffreToOffer(raw: ClientOffreRaw): Offer {
     likes: 0,
     date: formatCreatedAt(flat.created_at),
     price: formatPrice(flat),
-    location: resolveLocation(flat),
-    address: [origine, destination].filter(Boolean).join(' · ') || '—',
+    location: resolveLocation(depart, arrivee, ville),
+    address: [depart, arrivee].filter(Boolean).join(' · ') || ville || '—',
     category: resolveCategory(flat),
     publisherName,
     publisherHandle: `@${publisherName.replace(/\s+/g, '_').toUpperCase()}`,
     publisherInitials: resolvePublisherInitials(publisherName),
+    publisherCity: ville || undefined,
     logoBg: resolveLogoBg(String(seed)),
+    logoUrl: logoUrl || undefined,
     description: flat.description?.trim() || '—',
     pricingType: resolvePricingType(flat, flat.type_offre),
-    departureCountry: origine,
-    arrivalCountry: destination,
+    departureCountry: depart,
+    arrivalCountry: arrivee,
+    departureDate: formatPlainDate(flat.date_depart) || undefined,
+    depotDate: formatPlainDate(flat.date_depot_colis) || undefined,
+    capaciteDisponibleLabel: resolveCapacityLabel(disponible, unlimited),
+    capaciteTotaleLabel: unlimited ? 'Illimitée' : resolveCapacityLabel(totale, false),
+    uniteLabel: uniteLabel || undefined,
     verified: flat.statut === 'active',
     quantiteMin: typeOffre?.quantite_min ?? undefined,
     quantiteEntier: typeOffre?.quantite_entier ?? undefined,
-    capaciteIllimitee: flat.capacite_illimitee === true,
+    capaciteIllimitee: unlimited,
   };
 }
 

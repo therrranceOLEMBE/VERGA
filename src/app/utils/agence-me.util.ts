@@ -67,7 +67,31 @@ function resolveStatusClass(statut: string | undefined, isActive: boolean | unde
   return 'bg-verga-surface text-verga-muted';
 }
 
-export function mapAgenceMeToProfile(response: AgenceMeResponse): Partial<AgenceProfile> {
+function extractRoleValue(candidate: unknown): string {
+  if (typeof candidate === 'string' && candidate.trim()) {
+    return candidate.trim();
+  }
+  if (candidate && typeof candidate === 'object') {
+    const role = candidate as { slug?: string; nom?: string; name?: string; code?: string };
+    return (role.slug ?? role.code ?? role.nom ?? role.name ?? '').trim();
+  }
+  return '';
+}
+
+function resolveRoleSlug(response: AgenceMeResponse): string {
+  const data = unwrapMeData(response);
+  const user = resolveUser(data);
+  const candidates = [data.role, user.role, response.role];
+  for (const candidate of candidates) {
+    const value = extractRoleValue(candidate);
+    if (value) {
+      return value;
+    }
+  }
+  return '';
+}
+
+export function mapAgenceMeToProfile(response: AgenceMeResponse): Partial<AgenceProfile> & { roleSlug?: string } {
   const data = unwrapMeData(response);
   const user = resolveUser(data);
   const agence = resolveAgence(data, user);
@@ -94,6 +118,7 @@ export function mapAgenceMeToProfile(response: AgenceMeResponse): Partial<Agence
     gerantEmail: (agence.gerant_email ?? user.email)?.trim() ?? '',
     logoUrl: agence.logo?.url?.trim() ?? '',
     documents: mapDocuments(agence.documents),
+    roleSlug: resolveRoleSlug(response),
   };
 }
 

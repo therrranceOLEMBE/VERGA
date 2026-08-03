@@ -208,15 +208,59 @@ function resolveStatutLabelKey(statut: string): string {
   return '';
 }
 
+function resolvePlaceLabel(value: unknown, preferredKeys: string[] = []): string {
+  if (value == null) {
+    return '';
+  }
+  if (typeof value === 'string' || typeof value === 'number') {
+    return String(value).trim();
+  }
+  if (typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    for (const key of preferredKeys) {
+      const preferred = record[key];
+      if (typeof preferred === 'string' && preferred.trim()) {
+        return preferred.trim();
+      }
+      if (typeof preferred === 'number') {
+        return String(preferred);
+      }
+    }
+    return resolveLabel(value);
+  }
+  return '';
+}
+
+function resolveOrigine(source: AgenceOffreRaw, record: Record<string, unknown>): string {
+  const direct = resolvePlaceLabel(source.origine ?? record['origine'], ['depart', 'nom', 'name', 'label']);
+  if (direct) {
+    return direct;
+  }
+
+  const destination = record['destination'];
+  return resolvePlaceLabel(destination, ['depart', 'origine', 'nom', 'name']);
+}
+
+function resolveDestination(source: AgenceOffreRaw, record: Record<string, unknown>): string {
+  const destination = source.destination ?? record['destination'];
+  const fromDestination = resolvePlaceLabel(destination, ['arrivee', 'destination', 'nom', 'name', 'label']);
+  if (fromDestination) {
+    return fromDestination;
+  }
+
+  return resolvePlaceLabel(record['arrivee'], ['arrivee', 'nom', 'name']);
+}
+
 export function mapOffreToRow(raw: AgenceOffreRaw): AgenceOffre {
   const source = flattenOffreRaw(raw);
-  const type = source.type?.trim() ?? '';
-  const statut = source.statut?.trim() ?? '';
+  const record = source as Record<string, unknown>;
+  const type = typeof source.type === 'string' ? source.type.trim() : String(source.type ?? '').trim();
+  const statut = typeof source.statut === 'string' ? source.statut.trim() : String(source.statut ?? '').trim();
   const { disponible, total } = resolveStockValues(source);
 
   return {
     id: String(source.id ?? ''),
-    titre: (source.titre ?? source.title)?.trim() || '—',
+    titre: (typeof source.titre === 'string' ? source.titre : source.title)?.toString().trim() || '—',
     agence: resolveLabel(source.agence) || '—',
     type,
     typeLabelKey: resolveTypeLabelKey(type),
@@ -224,11 +268,11 @@ export function mapOffreToRow(raw: AgenceOffreRaw): AgenceOffre {
     stockDisponible: formatCount(disponible),
     stockTotal: formatCount(total),
     stock: resolveStockDisplay(disponible, total),
-    origine: source.origine?.trim() || '—',
-    destination: source.destination?.trim() || '—',
+    origine: resolveOrigine(source, record) || '—',
+    destination: resolveDestination(source, record) || '—',
     statut,
     statutLabelKey: resolveStatutLabelKey(statut),
-    description: source.description?.trim() ?? '',
+    description: typeof source.description === 'string' ? source.description.trim() : '',
   };
 }
 
@@ -239,11 +283,11 @@ export function parseOffreDetailResponse(response: AgenceOffreDetailResponse): A
 export function parseOffreEditForm(response: AgenceOffreDetailResponse): AgenceOffreEditForm {
   const source = flattenOffreRaw(unwrapOffreRaw(response));
   const record = source as Record<string, unknown>;
-  const type = source.type?.trim() ?? '';
+  const type = typeof source.type === 'string' ? source.type.trim() : String(source.type ?? '').trim();
 
   return {
     id: String(source.id ?? ''),
-    titre: (source.titre ?? source.title)?.trim() ?? '',
+    titre: (typeof source.titre === 'string' ? source.titre : source.title)?.toString().trim() ?? '',
     typeOffreId: resolveTypeOffreId(record),
     type,
     prix: toNumber(source.prix),
@@ -257,12 +301,12 @@ export function parseOffreEditForm(response: AgenceOffreDetailResponse): AgenceO
       'stock_disponible',
       'stock_restant',
     ]),
-    origine: source.origine?.trim() ?? '',
-    destination: source.destination?.trim() ?? '',
+    origine: resolveOrigine(source, record),
+    destination: resolveDestination(source, record),
     dateDepart: toDateInputValue(record['date_depart'] ?? record['dateDepart']),
     dateDepotColis: toDateInputValue(record['date_depot_colis'] ?? record['dateDepotColis']),
-    description: source.description?.trim() ?? '',
-    statut: normalizeStatut(source.statut),
+    description: typeof source.description === 'string' ? source.description.trim() : '',
+    statut: normalizeStatut(typeof source.statut === 'string' ? source.statut : String(source.statut ?? '')),
   };
 }
 

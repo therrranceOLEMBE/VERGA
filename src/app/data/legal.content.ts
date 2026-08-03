@@ -238,12 +238,12 @@ export const TERMS_DOCUMENT: LegalDocument = {
       title: { fr: 'Commandes client', en: 'Client orders' },
       paragraphs: {
         fr: [
-          'Acheter : paiement de la quantité totale. Réserver : possible lorsque la capacité est limitée ; un acompte peut être payé immédiatement et le solde plus tard depuis l’espace client.',
+          'Acheter : paiement immédiat de la quantité choisie. Réserver (capacité limitée uniquement) : le client indique la quantité totale souhaitée, puis la part qu’il achète immédiatement dans cette quantité ; il paie cette part tout de suite. La quantité restante peut être achetée plus tard depuis l’espace client.',
           'Avant paiement, une estimation (sous-total, frais de service / commission Verga, total) est affichée. Si le stock est insuffisant, la commande peut être refusée.',
           'La description de marchandise est obligatoire ; les photos sont optionnelles. Une commande peut être créée en invité, sous réserve des champs requis.',
         ],
         en: [
-          'Buy: pay the full quantity. Reserve: available when capacity is limited; a deposit may be paid immediately and the balance later from the client area.',
+          'Buy: immediate payment of the chosen quantity. Reserve (limited capacity only): the client enters the total quantity wanted, then the portion bought immediately within that total, and pays that portion now. The remaining quantity may be purchased later from the client area.',
           'Before payment, an estimate (subtotal, Verga service fee / commission, total) is shown. If stock is insufficient, the order may be refused.',
           'Cargo description is required; photos are optional. An order may be placed as a guest, subject to required fields.',
         ],
@@ -328,11 +328,11 @@ export const TERMS_DOCUMENT: LegalDocument = {
       title: { fr: 'Droit applicable', en: 'Governing law' },
       paragraphs: {
         fr: [
-          'Les présentes conditions sont régies par le droit applicable en Côte d’Ivoire, sous réserve des règles impératives de protection du consommateur éventuellement plus favorables.',
+          'Les présentes conditions sont régies par le droit applicable au Gabon, sous réserve des règles impératives de protection du consommateur éventuellement plus favorables.',
           'Pour tout litige, privilégiez d’abord le support Verga et la procédure de réclamation. À défaut d’accord, les tribunaux compétents pourront être saisis.',
         ],
         en: [
-          'These terms are governed by the law applicable in Ivory Coast, subject to any mandatory consumer protection rules that may be more favorable.',
+          'These terms are governed by the law applicable in Gabon, subject to any mandatory consumer protection rules that may be more favorable.',
           'For any dispute, first use Verga support and the claim process. Failing agreement, the competent courts may be seized.',
         ],
       },

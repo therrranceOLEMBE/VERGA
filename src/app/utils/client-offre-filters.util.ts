@@ -3,7 +3,21 @@ import { OfferDestinationRoute } from '../models/offer.model';
 import { OfferFilters } from '../services/offer-filters.service';
 import { DESTINATION_ROUTE_PAIRS } from './offer-destination.util';
 
-export function buildClientOffresQueryFromFilters(  filters: OfferFilters,
+/** Lieu caractéristique d’un corridor → paramètre API `destination` (départ ou arrivée). */
+export function destinationFromRoute(route: OfferDestinationRoute | ''): string {
+  if (!route || !DESTINATION_ROUTE_PAIRS[route]) {
+    return '';
+  }
+  const [, placeB] = DESTINATION_ROUTE_PAIRS[route];
+  return placeB;
+}
+
+/**
+ * Construit la query GET /client/offres à partir des filtres UI.
+ * Params API : search, destination, type, type_offre_id, date_debut, date_fin, page, per_page.
+ */
+export function buildClientOffresQueryFromFilters(
+  filters: OfferFilters,
   page: number,
   perPage: number,
 ): ClientOffresQueryParams {
@@ -12,30 +26,21 @@ export function buildClientOffresQueryFromFilters(  filters: OfferFilters,
     per_page: perPage,
   };
 
-  const searchParts: string[] = [];
   if (filters.search.trim()) {
-    searchParts.push(filters.search.trim());
+    params.search = filters.search.trim();
   }
 
-  if (filters.destinationRoute && DESTINATION_ROUTE_PAIRS[filters.destinationRoute]) {
-    const [countryA, countryB] = DESTINATION_ROUTE_PAIRS[filters.destinationRoute];
-    searchParts.push(countryA, countryB);
+  const destination =
+    filters.destination.trim() || destinationFromRoute(filters.destinationRoute);
+  if (destination) {
+    params.destination = destination;
   }
 
-  if (searchParts.length > 0) {
-    params.search = searchParts.join(' ');
-  }
-
-  if (filters.destination.trim()) {
-    params.destination = filters.destination.trim();
-  }
-
-  if (filters.type) {
-    params.type = filters.type as ClientOffreLegacyType;
-  }
-
+  // type_offre_id recommandé : prioritaire sur le type legacy
   if (filters.type_offre_id.trim()) {
     params.type_offre_id = filters.type_offre_id.trim();
+  } else if (filters.type) {
+    params.type = filters.type as ClientOffreLegacyType;
   }
 
   if (filters.date_debut) {
@@ -52,10 +57,8 @@ export function buildClientOffresQueryFromFilters(  filters: OfferFilters,
 export function countActiveOfferFilters(filters: OfferFilters): number {
   let count = 0;
   if (filters.search.trim()) count += 1;
-  if (filters.destination.trim()) count += 1;
-  if (filters.destinationRoute) count += 1;
-  if (filters.type) count += 1;
-  if (filters.type_offre_id.trim()) count += 1;
+  if (filters.destination.trim() || filters.destinationRoute) count += 1;
+  if (filters.type_offre_id.trim() || filters.type) count += 1;
   if (filters.date_debut) count += 1;
   if (filters.date_fin) count += 1;
   return count;

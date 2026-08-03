@@ -256,7 +256,16 @@ export class Accueil implements OnInit {
   }
 
   protected selectDestination(value: '' | OfferDestinationRoute): void {
+    if (!value) {
+      this.resetAllFilters();
+      return;
+    }
     this.filtersService.patch({ destinationRoute: value });
+  }
+
+  /** Réinitialise tous les filtres (bouton « Toutes » + état vide). */
+  protected resetAllFilters(): void {
+    this.filtersService.reset();
   }
 
   protected scrollDestinations(direction: 'left' | 'right'): void {

@@ -23,11 +23,19 @@ export interface Offer {
   publisherName: string;
   publisherHandle: string;
   publisherInitials: string;
+  publisherCity?: string;
   logoBg: string;
+  /** URL du logo agence (si fourni par l’API) */
+  logoUrl?: string;
   description: string;
   pricingType: OfferPricingType;
   departureCountry: string;
   arrivalCountry: string;
+  departureDate?: string;
+  depotDate?: string;
+  capaciteDisponibleLabel?: string;
+  capaciteTotaleLabel?: string;
+  uniteLabel?: string;
   promotion?: boolean;
   verified?: boolean;
   quantiteMin?: number;

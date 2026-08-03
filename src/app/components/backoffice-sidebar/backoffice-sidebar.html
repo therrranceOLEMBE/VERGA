@@ -4,7 +4,7 @@
  (click)="$event.stopPropagation()"
 >
  <div class="border-b border-verga-border px-5 py-6">
- <a routerLink="/backoffice/tableau-de-bord" class="backoffice-sidebar__brand block">
+ <a [routerLink]="homePath()" class="backoffice-sidebar__brand block">
  @if (agencyLogoUrl().logoUrl) {
  <img
  [src]="agencyLogoUrl().logoUrl"
@@ -31,7 +31,7 @@
 
  <nav class="min-h-0 flex-1 overflow-y-auto py-4" [attr.aria-label]="'backoffice.nav.label' | translate">
  <ul class="space-y-1">
- @for (item of mainNav; track item.path) {
+ @for (item of mainNav(); track item.path) {
  <li>
  <a
  [routerLink]="item.path"
@@ -81,6 +81,7 @@
  </li>
  }
 
+ @if (showOffersSection()) {
  <li class="relative">
  <button
  type="button"
@@ -102,7 +103,7 @@
 
  @if (offersOpen() || isOffersSectionActive()) {
  <ul class="mt-1 space-y-0.5 border-l-2 border-verga-primary/30 ml-6 pl-2">
- @for (sub of offersNav; track sub.path) {
+ @for (sub of offersNav(); track sub.path) {
  <li>
  <a
  [routerLink]="sub.path"
@@ -140,7 +141,9 @@
  </ul>
  }
  </li>
+ }
 
+ @if (showCollaboratorsSection()) {
  <li class="relative">
  <button
  type="button"
@@ -162,7 +165,7 @@
 
  @if (collaboratorsOpen() || isCollaboratorsSectionActive()) {
  <ul class="mt-1 space-y-0.5 border-l-2 border-verga-primary/30 ml-6 pl-2">
- @for (sub of collaboratorsNav; track sub.path) {
+ @for (sub of collaboratorsNav(); track sub.path) {
  <li>
  <a
  [routerLink]="sub.path"
@@ -189,6 +192,7 @@
  </ul>
  }
  </li>
+ }
 
  <li class="relative">
  <button
@@ -211,7 +215,7 @@
 
  @if (accountOpen() || isAccountSectionActive()) {
  <ul class="mt-1 space-y-0.5 border-l-2 border-verga-primary/30 ml-6 pl-2">
- @for (sub of accountNav; track sub.path) {
+ @for (sub of accountNav(); track sub.path) {
  <li>
  <a
  [routerLink]="sub.path"

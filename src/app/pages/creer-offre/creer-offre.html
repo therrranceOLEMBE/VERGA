@@ -1,153 +1,278 @@
 <div class="bo-page mx-auto max-w-3xl">
- <header class="bo-page-header">
- <div class="bo-page-header__copy">
- <h1 class="bo-page-title">{{ 'backoffice.createOffer.title' | translate }}</h1>
- <p class="bo-page-subtitle">{{ 'backoffice.createOffer.subtitle' | translate }}</p>
- </div>
- </header>
+  <header class="bo-page-header">
+    <div class="bo-page-header__copy">
+      <h1 class="bo-page-title">{{ 'backoffice.createOffer.title' | translate }}</h1>
+      <p class="bo-page-subtitle">{{ 'backoffice.createOffer.subtitle' | translate }}</p>
+    </div>
+  </header>
 
- @if (unauthenticated()) {
- <div class="mb-6 border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
- {{ 'backoffice.createOffer.authRequired' | translate }}
- <a routerLink="/connexion" class="ml-1 font-semibold text-verga-primary underline">{{ 'auth.login.title' | translate }}</a>
- </div>
- }
+  @if (unauthenticated()) {
+    <div class="mb-6 border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+      {{ 'backoffice.createOffer.authRequired' | translate }}
+      <a routerLink="/connexion" class="ml-1 font-semibold text-verga-primary underline">{{ 'auth.login.title' | translate }}</a>
+    </div>
+  }
 
- @if (errorMessage()) {
- <div class="mb-6 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
- @if (errorMessage().startsWith('backoffice.')) {
- {{ errorMessage() | translate }}
- } @else {
- {{ errorMessage() }}
- }
- </div>
- }
+  @if (errorMessage()) {
+    <div class="mb-6 border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      @if (errorMessage().startsWith('backoffice.')) {
+        {{ errorMessage() | translate }}
+      } @else {
+        {{ errorMessage() }}
+      }
+    </div>
+  }
 
- @if (successMessage()) {
- <div class="mb-6 border border-verga-success/30 bg-verga-success-muted px-4 py-3 text-sm text-verga-success">
- {{ successMessage() | translate }}
- </div>
- }
+  @if (successMessage()) {
+    <div class="mb-6 border border-verga-success/30 bg-verga-success-muted px-4 py-3 text-sm text-verga-success">
+      {{ successMessage() | translate }}
+    </div>
+  }
 
- <form class="space-y-6 border border-verga-border bg-white p-4 sm:p-8" (ngSubmit)="onSubmit($event)">
- <div>
- <label for="offer-title" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.offerTitle' | translate }} *</label>
- <input id="offer-title" name="titre" type="text" required [(ngModel)]="titre" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.offerTitlePh' | translate" />
- </div>
+  <form class="space-y-6 border border-verga-border bg-white p-4 sm:p-8" (ngSubmit)="onSubmit($event)">
+    <div>
+      <label for="offer-title" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.offerTitle' | translate }} *</label>
+      <input id="offer-title" name="titre" type="text" required [(ngModel)]="titre" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.offerTitlePh' | translate" />
+    </div>
 
- <div>
- <label for="offer-type-offre" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.offerType' | translate }} *</label>
- <select
- id="offer-type-offre"
- name="typeOffreId"
- required
- [(ngModel)]="typeOffreId"
- (ngModelChange)="onTypeOffreChange()"
- class="verga-field mt-2 appearance-none bg-white"
- [disabled]="loadingTypeOffres() || typeOffreOptions().length === 0"
- >
- <option value="">{{ 'backoffice.createOffer.selectOfferType' | translate }}</option>
- @for (option of typeOffreOptions(); track option.id) {
- <option [value]="option.id" [title]="option.description || ''">{{ option.label }}</option>
- }
- </select>
- @if (loadingTypeOffres()) {
- <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.createOffer.typeOffreLoading' | translate }}</p>
- } @else if (typeOffreOptions().length === 0) {
- <p class="mt-2 text-sm text-amber-700">{{ 'backoffice.createOffer.typeOffreLoadError' | translate }}</p>
- <button type="button" (click)="loadTypeOffres()" class="mt-1 text-sm font-semibold text-verga-primary hover:underline">
- {{ 'backoffice.createOffer.retryTypeOffres' | translate }}
- </button>
- }
- </div>
+    <div>
+      <label for="offer-type-offre" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.offerType' | translate }} *</label>
+      <select
+        id="offer-type-offre"
+        name="typeOffreId"
+        required
+        [(ngModel)]="typeOffreId"
+        (ngModelChange)="onTypeOffreChange()"
+        class="verga-field mt-2 appearance-none bg-white"
+        [disabled]="loadingTypeOffres() || typeOffreOptions().length === 0"
+      >
+        <option value="">{{ 'backoffice.createOffer.selectOfferType' | translate }}</option>
+        @for (option of typeOffreOptions(); track option.id) {
+          <option [value]="option.id" [title]="option.description || ''">{{ option.label }}</option>
+        }
+      </select>
+      @if (loadingTypeOffres()) {
+        <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.createOffer.typeOffreLoading' | translate }}</p>
+      } @else if (typeOffreOptions().length === 0) {
+        <p class="mt-2 text-sm text-amber-700">{{ 'backoffice.createOffer.typeOffreLoadError' | translate }}</p>
+        <button type="button" (click)="loadTypeOffres()" class="mt-1 text-sm font-semibold text-verga-primary hover:underline">
+          {{ 'backoffice.createOffer.retryTypeOffres' | translate }}
+        </button>
+      }
+    </div>
 
- <div class="grid gap-5 sm:grid-cols-2">
- <div>
- <label for="offer-origine" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.origine' | translate }} *</label>
- <input id="offer-origine" name="origine" type="text" required [(ngModel)]="origine" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.originePh' | translate" />
- </div>
- <div>
- <label for="offer-destination" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.destination' | translate }} *</label>
- <input id="offer-destination" name="destination" type="text" required [(ngModel)]="destination" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.destinationPh' | translate" />
- </div>
- </div>
+    <fieldset class="space-y-4 border border-verga-border p-4">
+      <legend class="px-1 text-sm font-semibold text-gray-900">{{ 'backoffice.createOffer.corridor' | translate }} *</legend>
 
- <div class="grid gap-5 sm:grid-cols-2">
- <div>
- <label for="offer-date-depart" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.departureDate' | translate }} *</label>
- <input id="offer-date-depart" name="dateDepart" type="date" required [(ngModel)]="dateDepart" class="verga-field mt-2" />
- </div>
- <div>
- <label for="offer-date-depot" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.depotDate' | translate }}</label>
- <input id="offer-date-depot" name="dateDepotColis" type="date" [(ngModel)]="dateDepotColis" class="verga-field mt-2" />
- <p class="mt-1.5 text-xs text-verga-muted">{{ 'backoffice.createOffer.depotDateHint' | translate }}</p>
- </div>
- </div>
+      <div class="flex flex-wrap gap-2">
+        <label class="create-offer-mode" [class.create-offer-mode--active]="destinationMode === 'catalog'">
+          <input
+            type="radio"
+            name="destinationMode"
+            value="catalog"
+            [ngModel]="destinationMode"
+            (ngModelChange)="onDestinationModeChange($event)"
+          />
+          <span>{{ 'backoffice.createOffer.modeCatalog' | translate }}</span>
+        </label>
+        <label class="create-offer-mode" [class.create-offer-mode--active]="destinationMode === 'custom'">
+          <input
+            type="radio"
+            name="destinationMode"
+            value="custom"
+            [ngModel]="destinationMode"
+            (ngModelChange)="onDestinationModeChange($event)"
+          />
+          <span>{{ 'backoffice.createOffer.modeCustom' | translate }}</span>
+        </label>
+      </div>
 
- <div class="grid gap-5 sm:grid-cols-2">
- <div>
- <label for="offer-prix" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.price' | translate }} *</label>
- <input id="offer-prix" name="prix" type="number" min="1" step="1" required [(ngModel)]="prix" class="verga-field mt-2" [placeholder]="'backoffice.createOffer.pricePh' | translate" />
- </div>
- <div>
- <label for="offer-capacite" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.capaciteTotale' | translate }} *</label>
- <input
- id="offer-capacite"
- name="capaciteTotale"
- type="number"
- min="1"
- step="1"
- [required]="!capaciteIllimitee"
- [disabled]="capaciteIllimitee"
- [(ngModel)]="capaciteTotale"
- class="verga-field mt-2 disabled:bg-verga-surface disabled:text-verga-muted"
- [placeholder]="(capaciteIllimitee ? 'backoffice.createOffer.capaciteIllimiteePh' : 'backoffice.createOffer.capaciteTotalePh') | translate"
- />
- </div>
- </div>
+      @if (destinationMode === 'catalog') {
+        <div>
+          <label for="offer-destination-id" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.selectDestination' | translate }} *</label>
+          <select
+            id="offer-destination-id"
+            name="destinationId"
+            required
+            [(ngModel)]="destinationId"
+            (ngModelChange)="onCatalogDestinationChange()"
+            class="verga-field mt-2 appearance-none bg-white"
+            [disabled]="loadingDestinations() || destinations().length === 0"
+          >
+            <option value="">{{ 'backoffice.createOffer.selectDestinationPh' | translate }}</option>
+            @for (destination of destinations(); track destination.id) {
+              <option [value]="destination.id">
+                {{ destination.label }} — {{ destination.montant | number : '1.0-0' }} FCFA
+              </option>
+            }
+          </select>
+          @if (loadingDestinations()) {
+            <p class="mt-2 text-sm text-verga-muted">{{ 'backoffice.createOffer.destinationLoading' | translate }}</p>
+          } @else if (destinations().length === 0) {
+            <p class="mt-2 text-sm text-amber-700">{{ 'backoffice.createOffer.destinationLoadError' | translate }}</p>
+            <button type="button" (click)="loadDestinations()" class="mt-1 text-sm font-semibold text-verga-primary hover:underline">
+              {{ 'backoffice.createOffer.retryDestinations' | translate }}
+            </button>
+          } @else if (selectedDestination(); as destination) {
+            <p class="mt-2 text-xs text-verga-muted">
+              {{ 'backoffice.createOffer.priceLockedHint' | translate }}
+              @if (destination.commissionPourcentage != null) {
+                · {{ 'backoffice.createOffer.commissionHint' | translate:{ value: destination.commissionPourcentage } }}
+              }
+            </p>
+          }
+        </div>
+      } @else {
+        <div class="grid gap-5 sm:grid-cols-2">
+          <div>
+            <label for="offer-custom-depart" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.origine' | translate }} *</label>
+            <input
+              id="offer-custom-depart"
+              name="customDepart"
+              type="text"
+              required
+              [(ngModel)]="customDepart"
+              class="verga-field mt-2"
+              [placeholder]="'backoffice.createOffer.originePh' | translate"
+            />
+          </div>
+          <div>
+            <label for="offer-custom-arrivee" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.destination' | translate }} *</label>
+            <input
+              id="offer-custom-arrivee"
+              name="customArrivee"
+              type="text"
+              required
+              [(ngModel)]="customArrivee"
+              class="verga-field mt-2"
+              [placeholder]="'backoffice.createOffer.destinationPh' | translate"
+            />
+          </div>
+        </div>
+        <p class="text-xs text-verga-muted">{{ 'backoffice.createOffer.customCorridorHint' | translate }}</p>
+      }
+    </fieldset>
 
- <div class="grid gap-5 sm:grid-cols-2">
- <label class="flex items-start gap-3 border border-verga-border bg-verga-surface p-4 text-sm text-gray-700">
- <input
- type="checkbox"
- name="capaciteIllimitee"
- [ngModel]="capaciteIllimitee"
- (ngModelChange)="onCapaciteIllimiteeChange($event)"
- class="mt-0.5 h-4 w-4 accent-[var(--color-verga-primary,#5eadd6)]"
- />
- <span>
- <span class="block font-semibold text-gray-900">{{ 'backoffice.createOffer.capaciteIllimitee' | translate }}</span>
- <span class="mt-1 block text-xs text-verga-muted">{{ 'backoffice.createOffer.capaciteIllimiteeHint' | translate }}</span>
- </span>
- </label>
- <div>
- <label for="offer-statut" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.statut' | translate }} *</label>
- <select id="offer-statut" name="statut" required [(ngModel)]="statut" class="verga-field mt-2 appearance-none bg-white">
- @for (option of statutOptions; track option.value) {
- <option [value]="option.value">{{ option.labelKey | translate }}</option>
- }
- </select>
- </div>
- </div>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="offer-date-depart" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.departureDate' | translate }} *</label>
+        <input id="offer-date-depart" name="dateDepart" type="date" required [(ngModel)]="dateDepart" class="verga-field mt-2" />
+      </div>
+      <div>
+        <label for="offer-date-depot" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.depotDate' | translate }}</label>
+        <input id="offer-date-depot" name="dateDepotColis" type="date" [(ngModel)]="dateDepotColis" class="verga-field mt-2" />
+        <p class="mt-1.5 text-xs text-verga-muted">{{ 'backoffice.createOffer.depotDateHint' | translate }}</p>
+      </div>
+    </div>
 
- <div>
- <label for="offer-description" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.description' | translate }} *</label>
- <textarea id="offer-description" name="description" rows="5" required [(ngModel)]="description" class="verga-field mt-2 min-h-[120px] resize-y"></textarea>
- </div>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label for="offer-prix" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.price' | translate }} *</label>
+        <input
+          id="offer-prix"
+          name="prix"
+          type="number"
+          min="1"
+          step="1"
+          required
+          [(ngModel)]="prix"
+          class="verga-field mt-2 disabled:bg-verga-surface disabled:text-verga-muted"
+          [placeholder]="'backoffice.createOffer.pricePh' | translate"
+          [readonly]="isPriceLocked()"
+          [attr.aria-readonly]="isPriceLocked()"
+        />
+        @if (isPriceLocked()) {
+          <p class="mt-1.5 text-xs text-verga-muted">{{ 'backoffice.createOffer.priceReadonly' | translate }}</p>
+        }
+      </div>
+      <div>
+        <label for="offer-capacite" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.capaciteTotale' | translate }} *</label>
+        <input
+          id="offer-capacite"
+          name="capaciteTotale"
+          type="number"
+          min="1"
+          step="1"
+          [required]="!capaciteIllimitee"
+          [disabled]="capaciteIllimitee"
+          [(ngModel)]="capaciteTotale"
+          class="verga-field mt-2 disabled:bg-verga-surface disabled:text-verga-muted"
+          [placeholder]="(capaciteIllimitee ? 'backoffice.createOffer.capaciteIllimiteePh' : 'backoffice.createOffer.capaciteTotalePh') | translate"
+        />
+      </div>
+    </div>
 
- <div class="flex flex-wrap gap-3">
- <button
- type="submit"
- class="verga-btn !w-auto px-8"
- [disabled]="submitting() || loadingTypeOffres() || typeOffreOptions().length === 0"
- >
- @if (submitting()) {
- {{ 'backoffice.createOffer.submitting' | translate }}
- } @else {
- {{ 'backoffice.createOffer.publish' | translate }}
- }
- </button>
- <a routerLink="/backoffice/historique-offres" class="verga-btn !w-auto bg-white !text-verga-primary border border-verga-border px-6">{{ 'backoffice.createOffer.cancel' | translate }}</a>
- </div>
- </form>
+    <div class="grid gap-5 sm:grid-cols-2">
+      <label class="flex items-start gap-3 border border-verga-border bg-verga-surface p-4 text-sm text-gray-700">
+        <input
+          type="checkbox"
+          name="capaciteIllimitee"
+          [ngModel]="capaciteIllimitee"
+          (ngModelChange)="onCapaciteIllimiteeChange($event)"
+          class="mt-0.5 h-4 w-4 accent-[var(--color-verga-primary,#5eadd6)]"
+        />
+        <span>
+          <span class="block font-semibold text-gray-900">{{ 'backoffice.createOffer.capaciteIllimitee' | translate }}</span>
+          <span class="mt-1 block text-xs text-verga-muted">{{ 'backoffice.createOffer.capaciteIllimiteeHint' | translate }}</span>
+        </span>
+      </label>
+      <div>
+        <label for="offer-statut" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.statut' | translate }} *</label>
+        <select id="offer-statut" name="statut" required [(ngModel)]="statut" class="verga-field mt-2 appearance-none bg-white">
+          @for (option of statutOptions; track option.value) {
+            <option [value]="option.value">{{ option.labelKey | translate }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <div>
+      <label for="offer-description" class="block text-sm font-medium text-gray-700">{{ 'backoffice.createOffer.description' | translate }} *</label>
+      <textarea id="offer-description" name="description" rows="5" required [(ngModel)]="description" class="verga-field mt-2 min-h-[120px] resize-y"></textarea>
+    </div>
+
+    <div class="flex flex-wrap gap-3">
+      <button
+        type="submit"
+        class="verga-btn !w-auto px-8"
+        [disabled]="submitting() || loadingTypeOffres() || typeOffreOptions().length === 0 || (destinationMode === 'catalog' && destinations().length === 0)"
+      >
+        @if (submitting()) {
+          {{ 'backoffice.createOffer.submitting' | translate }}
+        } @else {
+          {{ 'backoffice.createOffer.publish' | translate }}
+        }
+      </button>
+      <a routerLink="/backoffice/historique-offres" class="verga-btn !w-auto bg-white !text-verga-primary border border-verga-border px-6">{{ 'backoffice.createOffer.cancel' | translate }}</a>
+    </div>
+  </form>
 </div>
+
+@if (duplicateCorridorOpen()) {
+  <div
+    class="create-offer-modal-backdrop"
+    role="dialog"
+    aria-modal="true"
+    [attr.aria-labelledby]="'duplicate-corridor-title'"
+    (click)="closeDuplicateCorridorModal()"
+  >
+    <div class="create-offer-modal" (click)="$event.stopPropagation()">
+      <div class="create-offer-modal__accent" aria-hidden="true"></div>
+      <p class="create-offer-modal__eyebrow">{{ 'backoffice.createOffer.duplicateEyebrow' | translate }}</p>
+      <h2 id="duplicate-corridor-title" class="create-offer-modal__title">
+        {{ 'backoffice.createOffer.duplicateTitle' | translate }}
+      </h2>
+      <p class="create-offer-modal__text">
+        {{ 'backoffice.createOffer.duplicateText' | translate:{ corridor: duplicateCorridorLabel() } }}
+      </p>
+      <div class="create-offer-modal__actions">
+        <button type="button" class="verga-btn !w-auto px-5" (click)="useMatchedCatalogDestination()">
+          {{ 'backoffice.createOffer.duplicateUseCatalog' | translate }}
+        </button>
+        <button type="button" class="create-offer-modal__ghost" (click)="closeDuplicateCorridorModal()">
+          {{ 'backoffice.createOffer.duplicateClose' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

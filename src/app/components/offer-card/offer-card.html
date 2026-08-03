@@ -1,25 +1,79 @@
 <article class="offer-card">
   <a [routerLink]="['/offre', offer().id]" class="offer-card__link">
-    <div class="offer-card__top">
-      <span class="offer-card__category">{{ offer().category }}</span>
+    <div class="offer-card__brand" [style.--brand-bg]="offer().logoBg">
+      <div class="offer-card__brand-mark">
+        @if (offer().logoUrl) {
+          <img
+            [src]="offer().logoUrl"
+            [alt]="offer().publisherName"
+            class="offer-card__logo"
+            width="96"
+            height="96"
+            loading="lazy"
+            decoding="async"
+          />
+        } @else {
+          <span class="offer-card__logo offer-card__logo--fallback" aria-hidden="true">
+            {{ offer().publisherInitials }}
+          </span>
+        }
+      </div>
+      <div class="offer-card__brand-copy">
+        <p class="offer-card__brand-label">{{ 'offer.publishedBy' | translate }}</p>
+        <p class="offer-card__brand-name">{{ offer().publisherName }}</p>
+        @if (offer().publisherCity) {
+          <p class="offer-card__brand-city">{{ offer().publisherCity }}</p>
+        }
+      </div>
       @if (offer().promotion) {
         <span class="offer-card__promo">{{ 'offer.promo' | translate }}</span>
       }
     </div>
 
-    <h2 class="offer-card__title">{{ offer().title }}</h2>
-    <p class="offer-card__price">{{ offer().price }}</p>
+    <div class="offer-card__body">
+      <span class="offer-card__category">{{ offer().category }}</span>
+      <h2 class="offer-card__title">{{ offer().title }}</h2>
+      <p class="offer-card__price">{{ offer().price }}</p>
 
-    <dl class="offer-card__meta">
-      <div class="offer-card__meta-row">
-        <dt>{{ 'offer.card.date' | translate }}</dt>
-        <dd>{{ offer().date }}</dd>
-      </div>
-      <div class="offer-card__meta-row">
-        <dt>{{ 'offer.card.location' | translate }}</dt>
-        <dd>{{ offer().location }}</dd>
-      </div>
-    </dl>
+      <dl class="offer-card__meta">
+        <div class="offer-card__meta-row">
+          <dt>{{ 'offer.card.location' | translate }}</dt>
+          <dd>{{ offer().location }}</dd>
+        </div>
+        @if (offer().departureDate) {
+          <div class="offer-card__meta-row">
+            <dt>{{ 'offer.card.departureDate' | translate }}</dt>
+            <dd>{{ offer().departureDate }}</dd>
+          </div>
+        }
+        @if (offer().depotDate) {
+          <div class="offer-card__meta-row">
+            <dt>{{ 'offer.card.depotDate' | translate }}</dt>
+            <dd>{{ offer().depotDate }}</dd>
+          </div>
+        }
+        <div class="offer-card__meta-row">
+          <dt>{{ 'offer.card.capacity' | translate }}</dt>
+          <dd>
+            @if (offer().capaciteIllimitee) {
+              {{ 'offer.card.capacityUnlimited' | translate }}
+            } @else {
+              {{ offer().capaciteDisponibleLabel }}
+              @if (offer().capaciteTotaleLabel && offer().capaciteTotaleLabel !== '—') {
+                <span class="offer-card__meta-soft">/ {{ offer().capaciteTotaleLabel }}</span>
+              }
+              @if (offer().uniteLabel) {
+                <span class="offer-card__meta-soft">{{ offer().uniteLabel }}</span>
+              }
+            }
+          </dd>
+        </div>
+        <div class="offer-card__meta-row">
+          <dt>{{ 'offer.card.published' | translate }}</dt>
+          <dd>{{ offer().date }}</dd>
+        </div>
+      </dl>
+    </div>
   </a>
 
   <div
@@ -35,11 +89,6 @@
       </button>
     }
   </div>
-
-  <p class="offer-card__publisher">
-    {{ 'offer.publishedBy' | translate }}
-    <strong>{{ offer().publisherName }}</strong>
-  </p>
 </article>
 
 @if (bookingOpen()) {

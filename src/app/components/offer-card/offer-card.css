@@ -1,4 +1,4 @@
-/* Listings offres — style marketplace, aligné accueil (Outfit / Nunito, corail) */
+/* Listings offres — logo agence en tête, style marketplace Verga */
 
 .offer-card {
   --oc-accent: #ff6b35;
@@ -28,17 +28,108 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 0.65rem;
-  padding: 1rem 1rem 0.85rem;
   text-decoration: none;
   color: inherit;
 }
 
-.offer-card__top {
-  display: flex;
+.offer-card__brand {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem;
+  gap: 0.85rem 1rem;
+  padding: 1rem 1rem 0.95rem;
+  border-bottom: 1px solid var(--oc-border);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.88)),
+    var(--brand-bg, #0f172a);
+}
+
+.offer-card__brand-mark {
+  position: relative;
+  z-index: 1;
+}
+
+.offer-card__logo {
+  display: block;
+  width: 4.5rem;
+  height: 4.5rem;
+  object-fit: contain;
+  border: 1px solid var(--oc-border);
+  background: #fff;
+  padding: 0.25rem;
+}
+
+.offer-card__logo--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  object-fit: unset;
+  font-family: var(--oc-font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #fff;
+  background: var(--brand-bg, #0f172a);
+  border-color: transparent;
+}
+
+.offer-card__brand-copy {
+  min-width: 0;
+  padding-right: 2.5rem;
+}
+
+.offer-card__brand-label {
+  margin: 0;
+  font-family: var(--oc-font-display);
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--oc-accent-dark);
+}
+
+.offer-card__brand-name {
+  margin: 0.2rem 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--oc-font-display);
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--oc-ink);
+}
+
+.offer-card__brand-city {
+  margin: 0.2rem 0 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8125rem;
+  color: var(--oc-muted);
+}
+
+.offer-card__promo {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  font-family: var(--oc-font-display);
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--oc-accent-dark);
+}
+
+.offer-card__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.95rem 1rem 0.85rem;
 }
 
 .offer-card__category {
@@ -48,16 +139,6 @@
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--oc-muted);
-}
-
-.offer-card__promo {
-  flex-shrink: 0;
-  font-family: var(--oc-font-display);
-  font-size: 0.625rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--oc-accent-dark);
 }
 
 .offer-card__title {
@@ -120,10 +201,16 @@
   color: var(--oc-ink);
 }
 
+.offer-card__meta-soft {
+  margin-left: 0.2rem;
+  font-weight: 500;
+  color: var(--oc-muted);
+}
+
 .offer-card__actions {
   display: grid;
   gap: 0.45rem;
-  padding: 0 1rem 0.85rem;
+  padding: 0 1rem 1rem;
 }
 
 .offer-card__actions--split {
@@ -163,19 +250,4 @@
   border-color: var(--oc-ink);
   background: var(--oc-ink);
   color: #fff;
-}
-
-.offer-card__publisher {
-  margin: 0;
-  border-top: 1px solid var(--oc-border);
-  padding: 0.7rem 1rem 0.85rem;
-  font-size: 0.75rem;
-  color: var(--oc-muted);
-}
-
-.offer-card__publisher strong {
-  display: inline;
-  font-family: var(--oc-font-display);
-  font-weight: 700;
-  color: var(--oc-ink);
 }

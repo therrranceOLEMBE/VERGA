@@ -4,6 +4,8 @@ export type ClientOffreLegacyType = 'particulier' | 'metre_cube' | 'conteneur';
 
 export interface ClientOffreTypeOffreRaw {
   id?: string;
+  agence_id?: string | null;
+  is_platform?: boolean;
   slug?: string;
   nom?: string;
   description?: string | null;
@@ -11,12 +13,32 @@ export interface ClientOffreTypeOffreRaw {
   unite_label?: string;
   quantite_entier?: boolean;
   quantite_min?: number;
+  actif?: boolean;
+}
+
+export interface ClientOffreDestinationRaw {
+  id?: string;
+  depart?: string;
+  arrivee?: string;
+  montant?: number | string | null;
+  commission_pourcentage?: number | string | null;
+  appliquer_configuration?: boolean;
+  actif?: boolean;
+  rattachee?: boolean;
+}
+
+export interface ClientOffreAgenceLogoRaw {
+  id?: string;
+  chemin?: string;
+  url?: string;
+  nom_original?: string;
 }
 
 export interface ClientOffreAgenceRaw {
   id?: string;
   nom?: string;
   ville?: string;
+  logo?: ClientOffreAgenceLogoRaw | null;
 }
 
 export interface ClientOffreRaw {
@@ -30,8 +52,11 @@ export interface ClientOffreRaw {
   capacite_illimitee?: boolean;
   capacite_totale?: number | string | null;
   capacite_disponible?: number | string | null;
-  origine?: string;
-  destination?: string;
+  destination_id?: string | null;
+  destination?: string | ClientOffreDestinationRaw | null;
+  origine?: string | null;
+  date_depart?: string | null;
+  date_depot_colis?: string | null;
   statut?: string;
   created_at?: string | null;
   agence?: ClientOffreAgenceRaw | null;

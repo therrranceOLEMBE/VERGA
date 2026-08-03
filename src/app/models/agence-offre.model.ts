@@ -14,8 +14,9 @@ export interface AgenceOffreRaw {
     code?: string;
   } | null;
   prix?: number | string | null;
-  origine?: string;
-  destination?: string;
+  origine?: string | Record<string, unknown> | null;
+  destination?: string | Record<string, unknown> | null;
+  destination_id?: string | null;
   statut?: string;
   description?: string | null;
   stock?: number | string | Record<string, unknown> | null;

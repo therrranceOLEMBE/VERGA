@@ -1,4 +1,4 @@
-import { Component, HostListener, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { FiltersModal } from '../filters-modal/filters-modal';
@@ -36,6 +36,13 @@ export class Header {
 
   /** Re-évalué dès que la session client change. */
   protected readonly isClientAuthenticated = this.clientSession.isLoggedIn;
+
+  constructor() {
+    // Garde la barre de recherche synchronisée (ex. reset « Toutes » depuis l’accueil).
+    effect(() => {
+      this.searchQuery.set(this.filtersService.filters().search);
+    });
+  }
 
   private readonly guestMenuLinks: MenuLink[] = [
     { labelKey: 'nav.login', path: '/connexion' },

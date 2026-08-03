@@ -35,8 +35,8 @@ export const FAQ_ITEMS: FaqItem[] = [
       en: 'What is the difference between “Buy” and “Reserve”?',
     },
     answer: {
-      fr: 'Acheter = paiement de la quantité totale tout de suite, puis confirmation après validation du paiement. Réserver = uniquement si l’offre a une capacité limitée : vous bloquez une quantité et payez une partie maintenant ; le solde se règle plus tard depuis vos commandes. Les offres à capacité illimitée n’affichent pas « Réserver ».',
-      en: 'Buy = pay the full quantity now, then confirmation after payment validation. Reserve = only when capacity is limited: you lock a quantity and pay part now; the balance is paid later from your orders. Unlimited-capacity offers do not show “Reserve”.',
+      fr: 'Acheter = vous payez tout de suite la quantité choisie, puis la commande se confirme après validation du paiement. Réserver = uniquement si l’offre a une capacité limitée : vous indiquez d’abord la quantité totale souhaitée, puis la part que vous achetez maintenant dans cette quantité ; vous payez cette part tout de suite. La quantité restante reste liée à votre commande et vous pourrez l’acheter plus tard depuis votre espace client (commandes). Les offres à capacité illimitée n’affichent pas « Réserver ».',
+      en: 'Buy = you pay the chosen quantity right away; the order is confirmed after payment validation. Reserve = only when capacity is limited: first enter the total quantity you want, then the portion you buy now within that total; you pay that portion immediately. The remaining quantity stays linked to your order and you can buy it later from your client area (orders). Unlimited-capacity offers do not show “Reserve”.',
     },
   },
   {

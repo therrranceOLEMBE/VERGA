@@ -25,6 +25,11 @@ import {
   AgenceOffreUpdateResponse,
 } from '../models/agence-offre-create.model';
 import {
+  AgenceDestinationCreateRequest,
+  AgenceDestinationCreateResponse,
+  AgenceDestinationsListResponse,
+} from '../models/agence-destination.model';
+import {
   AgencePasswordUpdateRequest,
   AgencePasswordUpdateResponse,
 } from '../models/agence-password.model';
@@ -235,6 +240,27 @@ export class AgenceService {
 
   createOffre(token: string, payload: AgenceOffreCreateRequest): Observable<AgenceOffreCreateResponse> {
     return this.http.post<AgenceOffreCreateResponse>(`${this.baseUrl}/offres`, payload, {
+      headers: this.authHeaders(token),
+    });
+  }
+
+  getDestinations(token: string, search?: string): Observable<AgenceDestinationsListResponse> {
+    let params = new HttpParams();
+    if (search?.trim()) {
+      params = params.set('search', search.trim());
+    }
+
+    return this.http.get<AgenceDestinationsListResponse>(`${this.baseUrl}/destinations`, {
+      headers: this.authHeaders(token),
+      params,
+    });
+  }
+
+  createDestination(
+    token: string,
+    payload: AgenceDestinationCreateRequest,
+  ): Observable<AgenceDestinationCreateResponse> {
+    return this.http.post<AgenceDestinationCreateResponse>(`${this.baseUrl}/destinations`, payload, {
       headers: this.authHeaders(token),
     });
   }

@@ -23,6 +23,33 @@
 
       <div class="od-layout">
         <div class="od-copy">
+          <section class="od-agency" [attr.aria-label]="'offer.publishedBy' | translate">
+            <div class="od-agency__mark">
+              @if (o.logoUrl) {
+                <img
+                  [src]="o.logoUrl"
+                  [alt]="o.publisherName"
+                  class="od-agency__logo"
+                  width="120"
+                  height="120"
+                  loading="eager"
+                  decoding="async"
+                />
+              } @else {
+                <span class="od-agency__logo od-agency__logo--fallback" [style.background]="o.logoBg" aria-hidden="true">
+                  {{ o.publisherInitials }}
+                </span>
+              }
+            </div>
+            <div class="od-agency__copy">
+              <p class="od-agency__eyebrow">{{ 'offer.publishedBy' | translate }}</p>
+              <h2 class="od-agency__name">{{ o.publisherName }}</h2>
+              @if (o.publisherCity) {
+                <p class="od-agency__city">{{ o.publisherCity }}</p>
+              }
+            </div>
+          </section>
+
           <div class="od-head">
             <h1 class="od-title">{{ o.title }}</h1>
           </div>
@@ -42,20 +69,48 @@
 
           <ul class="od-facts">
             <li class="od-fact">
-              <p class="od-fact__label">{{ 'offerDetail.date' | translate }}</p>
-              <p class="od-fact__value">{{ o.date }}</p>
-            </li>
-            <li class="od-fact">
               <p class="od-fact__label">{{ 'offerDetail.location' | translate }}</p>
               <p class="od-fact__value">{{ o.location }}</p>
             </li>
+            @if (o.departureDate) {
+              <li class="od-fact">
+                <p class="od-fact__label">{{ 'offerDetail.departureDate' | translate }}</p>
+                <p class="od-fact__value">{{ o.departureDate }}</p>
+              </li>
+            }
+            @if (o.depotDate) {
+              <li class="od-fact">
+                <p class="od-fact__label">{{ 'offerDetail.depotDate' | translate }}</p>
+                <p class="od-fact__value">{{ o.depotDate }}</p>
+              </li>
+            }
             <li class="od-fact">
-              <p class="od-fact__label">{{ 'offerDetail.address' | translate }}</p>
-              <p class="od-fact__value">{{ o.address }}</p>
+              <p class="od-fact__label">{{ 'offerDetail.capacityAvailable' | translate }}</p>
+              <p class="od-fact__value">
+                @if (o.capaciteIllimitee) {
+                  {{ 'offer.card.capacityUnlimited' | translate }}
+                } @else {
+                  {{ o.capaciteDisponibleLabel || '—' }}
+                  @if (o.uniteLabel) {
+                    <span>{{ o.uniteLabel }}</span>
+                  }
+                }
+              </p>
             </li>
+            @if (!o.capaciteIllimitee) {
+              <li class="od-fact">
+                <p class="od-fact__label">{{ 'offerDetail.capacityTotal' | translate }}</p>
+                <p class="od-fact__value">
+                  {{ o.capaciteTotaleLabel || '—' }}
+                  @if (o.uniteLabel) {
+                    <span>{{ o.uniteLabel }}</span>
+                  }
+                </p>
+              </li>
+            }
             <li class="od-fact">
-              <p class="od-fact__label">{{ 'offer.publishedBy' | translate }}</p>
-              <p class="od-fact__value">{{ o.publisherHandle }}</p>
+              <p class="od-fact__label">{{ 'offerDetail.date' | translate }}</p>
+              <p class="od-fact__value">{{ o.date }}</p>
             </li>
           </ul>
 
@@ -82,18 +137,30 @@
           </div>
         </div>
 
-        <aside class="od-visual" aria-hidden="true">
-          <div class="od-visual__bg" [style.background]="o.logoBg || '#0f172a'"></div>
-          <div class="od-visual__frame">
-            <div class="od-poster" [style.background]="o.logoBg || '#0f172a'">
-              @if (o.promotion) {
-                <span class="od-poster__promo">{{ 'offer.promo' | translate }}</span>
-              }
-              <p class="od-poster__cat">{{ o.category }}</p>
-              <p class="od-poster__title">{{ o.title }}</p>
-              <p class="od-poster__date">{{ o.date }}</p>
-              <p class="od-poster__price">{{ o.price }}</p>
+        <aside class="od-visual" [attr.aria-label]="o.publisherName">
+          @if (o.logoUrl) {
+            <img
+              [src]="o.logoUrl"
+              [alt]="o.publisherName"
+              class="od-visual__logo"
+              width="800"
+              height="1000"
+              loading="eager"
+              decoding="async"
+            />
+          } @else {
+            <div class="od-visual__fallback" [style.background]="o.logoBg || '#0f172a'" aria-hidden="true">
+              <span>{{ o.publisherInitials }}</span>
             </div>
+          }
+          @if (o.promotion) {
+            <span class="od-visual__promo">{{ 'offer.promo' | translate }}</span>
+          }
+          <div class="od-visual__caption">
+            <p class="od-visual__agency">{{ o.publisherName }}</p>
+            @if (o.publisherCity) {
+              <p class="od-visual__city">{{ o.publisherCity }}</p>
+            }
           </div>
         </aside>
       </div>

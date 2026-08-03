@@ -9,8 +9,7 @@ export interface AgenceOffreCreateRequest {
   prix: number;
   capacite_illimitee: boolean;
   capacite_totale: number | null;
-  origine: string;
-  destination: string;
+  destination_id: string;
   date_depart: string;
   date_depot_colis?: string | null;
   description: string;
@@ -22,7 +21,22 @@ export interface AgenceOffreCreateResponse {
   message?: string;
 }
 
-export type AgenceOffreUpdateRequest = AgenceOffreCreateRequest;
+/** Mise à jour : conserve origine/destination pour compatibilité historique. */
+export interface AgenceOffreUpdateRequest {
+  titre: string;
+  type_offre_id: string;
+  type: string;
+  prix: number;
+  capacite_illimitee: boolean;
+  capacite_totale: number | null;
+  origine: string;
+  destination: string;
+  destination_id?: string;
+  date_depart: string;
+  date_depot_colis?: string | null;
+  description: string;
+  statut: AgenceOffreStatut;
+}
 
 export interface AgenceOffreUpdateResponse {
   data?: Record<string, unknown>;

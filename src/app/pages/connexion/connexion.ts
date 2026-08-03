@@ -11,6 +11,7 @@ import { ClientSessionService } from '../../services/client-session.service';
 import { ParticulierService } from '../../services/particulier.service';
 import { AUTH_SLIDES } from '../../utils/auth-slides';
 import { extractApiErrorMessage } from '../../utils/api-error.util';
+import { canAccessAgencePath, getAgenceHomePath } from '../../utils/agence-permissions.util';
 
 export type LoginFormType = 'entreprise' | 'particulier';
 
@@ -95,15 +96,18 @@ export class Connexion implements OnInit {
       .subscribe({
         next: (response) => {
           this.clientSession.clearSession();
-          this.agenceSession.setSession(response.token);
-          this.navigateAfterAgenceLogin();
+          this.agenceSession.setSession(response.token, response.user?.role);
+          this.agenceSession.ensurePermissions().subscribe({
+            next: () => this.navigateAfterAgenceLogin(),
+            error: () => this.navigateAfterAgenceLogin(),
+          });
         },
         error: (error: HttpErrorResponse) => {
           this.errorMessage.set(this.resolveLoginError(error));
           this.submitting.set(false);
         },
         complete: () => {
-          this.submitting.set(false);
+          // submitting cleared after navigation when ensurePermissions finishes
         },
       });
   }
@@ -137,9 +141,17 @@ export class Connexion implements OnInit {
 
   private navigateAfterAgenceLogin(): void {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    const roleSlug = this.agenceSession.getRoleSlug();
+    const home = getAgenceHomePath(roleSlug);
     const target =
-      returnUrl && returnUrl.startsWith('/backoffice') ? returnUrl : '/backoffice/tableau-de-bord';
-    void this.router.navigateByUrl(target, { replaceUrl: true });
+      returnUrl &&
+      returnUrl.startsWith('/backoffice') &&
+      canAccessAgencePath(roleSlug, returnUrl)
+        ? returnUrl
+        : home;
+    void this.router.navigateByUrl(target, { replaceUrl: true }).finally(() => {
+      this.submitting.set(false);
+    });
   }
 
   private navigateAfterClientLogin(): void {

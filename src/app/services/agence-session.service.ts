@@ -1,5 +1,5 @@
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, catchError, map, of, tap, throwError } from 'rxjs';
+import { Observable, catchError, finalize, map, of, shareReplay, tap, throwError } from 'rxjs';
 import { AgenceDashboardPeriode, AgenceDashboardResponse } from '../models/agence-dashboard.model';
 import { AgenceOffreDetailResponse, AgenceOffresListResponse, AgenceOffresQueryParams } from '../models/agence-offre.model';
 import {
@@ -16,6 +16,14 @@ import { AgenceSoldeResponse } from '../models/agence-solde.model';
 import { AgenceReclamationsListResponse, AgenceReclamationsQueryParams, AgenceReclamationDetailResponse, AgenceReclamationStatutUpdateRequest, AgenceReclamationStatutUpdateResponse, AgenceReclamationCreateRequest, AgenceReclamationCreateResponse } from '../models/agence-reclamation.model';
 import { AgenceOffreCreateRequest, AgenceOffreCreateResponse, AgenceOffreDeleteResponse, AgenceOffreUpdateRequest, AgenceOffreUpdateResponse } from '../models/agence-offre-create.model';
 import {
+  AgenceDestination,
+  AgenceDestinationCreateRequest,
+} from '../models/agence-destination.model';
+import {
+  extractCreatedDestinationId,
+  mapAgenceDestinationsResponse,
+} from '../utils/agence-destination.util';
+import {
   AgenceRolesResponse,
   AgenceUserCreateRequest,
   AgenceUserCreateResponse,
@@ -31,6 +39,7 @@ import {
   TypeOffreUpdateRequest,
 } from '../models/type-offre.model';
 import { mapAgenceMeToProfile } from '../utils/agence-me.util';
+import { extractAgenceRoleSlug, normalizeAgenceRoleSlug } from '../utils/agence-permissions.util';
 import { AgenceService } from './agence.service';
 
 export interface AgenceProfileDocument {
@@ -60,6 +69,7 @@ export interface AgenceProfile {
 }
 
 const AGENCE_TOKEN_KEY = 'verga-agence-token';
+const AGENCE_ROLE_KEY = 'verga-agence-role';
 
 const EMPTY_PROFILE: AgenceProfile = {
   companyName: '',
@@ -85,12 +95,26 @@ export class AgenceSessionService {
   private readonly agenceService = inject(AgenceService);
   private readonly token = signal<string | null>(this.readToken());
   private readonly profile = signal<AgenceProfile>({ ...EMPTY_PROFILE });
+  private readonly roleSlug = signal<string>(this.readRoleSlug());
+  /** false tant que le rôle n'est pas connu : évite d'afficher tout le menu puis de le filtrer. */
+  private readonly permissionsReady = signal(this.computeInitialPermissionsReady());
+  private permissionsLoad$: Observable<boolean> | null = null;
 
   readonly authToken = this.token.asReadonly();
   readonly agence = this.profile.asReadonly();
+  readonly currentRoleSlug = this.roleSlug.asReadonly();
+  readonly arePermissionsReady = this.permissionsReady.asReadonly();
 
   isAuthenticated(): boolean {
     return !!this.getToken();
+  }
+
+  getRoleSlug(): string {
+    return this.roleSlug();
+  }
+
+  isPermissionsReady(): boolean {
+    return this.permissionsReady();
   }
 
   getToken(): string | null {
@@ -101,14 +125,70 @@ export class AgenceSessionService {
     return stored;
   }
 
-  setSession(token: string): void {
+  setSession(token: string, role?: unknown): void {
     localStorage.setItem(AGENCE_TOKEN_KEY, token);
     this.token.set(token);
+
+    const normalizedRole = extractAgenceRoleSlug(role);
+    if (normalizedRole) {
+      this.setRoleSlug(normalizedRole);
+      this.permissionsReady.set(true);
+      this.permissionsLoad$ = null;
+      return;
+    }
+
+    localStorage.removeItem(AGENCE_ROLE_KEY);
+    this.roleSlug.set('');
+    this.permissionsReady.set(false);
+    this.permissionsLoad$ = null;
+  }
+
+  setRoleSlug(role: string): void {
+    const normalized = normalizeAgenceRoleSlug(role);
+    if (normalized) {
+      localStorage.setItem(AGENCE_ROLE_KEY, normalized);
+      this.roleSlug.set(normalized);
+    }
+  }
+
+  /**
+   * Garantit que le rôle est résolu avant d'afficher le backoffice.
+   * Utilise le cache local si présent, sinon charge `/me`.
+   */
+  ensurePermissions(): Observable<boolean> {
+    if (!this.getToken()) {
+      return of(false);
+    }
+
+    if (this.permissionsReady()) {
+      return of(true);
+    }
+
+    if (!this.permissionsLoad$) {
+      this.permissionsLoad$ = this.loadProfile().pipe(
+        tap(() => this.permissionsReady.set(true)),
+        map(() => true),
+        catchError(() => {
+          this.permissionsReady.set(true);
+          return of(true);
+        }),
+        finalize(() => {
+          this.permissionsLoad$ = null;
+        }),
+        shareReplay(1),
+      );
+    }
+
+    return this.permissionsLoad$;
   }
 
   clearSession(): void {
     localStorage.removeItem(AGENCE_TOKEN_KEY);
+    localStorage.removeItem(AGENCE_ROLE_KEY);
     this.token.set(null);
+    this.roleSlug.set('');
+    this.permissionsReady.set(true);
+    this.permissionsLoad$ = null;
     this.profile.set({ ...EMPTY_PROFILE });
   }
 
@@ -120,7 +200,13 @@ export class AgenceSessionService {
 
     return this.agenceService.getMe(token).pipe(
       tap((response) => {
-        this.updateProfile(mapAgenceMeToProfile(response));
+        const mapped = mapAgenceMeToProfile(response);
+        const { roleSlug, ...profileData } = mapped;
+        this.updateProfile(profileData);
+        if (roleSlug) {
+          this.setRoleSlug(roleSlug);
+        }
+        this.permissionsReady.set(true);
       }),
       map(() => void 0),
       catchError((error) => throwError(() => error)),
@@ -161,6 +247,34 @@ export class AgenceSessionService {
     }
 
     return this.agenceService.createOffre(token, payload);
+  }
+
+  loadDestinations(search?: string): Observable<AgenceDestination[]> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No agence token'));
+    }
+
+    return this.agenceService.getDestinations(token, search).pipe(
+      map((response) => mapAgenceDestinationsResponse(response)),
+    );
+  }
+
+  createDestination(payload: AgenceDestinationCreateRequest): Observable<string> {
+    const token = this.getToken();
+    if (!token) {
+      return throwError(() => new Error('No agence token'));
+    }
+
+    return this.agenceService.createDestination(token, payload).pipe(
+      map((response) => {
+        const id = extractCreatedDestinationId(response);
+        if (!id) {
+          throw new Error('Destination créée sans identifiant');
+        }
+        return id;
+      }),
+    );
   }
 
   updateOffre(offreId: string, payload: AgenceOffreUpdateRequest): Observable<AgenceOffreUpdateResponse> {
@@ -391,5 +505,17 @@ export class AgenceSessionService {
 
   private readToken(): string | null {
     return localStorage.getItem(AGENCE_TOKEN_KEY);
+  }
+
+  private readRoleSlug(): string {
+    return normalizeAgenceRoleSlug(localStorage.getItem(AGENCE_ROLE_KEY) ?? '');
+  }
+
+  private computeInitialPermissionsReady(): boolean {
+    // Connecté sans rôle en cache → attendre `/me` avant d'afficher le menu.
+    if (!this.readToken()) {
+      return true;
+    }
+    return !!this.readRoleSlug();
   }
 }

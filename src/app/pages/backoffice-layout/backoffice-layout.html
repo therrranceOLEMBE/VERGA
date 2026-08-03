@@ -1,5 +1,15 @@
 <div class="backoffice-shell min-h-screen bg-verga-surface font-sans">
- @if (sidebarOpen() && !loggingOut()) {
+ @if (!permissionsReady() && !loggingOut()) {
+ <div class="agency-logout" role="status" aria-live="polite" aria-busy="true">
+ <div class="agency-logout__orbit" aria-hidden="true"></div>
+ <div class="agency-logout__copy">
+ <p class="agency-logout__brand">VERGA</p>
+ <h2>{{ 'backoffice.permissionsLoading.title' | translate }}</h2>
+ <p>{{ 'backoffice.permissionsLoading.message' | translate }}</p>
+ </div>
+ </div>
+ } @else if (!loggingOut()) {
+ @if (sidebarOpen()) {
  <button
  type="button"
  class="backoffice-overlay fixed inset-0 z-30 bg-black/40 lg:hidden"
@@ -28,7 +38,7 @@
  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
  </svg>
  </button>
- <a routerLink="/backoffice/tableau-de-bord" class="backoffice-mobile-bar__brand inline-flex min-w-0 flex-1 items-center">
+ <a [routerLink]="homePath()" class="backoffice-mobile-bar__brand inline-flex min-w-0 flex-1 items-center">
  @if (agencyProfile().logoUrl) {
  <img
  [src]="agencyProfile().logoUrl"
@@ -53,6 +63,7 @@
  <router-outlet />
  </main>
  </div>
+ }
 
  @if (loggingOut()) {
  <div class="agency-logout" role="status" aria-live="polite" aria-busy="true">

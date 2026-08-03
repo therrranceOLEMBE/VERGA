@@ -6,6 +6,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { AgenceSessionService } from '../../services/agence-session.service';
 import { AgenceService } from '../../services/agence.service';
 import { AuthRedirectService } from '../../services/auth-redirect.service';
+import { canAccessAgencePath, getAgenceHomePath } from '../../utils/agence-permissions.util';
 
 @Component({
   selector: 'app-backoffice-layout',
@@ -24,6 +25,8 @@ export class BackofficeLayout implements OnInit, OnDestroy {
   protected readonly sidebarOpen = signal(false);
   protected readonly loggingOut = signal(false);
   protected readonly agencyProfile = this.agenceSession.agence;
+  protected readonly permissionsReady = this.agenceSession.arePermissionsReady;
+  protected readonly homePath = () => getAgenceHomePath(this.agenceSession.getRoleSlug());
 
   constructor() {
     this.navSub = this.router.events
@@ -39,9 +42,13 @@ export class BackofficeLayout implements OnInit, OnDestroy {
       return;
     }
 
-    this.agenceSession.loadProfile().subscribe({
-      error: () => {
-        // profil indisponible : la sidebar retombera sur le logo par défaut
+    this.agenceSession.ensurePermissions().subscribe({
+      next: () => {
+        this.redirectIfForbidden();
+        // Profil affichage (logo…) : uniquement si pas déjà chargé via ensurePermissions
+        if (!this.agencyProfile().companyName) {
+          this.agenceSession.loadProfile().subscribe({ error: () => undefined });
+        }
       },
     });
   }
@@ -95,5 +102,13 @@ export class BackofficeLayout implements OnInit, OnDestroy {
       next: finishLogout,
       error: finishLogout,
     });
+  }
+
+  private redirectIfForbidden(): void {
+    const roleSlug = this.agenceSession.getRoleSlug();
+    const url = this.router.url;
+    if (!canAccessAgencePath(roleSlug, url)) {
+      void this.router.navigateByUrl(getAgenceHomePath(roleSlug), { replaceUrl: true });
+    }
   }
 }
