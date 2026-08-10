@@ -237,6 +237,7 @@ export class AgenceService {
       headers: this.authHeaders(token),
     });
   }
+  // sauvegarde pour le code je met ce commentaire pour envoyer le code sur le ripo
 
   createOffre(token: string, payload: AgenceOffreCreateRequest): Observable<AgenceOffreCreateResponse> {
     return this.http.post<AgenceOffreCreateResponse>(`${this.baseUrl}/offres`, payload, {
